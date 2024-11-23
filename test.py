@@ -1,5 +1,7 @@
-import mysql.connector
+"""Modol testowy do łączenia się z bazą danych."""
+
 import os
+import mysql.connector
 from dotenv import load_dotenv
 
 load_dotenv()
