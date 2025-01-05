@@ -9,4 +9,5 @@ mysql-connector-python
 python-dotenv
 
 Inne:
-ERD editor
+ERD editor dodatek do VSC
+Inline SQL dodatek do VSC
