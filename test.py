@@ -9,15 +9,16 @@ load_dotenv()
 cnx = mysql.connector.connect(
     host="giniewicz.it",
     port=3306,
-    user="student",
+    user="team02",
     password=os.getenv("CONNECTION_PASSWORD"),
-    database="sakila",
+    database="team02",
 )
 
 cursor = cnx.cursor()
-cursor.execute("SELECT * FROM actor")
-for row in cursor:
-    print(row)
+# show all tables
+cursor.execute("SHOW TABLES")
+tables = cursor.fetchall()
+print(tables)
 
 cursor.close()
 cnx.close()
