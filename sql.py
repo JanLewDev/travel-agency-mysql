@@ -20,8 +20,8 @@ TABLES[
 ] = """-- sql
     CREATE TABLE telefony (
         id_telefonu INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        telefon VARCHAR(12) NOT NULL,
-        numer_bliskiego VARCHAR(12) DEFAULT NULL,
+        telefon VARCHAR(20) NOT NULL,
+        numer_bliskiego VARCHAR(20) DEFAULT NULL,
         PRIMARY KEY (id_telefonu)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
@@ -33,6 +33,7 @@ TABLES[
         id_klienta INT UNSIGNED NOT NULL AUTO_INCREMENT,
         imie VARCHAR(20) NOT NULL,
         nazwisko VARCHAR(20) NOT NULL,
+        plec ENUM('K', 'M') NOT NULL,
         email VARCHAR(100) DEFAULT NULL,
         id_telefonu INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_klienta),
@@ -47,6 +48,7 @@ TABLES[
         id_kontrahenta INT UNSIGNED NOT NULL AUTO_INCREMENT,
         nazwa VARCHAR(40) NOT NULL,
         opis TEXT DEFAULT NULL,
+        email VARCHAR(100) NOT NULL,
         PRIMARY KEY (id_kontrahenta),
         KEY idx_nazwa (nazwa)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
@@ -61,6 +63,7 @@ TABLES[
         nazwisko VARCHAR(20) NOT NULL,
         id_stanowiska INT UNSIGNED NOT NULL,
         id_telefonu INT UNSIGNED NOT NULL,
+        uwagi TEXT DEFAULT NULL,
         PRIMARY KEY (id_pracownika),
         CONSTRAINT fk_id_stanowiska_pracownicy FOREIGN KEY (id_stanowiska) REFERENCES stanowiska (id_stanowiska) ON DELETE RESTRICT ON UPDATE CASCADE,
         CONSTRAINT fk_id_telefonu_pracownicy FOREIGN KEY (id_telefonu) REFERENCES telefony (id_telefonu) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -111,6 +114,7 @@ TABLES[
         id_transportu INT UNSIGNED NOT NULL AUTO_INCREMENT,
         nazwa VARCHAR(20) NOT NULL,
         grupowy BOOLEAN NOT NULL DEFAULT FALSE,
+        opis TEXT DEFAULT NULL,
         id_kosztu INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_transportu),
         CONSTRAINT fk_id_kosztu_rodzaje_transportu FOREIGN KEY (id_kosztu) REFERENCES koszty (id_kosztu) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -124,8 +128,10 @@ TABLES[
         id_miejsca INT UNSIGNED NOT NULL AUTO_INCREMENT,
         miejsce VARCHAR(20) NOT NULL,
         id_kosztu INT UNSIGNED NOT NULL,
+        id_kontrahenta INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_miejsca),
-        CONSTRAINT fk_id_kosztu_miejsca_wycieczki FOREIGN KEY (id_kosztu) REFERENCES koszty (id_kosztu) ON DELETE RESTRICT ON UPDATE CASCADE
+        CONSTRAINT fk_id_kosztu_miejsca_wycieczki FOREIGN KEY (id_kosztu) REFERENCES koszty (id_kosztu) ON DELETE RESTRICT ON UPDATE CASCADE,
+        CONSTRAINT fk_id_kontrahenta_miejsca_wycieczki FOREIGN KEY (id_kontrahenta) REFERENCES kontrahenci (id_kontrahenta) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
@@ -242,7 +248,7 @@ TABLES[
         id_wycieczki INT UNSIGNED NOT NULL,
         id_typu_transakcji INT UNSIGNED NOT NULL,
         kwota DECIMAL(10, 2) NOT NULL,
-        data_transakcji TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        data_transakcji DATETIME NOT NULL,
         id_strony_od INT UNSIGNED NOT NULL,
         id_strony_do INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_transakcji),
