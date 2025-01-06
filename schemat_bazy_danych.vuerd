@@ -4,8 +4,8 @@
   "settings": {
     "width": 3000,
     "height": 3000,
-    "scrollTop": -16,
-    "scrollLeft": -1534,
+    "scrollTop": 0,
+    "scrollLeft": -1362,
     "zoomLevel": 1,
     "show": 511,
     "database": 1,
@@ -404,7 +404,8 @@
           "_a1PRZiOVF9NGeY_v-WhL",
           "dQo-19zniYDE4QivCq6wa",
           "JWj6rZC0x_fCYxInDAn8v",
-          "ingHy1ZNc1oH5wFplSwEL"
+          "ingHy1ZNc1oH5wFplSwEL",
+          "GdaH2S67w9Nk7_plxboMJ"
         ],
         "seqColumnIds": [
           "_a1PRZiOVF9NGeY_v-WhL",
@@ -414,7 +415,8 @@
           "dvyu6_Gsvl4FFLR03LiPK",
           "JRWNHNv1yrUe30Y7Ck5Ot",
           "JWj6rZC0x_fCYxInDAn8v",
-          "ingHy1ZNc1oH5wFplSwEL"
+          "ingHy1ZNc1oH5wFplSwEL",
+          "GdaH2S67w9Nk7_plxboMJ"
         ],
         "ui": {
           "x": 2284.6443,
@@ -425,7 +427,7 @@
           "color": ""
         },
         "meta": {
-          "updateAt": 1736167643561,
+          "updateAt": 1736173966394,
           "createAt": 1732450791009
         }
       },
@@ -3247,6 +3249,26 @@
           "updateAt": 1736172046179,
           "createAt": 1736172046178
         }
+      },
+      "GdaH2S67w9Nk7_plxboMJ": {
+        "id": "GdaH2S67w9Nk7_plxboMJ",
+        "tableId": "CTz0E5Bkt_Lsc1wZldGcs",
+        "name": "opis",
+        "comment": "",
+        "dataType": "TEXT",
+        "default": "",
+        "options": 0,
+        "ui": {
+          "keys": 0,
+          "widthName": 60,
+          "widthComment": 60,
+          "widthDataType": 60,
+          "widthDefault": 60
+        },
+        "meta": {
+          "updateAt": 1736173972328,
+          "createAt": 1736173966394
+        }
       }
     },
     "relationshipEntities": {
@@ -3653,7 +3675,7 @@
             "_a1PRZiOVF9NGeY_v-WhL"
           ],
           "x": 2284.6443,
-          "y": 1100.7394,
+          "y": 1112.7394,
           "direction": 1
         },
         "end": {
@@ -5906,6 +5928,15 @@
       1736172046175,
       -1,
       {}
+    ],
+    "GdaH2S67w9Nk7_plxboMJ": [
+      "tableColumnEntities",
+      1736173966393,
+      -1,
+      {
+        "name": 1736173969717,
+        "dataType": 1736173972327
+      }
     ]
   }
 }
