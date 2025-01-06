@@ -9,7 +9,7 @@ TABLES[
     CREATE TABLE stanowiska (
         id_stanowiska INT UNSIGNED NOT NULL AUTO_INCREMENT,
         nazwa_stanowiska VARCHAR(50) NOT NULL,
-        wysokosc_pensji INT NOT NULL,
+        wysokosc_pensji DECIMAL(10, 2) NOT NULL,
         PRIMARY KEY (id_stanowiska),
         KEY idx_nazwa_stanowiska (nazwa_stanowiska)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
@@ -31,13 +31,38 @@ TABLES[
 ] = """-- sql
     CREATE TABLE klienci (
         id_klienta INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        imie VARCHAR(20) NOT NULL,
-        nazwisko VARCHAR(20) NOT NULL,
+        imie VARCHAR(40) NOT NULL,
+        nazwisko VARCHAR(40) NOT NULL,
         plec ENUM('K', 'M') NOT NULL,
         email VARCHAR(100) DEFAULT NULL,
         id_telefonu INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_klienta),
         CONSTRAINT fk_id_telefonu_klienci FOREIGN KEY (id_telefonu) REFERENCES telefony (id_telefonu) ON DELETE RESTRICT ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
+"""
+
+TABLES[
+    "miasta"
+] = """-- sql
+    CREATE TABLE miasta (
+        id_miasta INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        miasto VARCHAR(50) NOT NULL,
+        PRIMARY KEY (id_miasta),
+        KEY idx_miasto (miasto)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
+"""
+
+TABLES[
+    "adresy"
+] = """-- sql
+    CREATE TABLE adresy (
+        id_adresu INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        adres VARCHAR(50) NOT NULL,
+        adres2 VARCHAR(50) DEFAULT NULL,
+        id_miasta INT UNSIGNED NOT NULL,
+        kod_pocztowy VARCHAR(6) DEFAULT NULL,
+        PRIMARY KEY (id_adresu),
+        CONSTRAINT fk_id_miasta_adresy FOREIGN KEY (id_miasta) REFERENCES miasta (id_miasta) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
@@ -49,8 +74,9 @@ TABLES[
         nazwa VARCHAR(40) NOT NULL,
         opis TEXT DEFAULT NULL,
         email VARCHAR(100) NOT NULL,
+        id_adresu INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_kontrahenta),
-        KEY idx_nazwa (nazwa)
+        CONSTRAINT fk_id_adresu_kontrahenci FOREIGN KEY (id_adresu) REFERENCES adresy (id_adresu) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
@@ -59,8 +85,8 @@ TABLES[
 ] = """-- sql
     CREATE TABLE pracownicy (
         id_pracownika INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        imie VARCHAR(20) NOT NULL,
-        nazwisko VARCHAR(20) NOT NULL,
+        imie VARCHAR(40) NOT NULL,
+        nazwisko VARCHAR(40) NOT NULL,
         id_stanowiska INT UNSIGNED NOT NULL,
         id_telefonu INT UNSIGNED NOT NULL,
         uwagi TEXT DEFAULT NULL,
@@ -71,39 +97,17 @@ TABLES[
 """
 
 TABLES[
-    "typy_kosztow"
-] = """-- sql
-    CREATE TABLE typy_kosztow (
-        id_typu_kosztu INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        nazwa VARCHAR(40) NOT NULL,
-        PRIMARY KEY (id_typu_kosztu),
-        KEY idx_nazwa (nazwa)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
-"""
-
-TABLES[
-    "koszty"
-] = """-- sql
-    CREATE TABLE koszty (
-        id_kosztu INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        koszt DECIMAL(10, 2) NOT NULL,
-        cena_dla_klienta DECIMAL(10, 2) NOT NULL,
-        id_typu_kosztu INT UNSIGNED NOT NULL,
-        PRIMARY KEY (id_kosztu),
-        CONSTRAINT fk_id_typu_kosztu_koszty FOREIGN KEY (id_typu_kosztu) REFERENCES typy_kosztow (id_typu_kosztu) ON DELETE RESTRICT ON UPDATE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
-"""
-
-TABLES[
     "rodzaje_uslug_dodatkowych"
 ] = """-- sql
     CREATE TABLE rodzaje_uslug_dodatkowych (
         id_uslugi_dodatkowej INT UNSIGNED NOT NULL AUTO_INCREMENT,
         nazwa VARCHAR(40) NOT NULL,
         opis_uslugi TEXT DEFAULT NULL,
-        cena DECIMAL(10, 2) NOT NULL,
-        koszt_organizacji DECIMAL(10, 2) NOT NULL,
-        PRIMARY KEY (id_uslugi_dodatkowej)
+        koszt DECIMAL(10, 2) NOT NULL,
+        cena_dla_klienta DECIMAL(10, 2) NOT NULL,
+        id_kontrahenta INT UNSIGNED NOT NULL,
+        PRIMARY KEY (id_uslugi_dodatkowej),
+        CONSTRAINT fk_id_kontrahenta_uslugi_dodatkowej FOREIGN KEY (id_kontrahenta) REFERENCES kontrahenci (id_kontrahenta) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
@@ -112,12 +116,11 @@ TABLES[
 ] = """-- sql
     CREATE TABLE rodzaje_transportu (
         id_transportu INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        nazwa VARCHAR(20) NOT NULL,
-        grupowy BOOLEAN NOT NULL DEFAULT FALSE,
+        nazwa VARCHAR(40) NOT NULL,
         opis TEXT DEFAULT NULL,
-        id_kosztu INT UNSIGNED NOT NULL,
-        PRIMARY KEY (id_transportu),
-        CONSTRAINT fk_id_kosztu_rodzaje_transportu FOREIGN KEY (id_kosztu) REFERENCES koszty (id_kosztu) ON DELETE RESTRICT ON UPDATE CASCADE
+        koszt DECIMAL(10, 2) NOT NULL,
+        cena_dla_klienta DECIMAL(10, 2) DEFAULT NULL,
+        PRIMARY KEY (id_transportu)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
@@ -126,29 +129,31 @@ TABLES[
 ] = """-- sql
     CREATE TABLE miejsca_wycieczki (
         id_miejsca INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        miejsce VARCHAR(20) NOT NULL,
-        id_kosztu INT UNSIGNED NOT NULL,
+        nazwa VARCHAR(50) NOT NULL,
+        id_adresu INT UNSIGNED NOT NULL,
+        koszt DECIMAL(10, 2) NOT NULL,
+        cena_dla_klienta DECIMAL(10, 2) NOT NULL,
         id_kontrahenta INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_miejsca),
-        CONSTRAINT fk_id_kosztu_miejsca_wycieczki FOREIGN KEY (id_kosztu) REFERENCES koszty (id_kosztu) ON DELETE RESTRICT ON UPDATE CASCADE,
+        CONSTRAINT fk_id_adresu_miejsca_wycieczki FOREIGN KEY (id_adresu) REFERENCES adresy (id_adresu) ON DELETE RESTRICT ON UPDATE CASCADE,
         CONSTRAINT fk_id_kontrahenta_miejsca_wycieczki FOREIGN KEY (id_kontrahenta) REFERENCES kontrahenci (id_kontrahenta) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
 TABLES[
-    "rodzaje_wycieczki"
+    "propozycje_wycieczki"
 ] = """-- sql
-    CREATE TABLE rodzaje_wycieczki (
-        id_rodzaju INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        opis TEXT NOT NULL,
+    CREATE TABLE propozycje_wycieczki (
+        id_propozycji INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        opis TEXT DEFAULT NULL,
         ograniczenia VARCHAR(50) DEFAULT NULL,
-        min_liczba_osob INT UNSIGNED NOT NULL,
-        maks_liczba_osob INT UNSIGNED NOT NULL,
-        id_kosztu INT UNSIGNED NOT NULL,
+        min_liczba_osob INT NOT NULL DEFAULT 0,
+        maks_liczba_osob INT NOT NULL,
+        nasze_koszty_razem DECIMAL(10, 2) NOT NULL,
+        cena_dla_klienta DECIMAL(10, 2) NOT NULL,
         id_miejsca INT UNSIGNED NOT NULL,
-        PRIMARY KEY (id_rodzaju),
-        CONSTRAINT fk_id_kosztu_rodzaje_wycieczki FOREIGN KEY (id_kosztu) REFERENCES koszty (id_kosztu) ON DELETE RESTRICT ON UPDATE CASCADE,
-        CONSTRAINT fk_id_miejsca_rodzaje_wycieczki FOREIGN KEY (id_miejsca) REFERENCES miejsca_wycieczki (id_miejsca) ON DELETE RESTRICT ON UPDATE CASCADE
+        PRIMARY KEY (id_propozycji),
+        CONSTRAINT fk_id_miejsca_propozycje_wycieczki FOREIGN KEY (id_miejsca) REFERENCES miejsca_wycieczki (id_miejsca) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
@@ -159,9 +164,9 @@ TABLES[
         id_wycieczki INT UNSIGNED NOT NULL AUTO_INCREMENT,
         czas_wyjazdu DATETIME NOT NULL,
         czas_powrotu DATETIME NOT NULL,
-        id_rodzaju INT UNSIGNED NOT NULL,
+        id_propozycji INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_wycieczki),
-        CONSTRAINT fk_id_rodzaju_wycieczki FOREIGN KEY (id_rodzaju) REFERENCES rodzaje_wycieczki (id_rodzaju) ON DELETE RESTRICT ON UPDATE CASCADE
+        CONSTRAINT fk_id_propozycji_wycieczki FOREIGN KEY (id_propozycji) REFERENCES propozycje_wycieczki (id_propozycji) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
@@ -202,81 +207,130 @@ TABLES[
 """
 
 TABLES[
-    "transport_rodzaj_wycieczki"
+    "transport_propozycja_wycieczki"
 ] = """-- sql
-    CREATE TABLE transport_rodzaj_wycieczki (
+    CREATE TABLE transport_propozycja_wycieczki (
         id_transportu INT UNSIGNED NOT NULL,
-        id_rodzaju INT UNSIGNED NOT NULL,
-        PRIMARY KEY (id_transportu, id_rodzaju),
-        CONSTRAINT fk_id_transportu_transport_rodzaj_wycieczki FOREIGN KEY (id_transportu) REFERENCES rodzaje_transportu (id_transportu) ON DELETE RESTRICT ON UPDATE CASCADE,
-        CONSTRAINT fk_id_rodzaju_transport_rodzaj_wycieczki FOREIGN KEY (id_rodzaju) REFERENCES rodzaje_wycieczki (id_rodzaju) ON DELETE RESTRICT ON UPDATE CASCADE
+        id_propozycji INT UNSIGNED NOT NULL,
+        PRIMARY KEY (id_transportu, id_propozycji),
+        CONSTRAINT fk_id_transportu_transport_propozycja_wycieczki FOREIGN KEY (id_transportu) REFERENCES rodzaje_transportu (id_transportu) ON DELETE RESTRICT ON UPDATE CASCADE,
+        CONSTRAINT fk_id_propozycji_transport_propozycja_wycieczki FOREIGN KEY (id_propozycji) REFERENCES propozycje_wycieczki (id_propozycji) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
 TABLES[
-    "typy_transakcji"
+    "koszty_u_kontrahentow"
 ] = """-- sql
-    CREATE TABLE typy_transakcji (
-        id_typu INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        nazwa VARCHAR(50) NOT NULL,
-        opis TEXT DEFAULT NULL,
-        PRIMARY KEY (id_typu)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
-"""
-
-TABLES[
-    "strony_transakcji"
-] = """-- sql
-    CREATE TABLE strony_transakcji (
-        id_strony INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        typ_strony ENUM('klient', 'pracownik', 'kontrahent', 'firma') NOT NULL DEFAULT 'firma',
-        id_klienta INT UNSIGNED NOT NULL,
-        id_pracownika INT UNSIGNED NOT NULL,
+    CREATE TABLE koszty_u_kontrahentow (
+        id_kosztu_u_kontrahenta INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        koszt DECIMAL(10, 2) NOT NULL,
+        cena_dla_klienta DECIMAL(10, 2) NOT NULL,
         id_kontrahenta INT UNSIGNED NOT NULL,
-        PRIMARY KEY (id_strony),
-        CONSTRAINT fk_id_klienta_strony FOREIGN KEY (id_klienta) REFERENCES klienci (id_klienta) ON DELETE RESTRICT ON UPDATE CASCADE,
-        CONSTRAINT fk_id_pracownika_strony FOREIGN KEY (id_pracownika) REFERENCES pracownicy (id_pracownika) ON DELETE RESTRICT ON UPDATE CASCADE,
-        CONSTRAINT fk_id_kontrahenta_strony FOREIGN KEY (id_kontrahenta) REFERENCES kontrahenci (id_kontrahenta) ON DELETE RESTRICT ON UPDATE CASCADE
+        PRIMARY KEY (id_kosztu_u_kontrahenta),
+        CONSTRAINT fk_id_kontrahenta_koszty_u_kontrahentow FOREIGN KEY (id_kontrahenta) REFERENCES kontrahenci (id_kontrahenta) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
 TABLES[
-    "transakcje"
+    "propozycja_koszt_u_kontrahenta"
 ] = """-- sql
-    CREATE TABLE transakcje (
+    CREATE TABLE propozycja_koszt_u_kontrahenta (
+        id_propozycji INT UNSIGNED NOT NULL,
+        id_kosztu_u_kontrahenta INT UNSIGNED NOT NULL,
+        PRIMARY KEY (id_propozycji, id_kosztu_u_kontrahenta),
+        CONSTRAINT fk_id_propozycji_propozycja_koszt_u_kontrahenta FOREIGN KEY (id_propozycji) REFERENCES propozycje_wycieczki (id_propozycji) ON DELETE RESTRICT ON UPDATE CASCADE,
+        CONSTRAINT fk_id_kosztu_u_kontrahenta_propozycja_koszt_u_kontrahenta FOREIGN KEY (id_kosztu_u_kontrahenta) REFERENCES koszty_u_kontrahentow (id_kosztu_u_kontrahenta) ON DELETE RESTRICT ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
+"""
+
+TABLES[
+    "transakcje_klienci"
+] = """-- sql
+    CREATE TABLE transakcje_klienci (
         id_transakcji INT UNSIGNED NOT NULL AUTO_INCREMENT,
-        id_wycieczki INT UNSIGNED NOT NULL,
-        id_typu_transakcji INT UNSIGNED NOT NULL,
         kwota DECIMAL(10, 2) NOT NULL,
         data_transakcji DATETIME NOT NULL,
-        id_strony_od INT UNSIGNED NOT NULL,
-        id_strony_do INT UNSIGNED NOT NULL,
+        id_klienta INT UNSIGNED NOT NULL,
+        id_wycieczki INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_transakcji),
-        CONSTRAINT fk_id_wycieczki_transakcje FOREIGN KEY (id_wycieczki) REFERENCES wycieczki (id_wycieczki) ON DELETE RESTRICT ON UPDATE CASCADE,
-        CONSTRAINT fk_id_typu_transakcji_transakcje FOREIGN KEY (id_typu_transakcji) REFERENCES typy_transakcji (id_typu) ON DELETE RESTRICT ON UPDATE CASCADE,
-        CONSTRAINT fk_id_strony_od_transakcje FOREIGN KEY (id_strony_od) REFERENCES strony_transakcji (id_strony) ON DELETE RESTRICT ON UPDATE CASCADE,
-        CONSTRAINT fk_id_strony_do_transakcje FOREIGN KEY (id_strony_do) REFERENCES strony_transakcji (id_strony) ON DELETE RESTRICT ON UPDATE CASCADE
+        CONSTRAINT fk_id_klienta_transakcje_klienci FOREIGN KEY (id_klienta) REFERENCES klienci (id_klienta) ON DELETE RESTRICT ON UPDATE CASCADE,
+        CONSTRAINT fk_id_wycieczki_transakcje_klienci FOREIGN KEY (id_wycieczki) REFERENCES wycieczki (id_wycieczki) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
+TABLES[
+    "transakcje_kontrahenci"
+] = """-- sql
+    CREATE TABLE transakcje_kontrahenci (
+        id_transakcji INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        kwota DECIMAL(10, 2) NOT NULL,
+        data_transakcji DATETIME NOT NULL,
+        id_kontrahenta INT UNSIGNED NOT NULL,
+        id_wycieczki INT UNSIGNED NOT NULL,
+        PRIMARY KEY (id_transakcji),
+        CONSTRAINT fk_id_kontrahenta_transakcje_kontrahenci FOREIGN KEY (id_kontrahenta) REFERENCES kontrahenci (id_kontrahenta) ON DELETE RESTRICT ON UPDATE CASCADE,
+        CONSTRAINT fk_id_wycieczki_transakcje_kontrahenci FOREIGN KEY (id_wycieczki) REFERENCES wycieczki (id_wycieczki) ON DELETE RESTRICT ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
+"""
+
+TABLES[
+    "transakcje_pracownicy"
+] = """-- sql
+    CREATE TABLE transakcje_pracownicy (
+        id_transakcji INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        kwota DECIMAL(10, 2) NOT NULL,
+        data_transakcji DATETIME NOT NULL,
+        id_pracownika INT UNSIGNED NOT NULL,
+        PRIMARY KEY (id_transakcji),
+        CONSTRAINT fk_id_pracownika_transakcje_pracownicy FOREIGN KEY (id_pracownika) REFERENCES pracownicy (id_pracownika) ON DELETE RESTRICT ON UPDATE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
+"""
+
+ORDER_TO_CREATE = [
+    "stanowiska",
+    "telefony",
+    "klienci",
+    "miasta",
+    "adresy",
+    "kontrahenci",
+    "pracownicy",
+    "rodzaje_uslug_dodatkowych",
+    "rodzaje_transportu",
+    "miejsca_wycieczki",
+    "propozycje_wycieczki",
+    "wycieczki",
+    "uslugi_dodatkowe",
+    "klient_wycieczka",
+    "pracownik_wycieczka",
+    "transport_propozycja_wycieczki",
+    "koszty_u_kontrahentow",
+    "propozycja_koszt_u_kontrahenta",
+    "transakcje_klienci",
+    "transakcje_kontrahenci",
+    "transakcje_pracownicy",
+]
+
 ORDER_TO_DROP = [
-    "transakcje",
-    "strony_transakcji",
-    "transport_rodzaj_wycieczki",
+    "transport_propozycja_wycieczki",
     "pracownik_wycieczka",
     "klient_wycieczka",
     "uslugi_dodatkowe",
+    "transakcje_pracownicy",
+    "transakcje_kontrahenci",
+    "transakcje_klienci",
+    "transakcje_pracownicy",
+    "propozycja_koszt_u_kontrahenta",
     "wycieczki",
-    "rodzaje_wycieczki",
+    "propozycje_wycieczki",
     "miejsca_wycieczki",
     "rodzaje_transportu",
     "rodzaje_uslug_dodatkowych",
-    "koszty",
-    "typy_kosztow",
     "pracownicy",
+    "koszty_u_kontrahentow",
     "kontrahenci",
+    "adresy",
+    "miasta",
     "klienci",
     "telefony",
     "stanowiska",
-    "typy_transakcji",
 ]

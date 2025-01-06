@@ -9,7 +9,7 @@ import pandas as pd
 import mysql.connector
 from mysql.connector import errorcode
 from dotenv import load_dotenv
-from sql import DB_NAME, TABLES, ORDER_TO_DROP
+from sql import DB_NAME, TABLES, ORDER_TO_CREATE, ORDER_TO_DROP
 from do_wypelnienia import (
     LICZBA_KLIENTOW,
     PRACOWNICY,
@@ -64,7 +64,8 @@ def show_tables(connection) -> list[tuple[str]]:
 def create_tables(connection) -> None:
     """Funkcja tworzaca tabele w bazie danych"""
     local_cursor = connection.cursor()
-    for table_name, table_description in TABLES.items():
+    for table_name in ORDER_TO_CREATE:
+        table_description = TABLES[table_name]
         try:
             local_cursor.execute(table_description)
         except mysql.connector.Error as err:
@@ -117,7 +118,7 @@ if not args.nodrop:
     dropall(cnx)
     assert len(show_tables(cnx)) == 0
     create_tables(cnx)
-    assert len(show_tables(cnx)) == len(TABLES)
+    assert len(show_tables(cnx)) == len(TABLES) == 21
 
 
 def save_top_1000_surnames():
@@ -127,8 +128,10 @@ def save_top_1000_surnames():
         df = df.sort_values(by="liczba", ascending=False).head(1000)
         df.to_csv(path, index=False, encoding="utf-8")
 
+
 def get_weighted_random_entry(data):
     return data.sample(weights=data["LICZBA"].astype(int)).iloc[0]
+
 
 def fill_telefony(connection):
     """Funkcja wypelniajaca tabele telefony"""
@@ -162,9 +165,6 @@ def fill_stanowiska(connection):
     connection.commit()
 
 
-def fill
-
-
 def dry_fill(connection):
     """Funkcja wypelniajaca tabele w bazie danych suchymi danymi"""
     print("Czyszczenie wszystkich tabel...")
@@ -182,6 +182,6 @@ def dry_fill(connection):
         sys.exit()
 
 
-dry_fill(cnx)
+# dry_fill(cnx)
 
 cnx.close()
