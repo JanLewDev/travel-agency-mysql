@@ -13,7 +13,6 @@ from sql import DB_NAME, TABLES, ORDER_TO_CREATE, ORDER_TO_DROP
 from do_wypelnienia import (
     LICZBA_KLIENTOW,
     PRACOWNICY,
-    LICZBA_NUMEROW_TELEFONOW,
     STANOWISKA,
 )
 
@@ -36,11 +35,11 @@ cnx = mysql.connector.connect(
     database="team02",
 )
 
-data_paths = [
-    "dane_statystyczne/nazwiska_zenskie.csv",
-    "dane_statystyczne/nazwiska_meskie.csv",
-    "dane_statystyczne/Imiona_nadane_dzieciom_w_Polsce_w_I_polowie_2024.csv",
-]
+data_paths = {
+    "naz_zenskie": "dane_statystyczne/nazwiska_zenskie.csv",
+    "naz_meskie": "dane_statystyczne/nazwiska_meskie.csv",
+    "imiona": "dane_statystyczne/Imiona_nadane_dzieciom_w_Polsce_w_I_polowie_2024.csv",
+}
 
 
 def show_databases(connection) -> list[tuple[str]]:
@@ -130,26 +129,8 @@ def save_top_1000_surnames():
 
 
 def get_weighted_random_entry(data):
+    """Funkcja zwracajaca losowy wpis z danymi z wagami"""
     return data.sample(weights=data["LICZBA"].astype(int)).iloc[0]
-
-
-def fill_telefony(connection):
-    """Funkcja wypelniajaca tabele telefony"""
-    local_cursor = connection.cursor()
-    for i in range(LICZBA_NUMEROW_TELEFONOW):
-        telefon = f"{randint(500, 999)}-{randint(100, 999)}-{randint(100, 999)}"
-        numer_bliskiego = (
-            f"{randint(500, 999)}-{randint(100, 999)}-{randint(100, 999)}"
-            if random() > 0.5 and i < len(PRACOWNICY)
-            else None
-        )
-        local_cursor.execute(
-            "INSERT INTO telefony (telefon, numer_bliskiego) VALUES (%s, %s)",
-            (telefon, numer_bliskiego),
-        )
-
-    local_cursor.close()
-    connection.commit()
 
 
 def fill_stanowiska(connection):
@@ -165,23 +146,53 @@ def fill_stanowiska(connection):
     connection.commit()
 
 
+def fill_pracownicy(connection):
+    """Funkcja wypelniajaca tabele pracownicy"""
+    for uwaga, stanowisko in PRACOWNICY.items():
+        imie_row = get_weighted_random_entry(pd.read_csv(data_paths["imiona"]))
+        imie = imie_row["IMIĘ"]
+        plec = imie_row["PŁEĆ"]
+        nazwisko = get_weighted_random_entry(
+            pd.read_csv(data_paths["naz_zenskie" if plec == "K" else "naz_meskie"])
+        )["NAZWISKO"]
+        local_cursor = connection.cursor()
+        local_cursor.execute(
+            "SELECT id_stanowiska FROM stanowiska WHERE nazwa_stanowiska = %s",
+            (stanowisko,),
+        )
+        id_stanowiska = local_cursor.fetchone()[0]
+        telefon = f"{randint(500, 999)}-{randint(100, 999)}-{randint(100, 999)}"
+        numer_bliskiego = None
+        local_cursor.execute(
+            "INSERT INTO telefony (telefon, numer_bliskiego) VALUES (%s, %s)",
+            (telefon, numer_bliskiego),
+        )
+        id_telefonu = local_cursor.lastrowid
+        local_cursor.execute(
+            "INSERT INTO pracownicy (imie, nazwisko, id_stanowiska, id_telefonu, uwagi) VALUES (%s, %s, %s, %s, %s)",
+            (imie, nazwisko, id_stanowiska, id_telefonu, uwaga),
+        )
+        local_cursor.close()
+        connection.commit()
+
+
 def dry_fill(connection):
     """Funkcja wypelniajaca tabele w bazie danych suchymi danymi"""
     print("Czyszczenie wszystkich tabel...")
     emptyall(connection)
     try:
-        # najpierw tabele, na ktore maja referencje inne tabele
-        print("Wypelnianie tabeli telefony...")
-        fill_telefony(connection)
-
+        # najpierw tabele bez kluczy obcych
         print("Wypelnianie tabeli stanowiska...")
         fill_stanowiska(connection)
+
+        print("Wypelnianie tabeli pracownicy...")
+        fill_pracownicy(connection)
 
     except mysql.connector.Error as err:
         print(err.msg)
         sys.exit()
 
 
-# dry_fill(cnx)
+dry_fill(cnx)
 
 cnx.close()
