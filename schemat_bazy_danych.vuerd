@@ -4,8 +4,8 @@
   "settings": {
     "width": 3000,
     "height": 3000,
-    "scrollTop": -880.7127,
-    "scrollLeft": -1250,
+    "scrollTop": -888.7127,
+    "scrollLeft": -1310,
     "zoomLevel": 0.76,
     "show": 511,
     "database": 1,
@@ -1941,20 +1941,20 @@
       "_a1PRZiOVF9NGeY_v-WhL": {
         "id": "_a1PRZiOVF9NGeY_v-WhL",
         "tableId": "CTz0E5Bkt_Lsc1wZldGcs",
-        "name": "id_transportu",
+        "name": "id_rodzaju_transportu",
         "comment": "",
         "dataType": "INT",
         "default": "",
         "options": 11,
         "ui": {
           "keys": 1,
-          "widthName": 72,
+          "widthName": 117,
           "widthComment": 60,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1734534957188,
+          "updateAt": 1736268648814,
           "createAt": 1732450797153
         }
       },
@@ -4365,7 +4365,7 @@
         "comment": "",
         "dataType": "DECIMAL(10, 2)",
         "default": "",
-        "options": 0,
+        "options": 8,
         "ui": {
           "keys": 0,
           "widthName": 88,
@@ -4374,7 +4374,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1736266641913,
+          "updateAt": 1736268171705,
           "createAt": 1736266629321
         }
       },
@@ -4425,7 +4425,7 @@
         "comment": "",
         "dataType": "VARCHAR(40)",
         "default": "",
-        "options": 0,
+        "options": 8,
         "ui": {
           "keys": 0,
           "widthName": 60,
@@ -4434,7 +4434,7 @@
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1736266746879,
+          "updateAt": 1736268654554,
           "createAt": 1736266737252
         }
       },
@@ -4666,7 +4666,7 @@
           "columnIds": [
             "_a1PRZiOVF9NGeY_v-WhL"
           ],
-          "x": 1660.8284,
+          "x": 1683.3284,
           "y": 1133.9499,
           "direction": 4
         },
@@ -6270,7 +6270,7 @@
       1732450797153,
       -1,
       {
-        "name": 1732450803807,
+        "name": 1736268648813,
         "dataType": 1732450805727,
         "options(primaryKey)": 1732450811154,
         "options(unique)": 1734534957186,
@@ -7894,7 +7894,8 @@
       -1,
       {
         "name": 1736266633969,
-        "dataType": 1736266641912
+        "dataType": 1736266641912,
+        "options(notNull)": 1736268171704
       }
     ],
     "sV5zU6hHrHLuNAqDPVe_j": [
@@ -7927,7 +7928,8 @@
       -1,
       {
         "name": 1736266739915,
-        "dataType": 1736266746878
+        "dataType": 1736266746878,
+        "options(notNull)": 1736268654554
       }
     ],
     "i8InqKyD94onXD1OJV_rC": [

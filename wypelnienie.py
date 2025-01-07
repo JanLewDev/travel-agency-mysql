@@ -85,6 +85,7 @@ def dropall(connection) -> None:
     local_cursor.execute("SHOW TABLES")
     local_tables = local_cursor.fetchall()
     local_tables = [table[0] for table in local_tables]
+    print("Usuwanie wszystkich tabel...")
     for table in ORDER_TO_DROP:
         if table in local_tables:
             try:
@@ -117,7 +118,7 @@ if not args.nodrop:
     dropall(cnx)
     assert len(show_tables(cnx)) == 0
     create_tables(cnx)
-    assert len(show_tables(cnx)) == len(TABLES) == 21
+    assert len(show_tables(cnx)) == len(TABLES) == 22
 
 
 def save_top_1000_surnames():
