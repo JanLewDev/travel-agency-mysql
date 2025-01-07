@@ -143,6 +143,7 @@ TABLES[
 ] = """-- sql
     CREATE TABLE propozycje_wycieczki (
         id_propozycji INT UNSIGNED NOT NULL AUTO_INCREMENT,
+		nazwa VARCHAR(50) NOT NULL,
         opis TEXT DEFAULT NULL,
         ograniczenia VARCHAR(50) DEFAULT NULL,
         min_liczba_osob INT NOT NULL DEFAULT 0,
@@ -162,6 +163,7 @@ TABLES[
         id_wycieczki INT UNSIGNED NOT NULL AUTO_INCREMENT,
         czas_wyjazdu DATETIME NOT NULL,
         czas_powrotu DATETIME NOT NULL,
+		liczba_osob INT UNSIGNED NOT NULL,
         id_propozycji INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_wycieczki),
         CONSTRAINT fk_id_propozycji_wycieczki FOREIGN KEY (id_propozycji) REFERENCES propozycje_wycieczki (id_propozycji) ON DELETE RESTRICT ON UPDATE CASCADE
@@ -223,6 +225,7 @@ TABLES[
 ] = """-- sql
     CREATE TABLE koszty_u_kontrahentow (
         id_kosztu_u_kontrahenta INT UNSIGNED NOT NULL AUTO_INCREMENT,
+		nazwa VARCHAR(40) NOT NULL,
         koszt DECIMAL(10, 2) NOT NULL,
         cena_dla_klienta DECIMAL(10, 2) NOT NULL,
         id_kontrahenta INT UNSIGNED NOT NULL,

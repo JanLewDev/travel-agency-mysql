@@ -3,18 +3,13 @@
 import os
 import sys
 import argparse
-from random import randint, random
-from datetime import datetime
+from random import randint, random, choice
 import pandas as pd
 import mysql.connector
 from mysql.connector import errorcode
 from dotenv import load_dotenv
 from sql import DB_NAME, TABLES, ORDER_TO_CREATE, ORDER_TO_DROP
-from do_wypelnienia import (
-    LICZBA_KLIENTOW,
-    PRACOWNICY,
-    STANOWISKA,
-)
+from do_wypelnienia import *
 
 load_dotenv()
 parser = argparse.ArgumentParser(description="Wypelnienie bazy danych")
@@ -134,6 +129,29 @@ def get_weighted_random_entry(data):
     return data.sample(weights=data["LICZBA"].astype(int)).iloc[0]
 
 
+nazwy_id = {
+    "miasta": "id_miasta",
+    "adresy": "id_adresu",
+    "kontrahenci": "id_kontrahenta",
+    "miejsca_wycieczki": "id_miejsca",
+    "propozycje_wycieczki": "id_propozycji",
+    "wycieczki": "id_wycieczki",
+    "pracownicy": "id_pracownika",
+    "klienci": "id_klienta",
+    "rodzaje_uslug_dodatkowych": "id_uslugi",
+}
+
+
+def get_id_from_table(connection, table, column, value):
+    """Funkcja zwracajaca ID z tabeli"""
+    cursor = connection.cursor()
+    query = f"SELECT {nazwy_id[table]} FROM {table} WHERE {column} = %s"
+    cursor.execute(query, (value,))
+    result = cursor.fetchone()
+    cursor.close()
+    return result[0] if result else None
+
+
 def fill_stanowiska(connection):
     """Funkcja wypelniajaca tabele stanowiska"""
     local_cursor = connection.cursor()
@@ -147,15 +165,21 @@ def fill_stanowiska(connection):
     connection.commit()
 
 
+def get_random_name() -> tuple[str, str, str]:
+    """Funkcja zwracajaca losowe imie i nazwisko"""
+    imie_row = get_weighted_random_entry(pd.read_csv(data_paths["imiona"]))
+    imie = imie_row["IMIĘ"]
+    plec = imie_row["PŁEĆ"]
+    nazwisko = get_weighted_random_entry(
+        pd.read_csv(data_paths["naz_zenskie" if plec == "K" else "naz_meskie"])
+    )["NAZWISKO"]
+    return (imie, nazwisko, plec)
+
+
 def fill_pracownicy(connection):
     """Funkcja wypelniajaca tabele pracownicy"""
     for uwaga, stanowisko in PRACOWNICY.items():
-        imie_row = get_weighted_random_entry(pd.read_csv(data_paths["imiona"]))
-        imie = imie_row["IMIĘ"]
-        plec = imie_row["PŁEĆ"]
-        nazwisko = get_weighted_random_entry(
-            pd.read_csv(data_paths["naz_zenskie" if plec == "K" else "naz_meskie"])
-        )["NAZWISKO"]
+        imie, nazwisko, _ = get_random_name()
         local_cursor = connection.cursor()
         local_cursor.execute(
             "SELECT id_stanowiska FROM stanowiska WHERE nazwa_stanowiska = %s",
@@ -177,6 +201,244 @@ def fill_pracownicy(connection):
         connection.commit()
 
 
+def fill_klienci(connection):
+    """Funkcja wypelniajaca tabele klienci"""
+    for _ in range(LICZBA_KLIENTOW):
+        imie, nazwisko, plec = get_random_name()
+        telefon = f"{randint(500, 999)}-{randint(100, 999)}-{randint(100, 999)}"
+        numer_bliskiego = (
+            f"{randint(500, 999)}-{randint(100, 999)}-{randint(100, 999)}"
+            if random() < 0.4
+            else None
+        )
+        email = (
+            f"{imie.lower()}.{nazwisko.lower()}@{choice(['gmail.com', 'onet.pl', 'wp.pl', 'interia.pl'])}"
+            if random() < 0.8
+            else None
+        )
+        local_cursor = connection.cursor()
+        local_cursor.execute(
+            "INSERT INTO telefony (telefon, numer_bliskiego) VALUES (%s, %s)",
+            (telefon, numer_bliskiego),
+        )
+        id_telefonu = local_cursor.lastrowid
+        local_cursor.execute(
+            "INSERT INTO klienci (imie, nazwisko, plec, email, id_telefonu) VALUES (%s, %s, %s, %s, %s)",
+            (imie, nazwisko, plec, email, id_telefonu),
+        )
+        local_cursor.close()
+        connection.commit()
+
+
+def fill_propozycje(connection):
+    """Funkcja wypelniajaca tabele propozycje wycieczki i powiazane"""
+    for propozycja in PROPOZYCJE:
+        nazwa, opis, ograniczenia, min_osob, max_osob, koszty, cena = propozycja
+
+        # Pobieranie ID miejsca wycieczki
+        miejsce = MIEJSCA_WYCIECZKI[nazwa]
+        adres = ADRESY[nazwa]
+        kontrahent = KONTRAHENCI[miejsce[4]]
+
+        id_miasta = get_id_from_table(connection, "miasta", "miasto", adres[2])
+        if not id_miasta:
+            cursor = connection.cursor()
+            cursor.execute("INSERT INTO miasta (miasto) VALUES (%s)", (adres[2],))
+            id_miasta = cursor.lastrowid
+            cursor.close()
+            connection.commit()
+
+        # Dodanie adresu
+        id_adresu = get_id_from_table(connection, "adresy", "adres", adres[0])
+        if not id_adresu:
+            cursor = connection.cursor()
+            cursor.execute(
+                "INSERT INTO adresy (adres, adres2, id_miasta, kod_pocztowy) VALUES (%s, %s, %s, %s)",
+                (adres[0], adres[1], id_miasta, adres[3]),
+            )
+            id_adresu = cursor.lastrowid
+            cursor.close()
+            connection.commit()
+
+        # Dodanie kontrahenta
+        id_kontrahenta = get_id_from_table(
+            connection, "kontrahenci", "nazwa", kontrahent[0]
+        )
+        if not id_kontrahenta:
+            cursor = connection.cursor()
+            cursor.execute(
+                "INSERT INTO kontrahenci (nazwa, opis, email, id_adresu) VALUES (%s, %s, %s, %s)",
+                (kontrahent[0], kontrahent[1], kontrahent[2], id_adresu),
+            )
+            id_kontrahenta = cursor.lastrowid
+            cursor.close()
+            connection.commit()
+
+        # Dodanie miejsca wycieczki
+        id_miejsca = get_id_from_table(connection, "miejsca_wycieczki", "nazwa", nazwa)
+        if not id_miejsca:
+            cursor = connection.cursor()
+            cursor.execute(
+                "INSERT INTO miejsca_wycieczki (nazwa, id_adresu, koszt, cena_dla_klienta, id_kontrahenta) VALUES (%s, %s, %s, %s, %s)",
+                (nazwa, id_adresu, miejsce[2], miejsce[3], id_kontrahenta),
+            )
+            id_miejsca = cursor.lastrowid
+            cursor.close()
+            connection.commit()
+
+        # Dodanie propozycji wycieczki
+        cursor = connection.cursor()
+        cursor.execute(
+            """
+            INSERT INTO propozycje_wycieczki (nazwa, opis, ograniczenia, min_liczba_osob, maks_liczba_osob, nasze_koszty_razem, cena_dla_klienta, id_miejsca)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            (nazwa, opis, ograniczenia, min_osob, max_osob, koszty, cena, id_miejsca),
+        )
+        cursor.close()
+        connection.commit()
+
+
+def fill_wycieczki(connection):
+    """Funkcja wypelniajaca tabele wycieczki i powiazane"""
+    for wycieczka in WYCIECZKI:
+        czas_wyjazdu, czas_powrotu, liczba_osob, propozycja = wycieczka
+
+        id_propozycji = get_id_from_table(
+            connection, "propozycje_wycieczki", "nazwa", propozycja
+        )
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO wycieczki (czas_wyjazdu, czas_powrotu, liczba_osob, id_propozycji) VALUES (%s, %s, %s, %s)",
+            (czas_wyjazdu, czas_powrotu, liczba_osob, id_propozycji),
+        )
+        id_wycieczki = cursor.lastrowid
+
+        # Powiązanie z klientami
+        for klient_id in KLIENCI_WYCIECZKI.get(id_wycieczki, []):
+            cursor.execute(
+                "INSERT INTO klient_wycieczka (id_klienta, id_wycieczki) VALUES (%s, %s)",
+                (klient_id, id_wycieczki),
+            )
+
+        # Powiązanie z pracownikami
+        for pracownik_nazwa in PRACOWNIK_WYCIECZKA.get(id_wycieczki, []):
+            pracownik_id = get_id_from_table(
+                connection, "pracownicy", "uwagi", pracownik_nazwa
+            )
+            cursor.execute(
+                "INSERT INTO pracownik_wycieczka (id_wycieczki, id_pracownika) VALUES (%s, %s)",
+                (id_wycieczki, pracownik_id),
+            )
+
+        cursor.close()
+        connection.commit()
+
+
+def fill_uslugi_dodatkowe(connection):
+    """Funkcja wypelniajaca tabele uslugi dodatkowe i powiazane"""
+    for nazwa, (opis, koszt, cena, kontrahent) in RODZAJE_USLUG_DODATKOWYCH.items():
+        # Pobieranie ID kontrahenta
+        id_kontrahenta = get_id_from_table(
+            connection, "kontrahenci", "nazwa", kontrahent
+        )
+        if not id_kontrahenta:
+            cursor = connection.cursor()
+            kontrahent_data = KONTRAHENCI[kontrahent]
+            adres = ADRESY[kontrahent_data[0]]
+
+            id_miasta = get_id_from_table(connection, "miasta", "miasto", adres[2])
+            if not id_miasta:
+                cursor.execute("INSERT INTO miasta (miasto) VALUES (%s)", (adres[2],))
+                id_miasta = cursor.lastrowid
+
+            cursor.execute(
+                "INSERT INTO adresy (adres, adres2, id_miasta, kod_pocztowy) VALUES (%s, %s, %s, %s)",
+                (adres[0], adres[1], id_miasta, adres[3]),
+            )
+            id_adresu = cursor.lastrowid
+
+            cursor.execute(
+                "INSERT INTO kontrahenci (nazwa, opis, email, id_adresu) VALUES (%s, %s, %s, %s)",
+                (kontrahent_data[0], kontrahent_data[1], kontrahent_data[2], id_adresu),
+            )
+            id_kontrahenta = cursor.lastrowid
+            connection.commit()
+
+        # Dodanie usługi dodatkowej
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO rodzaje_uslug_dodatkowych (nazwa, opis_uslugi, koszt, cena_dla_klienta, id_kontrahenta) VALUES (%s, %s, %s, %s, %s)",
+            (nazwa, opis, koszt, cena, id_kontrahenta),
+        )
+        id_uslugi = cursor.lastrowid
+        cursor.close()
+        connection.commit()
+
+        # Powiązanie usługi z wycieczkami
+        for id_wycieczki, uslugi in USLUGI_DODATKOWE.items():
+            if nazwa in uslugi:
+                cursor = connection.cursor()
+                cursor.execute(
+                    "INSERT INTO uslugi_dodatkowe (id_wycieczki, id_uslugi) VALUES (%s, %s)",
+                    (id_wycieczki, id_uslugi),
+                )
+                cursor.close()
+                connection.commit()
+
+
+def fill_transakcje_pracownicy(connection):
+    """Funkcja wypelniajaca tabele transakcje pracownicy"""
+    for data, pracownik, kwota in TRANSAKCJE_PRACOWNICY:
+        id_pracownika = get_id_from_table(connection, "pracownicy", "uwagi", pracownik)
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO transakcje_pracownicy (kwota, data_transakcji, id_pracownika) VALUES (%s, %s, %s)",
+            (kwota, data, id_pracownika),
+        )
+        cursor.close()
+        connection.commit()
+
+
+def fill_transakcje_kontrahenci(connection):
+    """Funkcja wypelniajaca tabele transakcje kontrahenci"""
+    for kwota, data, kontrahent, id_wycieczki in TRANSAKCJE_KONTRAHENCI:
+        id_kontrahenta = get_id_from_table(
+            connection, "kontrahenci", "nazwa", kontrahent
+        )
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO transakcje_kontrahenci (kwota, data_transakcji, id_kontrahenta, id_wycieczki) VALUES (%s, %s, %s, %s)",
+            (kwota, data, id_kontrahenta, id_wycieczki),
+        )
+        cursor.close()
+        connection.commit()
+
+
+def fill_transakcje_klienci(connection):
+    """Funkcja wypelniajaca tabele transakcje klienci"""
+    for (id_klienta, id_wycieczki), (kwota, data) in TRANSAKCJE_KLIENCI.items():
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO transakcje_klienci (kwota, data_transakcji, id_klienta, id_wycieczki) VALUES (%s, %s, %s, %s)",
+            (kwota, data, id_klienta, id_wycieczki),
+        )
+        cursor.close()
+        connection.commit()
+
+
+def fill_klienci_wycieczki(connection):
+    """Funkcja wypelniajaca tabele klienci_wycieczki"""
+    for id_klienta, id_wycieczki in KLIENCI_WYCIECZKI:
+        cursor = connection.cursor()
+        cursor.execute(
+            "INSERT INTO klient_wycieczka (id_klienta, id_wycieczki) VALUES (%s, %s)",
+            (id_klienta, id_wycieczki),
+        )
+        cursor.close()
+        connection.commit()
+
+
 def dry_fill(connection):
     """Funkcja wypelniajaca tabele w bazie danych suchymi danymi"""
     print("Czyszczenie wszystkich tabel...")
@@ -188,6 +450,27 @@ def dry_fill(connection):
 
         print("Wypelnianie tabeli pracownicy...")
         fill_pracownicy(connection)
+
+        print("Wypelnianie tabeli klienci...")
+        fill_klienci(connection)
+
+        print("Wypelnianie propozycji wycieczek...")
+        fill_propozycje(connection)
+
+        print("Wypelnianie wycieczek...")
+        fill_wycieczki(connection)
+
+        print("Wypelnianie uslug dodatkowych...")
+        fill_uslugi_dodatkowe(connection)
+
+        print("Wypelnianie transakcji pracownikow...")
+        fill_transakcje_pracownicy(connection)
+
+        print("Wypelnianie transakcji kontrahentow...")
+        fill_transakcje_kontrahenci(connection)
+
+        print("Wypelnianie transakcji klientow...")
+        fill_transakcje_klienci(connection)
 
     except mysql.connector.Error as err:
         print(err.msg)
