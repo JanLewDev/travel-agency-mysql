@@ -1,0 +1,69 @@
+---
+title: "Raport firmy"
+author: "Grupa Wombat Grylls"
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc: true
+  html_document:
+    number_sections: false
+    toc: true
+    toc_float: true
+    theme: united
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+options(repos = list(CRAN="http://cran.rstudio.com/"))
+
+#install.packages("RMariaDB")
+#install.packages("ggplot2")
+#install.packages("lattice")
+
+
+library(lattice)
+library(ggplot2)
+library(RMariaDB)
+```
+
+```{r}
+#tutaj polaczenie z baza danych i selecty
+```
+
+# Schemat
+
+
+```{r, out.width="60%",  fig.align="center", fig.cap="Schemat naszej bazy danych"}
+knitr::include_graphics("zdjecia/Wombat.png")
+```
+
+# Analiza danych
+
+```{r}
+#tutaj dam wykresy, trendy, itp. itd.
+```
+
+# Podsumowanie
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc blandit sagittis nibh at venenatis. Duis ut pharetra nibh. Aliquam erat volutpat. Nunc faucibus elit sed faucibus blandit. Nam fermentum, lacus at scelerisque interdum, ipsum arcu viverra mi, non pulvinar lorem dolor eu elit. Etiam sagittis erat libero, id eleifend tortor posuere quis. Aliquam erat volutpat. Proin eget nunc accumsan sapien consequat pulvinar. In vel rhoncus velit, ac sodales ipsum.
+
+Nam vel turpis sed erat feugiat finibus. Nulla egestas fermentum risus, sit amet venenatis leo fermentum non. Aliquam dignissim elit id leo auctor suscipit. Proin non turpis quam. Mauris auctor nisl risus, at venenatis lacus lobortis sit amet. Aliquam rhoncus quam eu convallis posuere. Sed euismod tellus felis. Curabitur pulvinar nunc dui, in volutpat diam volutpat non. Sed finibus arcu vel felis condimentum, id auctor velit fringilla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vivamus laoreet, sapien vel sollicitudin mollis, urna lacus faucibus erat, sit amet egestas odio lorem ut nulla. Ut blandit aliquet placerat. Nunc et aliquet augue. Curabitur nec augue orci.
+
+Duis non neque feugiat, euismod orci eu, tempus velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Ut iaculis pharetra nulla, feugiat sodales nibh ornare ac. Praesent iaculis eros ex, id hendrerit dolor eleifend eu. Phasellus feugiat elit feugiat nisi gravida sagittis. Aenean rutrum tincidunt commodo. Curabitur convallis id mi sit amet elementum. Aliquam a consectetur risus, vel sagittis lacus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+
+Aenean mauris ipsum, molestie quis turpis et, dictum molestie nisl. Cras accumsan condimentum libero. Vestibulum iaculis, dui quis luctus consectetur, elit eros tincidunt turpis, non vehicula ex sem id magna. Aenean non aliquam velit, ut blandit ipsum. Donec blandit ullamcorper libero a consectetur. Donec at lacus turpis. Aenean ut rhoncus augue, nec rhoncus orci. Integer non ex a lacus sagittis ultrices. Suspendisse porttitor lacus finibus enim blandit convallis. Nam varius, arcu sed efficitur vulputate, nibh nisi scelerisque erat, eu faucibus sem eros et nibh. Sed leo metus, posuere nec nibh at, placerat molestie est. Quisque pretium ante efficitur ligula mollis rutrum. In rutrum arcu nec mi vehicula aliquet. Sed blandit magna volutpat turpis commodo auctor. Donec ut turpis et metus lacinia maximus.
+
+Suspendisse sit amet nulla leo. Nam in justo et elit aliquet porta et quis magna. Aenean dolor ex, ornare vel rutrum non, consequat sit amet sapien. Nunc eu dolor quis elit facilisis posuere. Donec non varius mauris. Nam ullamcorper quis mauris sit amet scelerisque. Proin ut erat non nunc egestas rhoncus eget nec nibh. Morbi efficitur orci a lectus malesuada consequat. Phasellus vestibulum pharetra justo, vel molestie erat congue sed.
+
+Etiam pellentesque dui at vulputate egestas. Maecenas faucibus diam a sapien hendrerit, vitae blandit ligula iaculis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam accumsan varius felis vitae cursus. Nam vitae dictum sem. Duis interdum ante a sem convallis, eu tincidunt nibh dictum. Aenean non tincidunt mi, a pharetra est. Morbi non maximus tortor, nec tempus magna. Ut enim nunc, tincidunt bibendum est vel, faucibus venenatis lectus. Fusce posuere commodo ex, quis mattis elit porttitor sit amet. Mauris dapibus turpis non dolor congue, eu congue magna egestas. Nunc vulputate nisl id commodo facilisis. Praesent at augue cursus neque auctor convallis. Nam vel est velit.
+
+In at neque vel sem euismod mollis ac non sem. Pellentesque ac nisi ut mauris dictum placerat at ut diam. Quisque quis velit nec libero sodales pellentesque eu nec tortor. Fusce rhoncus lorem eget justo viverra viverra. Pellentesque faucibus ipsum id arcu lobortis vehicula. Curabitur ut magna posuere, pulvinar nibh a, tincidunt elit. Duis molestie, ipsum eget ultricies maximus, arcu nisi consequat sapien, non egestas dui purus pharetra nisi. Nam vitae erat eu ipsum laoreet rutrum quis porttitor est. Curabitur a interdum dolor.
+
+Sed ac vestibulum neque. Nulla facilisi. Ut luctus quam eros, a rhoncus diam pulvinar eu. Integer in porttitor risus, eu dignissim dolor. Phasellus pellentesque dui scelerisque enim iaculis, at tincidunt nisi pulvinar. Maecenas orci ante, gravida non enim ac, dignissim laoreet neque. Sed venenatis lorem et metus fringilla venenatis.
+
+Donec ac leo vel ante rhoncus porttitor. Nullam eu egestas erat. Nam convallis feugiat vestibulum. Fusce tincidunt neque ut augue porttitor sodales. Donec et ullamcorper nibh, aliquam hendrerit felis. Curabitur diam leo, gravida ut ultrices in, imperdiet vitae mi. Curabitur in hendrerit lorem. Ut sollicitudin pulvinar orci, vitae porta odio finibus at. Fusce tincidunt molestie quam quis finibus. Mauris cursus, leo vel volutpat tristique, metus tellus gravida sem, ut ultricies risus urna nec urna. Maecenas mattis varius laoreet. Aenean efficitur, urna porta dignissim iaculis, orci quam bibendum ex, non scelerisque massa justo sed mauris. Integer et mollis ante. Etiam scelerisque tortor consectetur, rhoncus arcu vitae, gravida odio. Morbi erat metus, pellentesque et orci at, ornare consequat augue. Praesent semper orci sit amet mauris bibendum hendrerit.
+
+# Lorem
+Aenean at lectus risus. Etiam vitae mauris eget neque suscipit volutpat. Etiam imperdiet, risus sit amet efficitur lobortis, felis urna tempor magna, at fermentum arcu felis eu mauris. In aliquet at metus non congue. Aenean elementum dui varius varius tempor. Cras ornare nunc accumsan, consectetur libero a, rutrum nulla. Donec metus lorem, convallis at est eget, pulvinar ullamcorper urna. Sed dapibus ultrices purus vel dignissim. Aenean pharetra eros orci, eu pharetra elit eleifend non. Praesent interdum tincidunt eros, id consectetur purus ullamcorper eu. Vestibulum ac hendrerit lectus. Sed hendrerit dui arcu, non congue erat sagittis a. Nulla facilisi. 
+
+
