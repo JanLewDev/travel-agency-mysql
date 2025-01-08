@@ -44,7 +44,7 @@ TRANSPORT = [
 # najpierw zatrudnilismy wszystkich pracownikow,
 # a dopiero potem mielismy klientow (duzy kapital zakladowy)
 
-MIASTA = ["Warszawa", "Międzyzdroje", "Karpacz", "Sosnowiec"]
+MIASTA = ["Warszawa", "Międzyzdroje", "Karpacz", "Sosnowiec","Legnica"]
 
 # transakcje najpierw posortowac
 # wyplaty pensji w 2024 roku, 10 dnia kazdego miesiaca
@@ -63,6 +63,14 @@ TRANSAKCJE_PRACOWNICY = [
 # email - gromada.top@gmail.com
 # wyjazdy
 
+# propozycja - trzydniowa wycieczka z instruktorem narciarstwa, Karpacz
+# min osob 10, maks 20
+# koszt transportu 100
+# koszt miejsca 235
+# koszt instruktora 40 za osobe - nasze koszty
+# Kontrahent - Pensjonat Jar, ul. Narutowicza 1, 58-540 Karpacz
+# email - bogumila.jarska@o2.pl
+
 PROPOZYCJE = [
     (
         "Morsowanie Międzyzdroje",  # nazwa
@@ -71,7 +79,16 @@ PROPOZYCJE = [
         45,  # min osob
         50,  # max osob
         40,  # nasze koszty na osobe total
-        80,  # cena dla kilienta za osobe za nasze koszty
+        80,  # cena dla klienta za osobe za nasze koszty
+    ),
+    (
+        "Narty Karpacz",
+        "Trzy dni na nartach w Karpaczu z instruktorem",
+        None,
+        10,
+        20,
+        40,
+        90,
     )
 ]
 
@@ -83,6 +100,13 @@ MIEJSCA_WYCIECZKI = {
         100,
         150,
         "Siec hoteli Gromada",
+    ),
+    "Narty Karpacz": (
+        "Pensjonat Jar",
+        None,
+        235,
+        300,
+        "Jarska Apartments"
     )
 }
 
@@ -96,15 +120,20 @@ ADRESY = {
         "Międzyzdroje",
         "72-500",
     ),
+    "Narty Karpacz": ("ul. Narutowicza 1", None, "Karpacz", "58-540"),
+    "Wypożyczalnia sprzętu narciarskiego": ("ul. Turystyczna 4", None, "Karpacz", "58-540"),
+    "Jarska Apartments": ("ul. Hetmańska 2", None, "Legnica", "59-220"),
 }
 
 # koszt, cena dla klienta
 KOSZTY_MIASTA = {
     "Międzyzdroje": (2 * 100, 2 * 150),
+    "Karpacz": (2 * 65, 2 * 100)
 }
 
 # nazwa, opis_uslugi, koszt, cena dla klienta, nazwa kontrahenta
 # deska - mamy umowe ze dadza tyle desek ile beda potrzebowac klienci
+# sprzet narciarski - naturalnie tez
 RODZAJE_USLUG_DODATKOWYCH = {
     "Deski surfingowe": (
         "Deska surfingowa wypożyczana nad Bałtykiem",
@@ -112,16 +141,22 @@ RODZAJE_USLUG_DODATKOWYCH = {
         80,
         "Wypożyczalnia desek surfingowych",
     ),
+    "Sprzęt narciarski" : (
+        "Narty i kijki wypożyczane w górach",
+        100,
+        125,
+        "Wypożyczalnia sprzętu narciarskiego",
+    )
 }
 
 # klucz to id_wycieczki, wartosc to lista z nazwami uslug
-USLUGI_DODATKOWE = {1: ["Deski surfingowe"]}
+USLUGI_DODATKOWE = {1: ["Deski surfingowe"], 2: ["Sprzęt narciarski"]}
 
 # nazwa, opis, email, nazwa_adresu
 KONTRAHENCI = {
     "Siec hoteli Gromada": (
         "Siec hoteli Gromada",
-        "Siec hoteli Gromada działająca w polsce",
+        "Siec hoteli Gromada działająca w Polsce",
         "gromada@office.pl",
         "Siec hoteli Gromada biuro",
     ),
@@ -131,19 +166,36 @@ KONTRAHENCI = {
         "deski.baltyk@gmail.com",
         "Wypożyczalnia desek surfingowych",
     ),
+    "Wypożyczalnia sprzętu narciarskiego": (
+        "Wypożyczalnia sprzętu narciarskiego",
+        "Wypożyczalnia sprzętu narciarskiego działająca w górach",
+        "ski.rental@tlen.pl",
+        "Wypożyczalnia sprzętu narciarskiego",
+    ),
+    "Jarska Apartments": (
+        "Jarska Apartments",
+        "Sieć pensjonatów Jarska działające w Polsce",
+        "contact.jarska@hotmail.com",
+        "Sieć pensjonatów Jarska biuro",
+    )
 }
 
 # nazwa, koszt, cena dla klienta, id_kontrahenta (potem)
 KOSZTY_U_KONTRAHENTOW = {
     "Wieczorne ognisko": (50, 80, "Siec hoteli Gromada"),
+    "Karkonoskie fondue": (15, 40, "Jarska Apartments"),
 }
 
 # klucz to nazwa propozycji, wartosc to lista z nazwami z KOSZTY_U_KONTRAHENTOW
-PROPOZYCJE_KOSZT_U_KONTRAHENTOW = {"Morsowanie Międzyzdroje": ["Wieczorne ognisko"]}
+PROPOZYCJE_KOSZT_U_KONTRAHENTOW = {
+    "Morsowanie Międzyzdroje": ["Wieczorne ognisko"],
+    "Narty Karpacz": ["Karkonoskie fondue"],
+}
 
 # klucz to nazwa propozycji, wartosci to (nazwa_transportu, koszty_miasta_klucz)
 TRANSPORT_PROPOZYCJA_WYCIECZKI = {
-    "Morsowanie Międzyzdroje": ("Autokar 1", "Międzyzdroje")
+    "Morsowanie Międzyzdroje": ("Autokar 1", "Międzyzdroje"),
+    "Narty Karpacz": ("Bus 1", "Karpacz"),
 }
 
 # klucz to id_wycieczki, wartosc to lista nazw pracownikow
