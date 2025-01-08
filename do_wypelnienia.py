@@ -44,7 +44,7 @@ TRANSPORT = [
 # najpierw zatrudnilismy wszystkich pracownikow,
 # a dopiero potem mielismy klientow (duzy kapital zakladowy)
 
-MIASTA = ["Warszawa", "Międzyzdroje", "Karpacz", "Sosnowiec","Legnica"]
+MIASTA = ["Warszawa", "Międzyzdroje", "Karpacz", "Sosnowiec","Legnica", "Szczecinek"]
 
 # transakcje najpierw posortowac
 # wyplaty pensji w 2024 roku, 10 dnia kazdego miesiaca
@@ -71,6 +71,13 @@ TRANSAKCJE_PRACOWNICY = [
 # Kontrahent - Pensjonat Jar, ul. Narutowicza 1, 58-540 Karpacz
 # email - bogumila.jarska@o2.pl
 
+# propozycja - wakeboardowy, dwudniowy wypad do Szczecinka
+# min 30, maks 50
+# koszt transportu 130
+# wynajem desek, pianki itp: 140 - nasze koszty
+# Kontrahent - Hotel Zacisze (sieć Gromada), ul. Polna 25, 78-400 Szczecinek
+# ramy czasowe: bardziej letnie
+
 PROPOZYCJE = [
     (
         "Morsowanie Międzyzdroje",  # nazwa
@@ -89,6 +96,15 @@ PROPOZYCJE = [
         20,
         40,
         90,
+    ),
+    (
+        "Wakeboard Szczecinek",
+        "Dwudniowy wypad na wakeboard na jeziorze Trzesiecko",
+        "Umiejętność pływania na wakeboardzie",
+        30,
+        50,
+        140,
+        170,
     )
 ]
 
@@ -106,7 +122,14 @@ MIEJSCA_WYCIECZKI = {
         None,
         235,
         300,
-        "Jarska Apartments"
+        "Jarska Apartments",
+    ),
+    "Wakeboard Szczecinek": (
+        "Hotel Zacisze",
+        None,
+        70,
+        105,
+        "Siec hoteli Gromada",
     )
 }
 
@@ -123,12 +146,15 @@ ADRESY = {
     "Narty Karpacz": ("ul. Narutowicza 1", None, "Karpacz", "58-540"),
     "Wypożyczalnia sprzętu narciarskiego": ("ul. Turystyczna 4", None, "Karpacz", "58-540"),
     "Jarska Apartments": ("ul. Hetmańska 2", None, "Legnica", "59-220"),
+    "Wakeboard Szczecinek": ("ul. Polna 25", None, "Szczecinek", "78-400"),
+    "Wypożyczalnia wakeboardowa": ("ul. Kościuszki 14", None, "Szczecinek", "78-400"),
 }
 
 # koszt, cena dla klienta
 KOSZTY_MIASTA = {
     "Międzyzdroje": (2 * 100, 2 * 150),
-    "Karpacz": (2 * 65, 2 * 100)
+    "Karpacz": (2 * 65, 2 * 100),
+    "Szczecinek": (2 * 90, 2 * 130),
 }
 
 # nazwa, opis_uslugi, koszt, cena dla klienta, nazwa kontrahenta
@@ -146,11 +172,17 @@ RODZAJE_USLUG_DODATKOWYCH = {
         100,
         125,
         "Wypożyczalnia sprzętu narciarskiego",
+    ),
+    "Wakeboard, pianka, kask": (
+        "Sprzęt potrzebny do uprawiania wakeboardingu",
+        140,
+        175,
+        "Wypożyczalnia wakeboardowa",
     )
 }
 
 # klucz to id_wycieczki, wartosc to lista z nazwami uslug
-USLUGI_DODATKOWE = {1: ["Deski surfingowe"], 2: ["Sprzęt narciarski"]}
+USLUGI_DODATKOWE = {1: ["Deski surfingowe"], 2: ["Sprzęt narciarski"], 3:["Wakeboard, pianka, kask"]}
 
 # nazwa, opis, email, nazwa_adresu
 KONTRAHENCI = {
@@ -177,6 +209,12 @@ KONTRAHENCI = {
         "Sieć pensjonatów Jarska działające w Polsce",
         "contact.jarska@hotmail.com",
         "Sieć pensjonatów Jarska biuro",
+    ),
+    "Wypożyczalnia wakeboardowa": (
+        "Wypożyczalnia wakeboardowa",
+        "Wypożyczalnia desek wakeboardowych, pianek i kasków",
+        "wakeboard.szczecinek@wp.pl",
+        "Wypożyczalnia wakeboardowa",
     )
 }
 
@@ -184,24 +222,28 @@ KONTRAHENCI = {
 KOSZTY_U_KONTRAHENTOW = {
     "Wieczorne ognisko": (50, 80, "Siec hoteli Gromada"),
     "Karkonoskie fondue": (15, 40, "Jarska Apartments"),
+    "Masaż misami tybetańskimi": (40, 70, "Siec hoteli Gromada")
 }
 
 # klucz to nazwa propozycji, wartosc to lista z nazwami z KOSZTY_U_KONTRAHENTOW
 PROPOZYCJE_KOSZT_U_KONTRAHENTOW = {
     "Morsowanie Międzyzdroje": ["Wieczorne ognisko"],
     "Narty Karpacz": ["Karkonoskie fondue"],
+    "Wakeboard Szczecinek": ["Masaż misami tybetańskimi"],
 }
 
 # klucz to nazwa propozycji, wartosci to (nazwa_transportu, koszty_miasta_klucz)
 TRANSPORT_PROPOZYCJA_WYCIECZKI = {
     "Morsowanie Międzyzdroje": ("Autokar 1", "Międzyzdroje"),
     "Narty Karpacz": ("Bus 1", "Karpacz"),
+    "Wakeboard Szczecinek": ("Autokar 2", "Szczecinek"),
 }
 
 # klucz to id_wycieczki, wartosc to lista nazw pracownikow
 PRACOWNIK_WYCIECZKA = {
     1: ["Kierowca1", "Organizator1"],
     2: ["Kierowca1", "Organizator2"],
+    3: ["Kierowca2", "Organizator1"],
 }
 
 
