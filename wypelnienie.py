@@ -113,7 +113,7 @@ if not args.nodrop:
     dropall(cnx)
     assert len(show_tables(cnx)) == 0
     create_tables(cnx)
-    assert len(show_tables(cnx)) == len(TABLES) == 22
+    assert len(show_tables(cnx)) == len(TABLES) == 23
 
 
 def save_top_1000_surnames():
@@ -139,6 +139,7 @@ nazwy_id = {
     "pracownicy": "id_pracownika",
     "klienci": "id_klienta",
     "rodzaje_uslug_dodatkowych": "id_uslugi",
+    "kraje": "id_kraju",
 }
 
 
@@ -243,7 +244,16 @@ def fill_propozycje(connection):
         id_miasta = get_id_from_table(connection, "miasta", "miasto", adres[2])
         if not id_miasta:
             cursor = connection.cursor()
-            cursor.execute("INSERT INTO miasta (miasto) VALUES (%s)", (adres[2],))
+            id_kraju = get_id_from_table(connection, "kraje", "kraj", MIASTA[adres[2]])
+            if not id_kraju:
+                cursor.execute(
+                    "INSERT INTO kraje (kraj) VALUES (%s)", (MIASTA[adres[2]],)
+                )
+            id_kraju = cursor.lastrowid
+            cursor.execute(
+                "INSERT INTO miasta (miasto, id_kraju) VALUES (%s, %s)",
+                (adres[2], id_kraju),
+            )
             id_miasta = cursor.lastrowid
             cursor.close()
             connection.commit()
@@ -349,8 +359,20 @@ def fill_uslugi_dodatkowe(connection):
 
             id_miasta = get_id_from_table(connection, "miasta", "miasto", adres[2])
             if not id_miasta:
-                cursor.execute("INSERT INTO miasta (miasto) VALUES (%s)", (adres[2],))
+                id_kraju = get_id_from_table(
+                    connection, "kraje", "kraj", MIASTA[adres[2]]
+                )
+                if not id_kraju:
+                    cursor.execute(
+                        "INSERT INTO kraje (kraj) VALUES (%s)", (MIASTA[adres[2]],)
+                    )
+                id_kraju = cursor.lastrowid
+                cursor.execute(
+                    "INSERT INTO miasta (miasto, id_kraju) VALUES (%s, %s)",
+                    (adres[2], id_kraju),
+                )
                 id_miasta = cursor.lastrowid
+                connection.commit()
 
             cursor.execute(
                 "INSERT INTO adresy (adres, adres2, id_miasta, kod_pocztowy) VALUES (%s, %s, %s, %s)",

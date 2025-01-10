@@ -44,7 +44,12 @@ TRANSPORT = [
 # najpierw zatrudnilismy wszystkich pracownikow,
 # a dopiero potem mielismy klientow (duzy kapital zakladowy)
 
-MIASTA = ["Warszawa", "Międzyzdroje", "Karpacz", "Sosnowiec"]
+MIASTA = {
+    "Warszawa": "Polska",
+    "Międzyzdroje": "Polska",
+    "Karpacz": "Polska",
+    "Sosnowiec": "Polska",
+}
 
 # transakcje najpierw posortowac
 # wyplaty pensji w 2024 roku, 10 dnia kazdego miesiaca

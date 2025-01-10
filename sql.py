@@ -42,13 +42,26 @@ TABLES[
 """
 
 TABLES[
+    "kraje"
+] = """-- sql
+    CREATE TABLE kraje (
+        id_kraju INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        kraj VARCHAR(50) NOT NULL,
+        PRIMARY KEY (id_kraju),
+        KEY idx_kraj (kraj)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
+"""
+
+TABLES[
     "miasta"
 ] = """-- sql
     CREATE TABLE miasta (
         id_miasta INT UNSIGNED NOT NULL AUTO_INCREMENT,
         miasto VARCHAR(50) NOT NULL,
+        id_kraju INT UNSIGNED NOT NULL,
         PRIMARY KEY (id_miasta),
-        KEY idx_miasto (miasto)
+        KEY idx_miasto (miasto),
+        CONSTRAINT fk_id_kraju_miasta FOREIGN KEY (id_kraju) REFERENCES kraje (id_kraju) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_polish_ci;
 """
 
@@ -306,6 +319,7 @@ ORDER_TO_CREATE = [
     "stanowiska",
     "telefony",
     "klienci",
+    "kraje",
     "miasta",
     "adresy",
     "kontrahenci",
@@ -348,6 +362,7 @@ ORDER_TO_DROP = [
     "kontrahenci",
     "adresy",
     "miasta",
+    "kraje",
     "klienci",
     "telefony",
     "stanowiska",
