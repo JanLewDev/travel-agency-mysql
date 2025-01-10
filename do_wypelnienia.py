@@ -44,7 +44,7 @@ TRANSPORT = [
 # najpierw zatrudnilismy wszystkich pracownikow,
 # a dopiero potem mielismy klientow (duzy kapital zakladowy)
 
-MIASTA = ["Warszawa", "Międzyzdroje", "Karpacz", "Sosnowiec","Legnica", "Szczecinek"]
+MIASTA = ["Warszawa", "Międzyzdroje", "Karpacz", "Sosnowiec","Legnica", "Szczecinek", "Polanica-Zdrój"]
 
 # transakcje najpierw posortowac
 # wyplaty pensji w 2024 roku, 10 dnia kazdego miesiaca
@@ -78,6 +78,13 @@ TRANSAKCJE_PRACOWNICY = [
 # Kontrahent - Hotel Zacisze (sieć Gromada), ul. Polna 25, 78-400 Szczecinek
 # ramy czasowe: bardziej letnie
 
+# propozycja - jednodniowa wycieczka, bez kontrahenta typu hotel, PN Góry Stołowe
+# min 45, maks 50
+# koszt transportu
+# obiad w karczmie: koszt 30, cena 65
+# kontrahent Karczma "U Krysi"
+# ramy czasowe: poza zimą
+
 PROPOZYCJE = [
     (
         "Morsowanie Międzyzdroje",  # nazwa
@@ -105,6 +112,15 @@ PROPOZYCJE = [
         50,
         140,
         170,
+    ),
+    (
+        "Góry Stołowe",
+        "Jednodniowa wycieczka PN Gór Stołowych z obiadem w cenie",
+        None,
+        45,
+        50,
+        15,
+        30,
     )
 ]
 
@@ -130,6 +146,13 @@ MIEJSCA_WYCIECZKI = {
         70,
         105,
         "Siec hoteli Gromada",
+    ),
+    "Góry Stołowe": ( # tutaj wyjątkowo obiad a nie spanie
+        "Karczma U Krysi",
+        None,
+        30,
+        65,
+        "Swojska Gastronomia",
     )
 }
 
@@ -148,6 +171,9 @@ ADRESY = {
     "Jarska Apartments": ("ul. Hetmańska 2", None, "Legnica", "59-220"),
     "Wakeboard Szczecinek": ("ul. Polna 25", None, "Szczecinek", "78-400"),
     "Wypożyczalnia wakeboardowa": ("ul. Kościuszki 14", None, "Szczecinek", "78-400"),
+    "Góry Stołowe": ("ul. Ogrodowa 11", None, "Polanica-Zdrój", "57-320"),
+    "Swojska Gastronomia": ("ul. Francuska 18", None, "Warszawa", "03-906"),
+    "Górpol": ("ul. Górska 1", None, "Polanica-Zdrój", "57-320"),
 }
 
 # koszt, cena dla klienta
@@ -155,6 +181,7 @@ KOSZTY_MIASTA = {
     "Międzyzdroje": (2 * 100, 2 * 150),
     "Karpacz": (2 * 65, 2 * 100),
     "Szczecinek": (2 * 90, 2 * 130),
+    "Polanica-Zdrój": (2 * 50, 2 * 80),
 }
 
 # nazwa, opis_uslugi, koszt, cena dla klienta, nazwa kontrahenta
@@ -178,11 +205,17 @@ RODZAJE_USLUG_DODATKOWYCH = {
         140,
         175,
         "Wypożyczalnia wakeboardowa",
+    ),
+    "Kijki do chodzenia": (
+        "Kijki ułatwiające poruszenia się po górach",
+        15,
+        25,
+        "Górpol",
     )
 }
 
 # klucz to id_wycieczki, wartosc to lista z nazwami uslug
-USLUGI_DODATKOWE = {1: ["Deski surfingowe"], 2: ["Sprzęt narciarski"], 3:["Wakeboard, pianka, kask"]}
+USLUGI_DODATKOWE = {1: ["Deski surfingowe"], 2: ["Sprzęt narciarski"], 3:["Wakeboard, pianka, kask"], 4:["Kijki do chodzenia"]}
 
 # nazwa, opis, email, nazwa_adresu
 KONTRAHENCI = {
@@ -215,7 +248,19 @@ KONTRAHENCI = {
         "Wypożyczalnia desek wakeboardowych, pianek i kasków",
         "wakeboard.szczecinek@wp.pl",
         "Wypożyczalnia wakeboardowa",
-    )
+    ),
+    "Swojska Gastronomia": (
+        "Swojska Gastronomia",
+        "Firma obsługujące restauracje w Polsce",
+        "swojska.gastro@gmail.com",
+        "Swojska Gastronomia",
+    ),
+    "Górpol": (
+        "Górpol",
+        "Firma zajmująca się górskim sprzętem",
+        "gorpol@interia.pl",
+        "Górpol",
+    ),
 }
 
 # nazwa, koszt, cena dla klienta, id_kontrahenta (potem)
@@ -237,6 +282,7 @@ TRANSPORT_PROPOZYCJA_WYCIECZKI = {
     "Morsowanie Międzyzdroje": ("Autokar 1", "Międzyzdroje"),
     "Narty Karpacz": ("Bus 1", "Karpacz"),
     "Wakeboard Szczecinek": ("Autokar 2", "Szczecinek"),
+    "Góry Stołowe": ("Autokar 1", "Polanica-Zdrój"),
 }
 
 # klucz to id_wycieczki, wartosc to lista nazw pracownikow
@@ -244,6 +290,7 @@ PRACOWNIK_WYCIECZKA = {
     1: ["Kierowca1", "Organizator1"],
     2: ["Kierowca1", "Organizator2"],
     3: ["Kierowca2", "Organizator1"],
+    # do ustalenia gdy id wycieczki będą ustawione dopiero imo
 }
 
 
@@ -260,28 +307,60 @@ for i in range(1, 49, randint(1, 3)):
 
 # data wyjazdu, data powrotu, liczba osob, nazwa propozycji
 WYCIECZKI = [
-    (
+    (   #id_wycieczki = 1
         datetime(2024, 1, 3, 6, 0, 0),
         datetime(2024, 1, 4, 22, 0, 0),
         50,
         "Morsowanie Międzyzdroje",
     ),
-    (
+    (   #id_wycieczki = 2
         datetime(2024, 1, 26, 6, 0, 0),
         datetime(2024, 1, 27, 22, 0, 0),
         48,
         "Morsowanie Międzyzdroje",
     ),
+    (   #id_wycieczki = 3
+        datetime(2024, 2, 2, 7, 0, 0),
+        datetime(2024, 2, 4, 17, 0, 0),
+        14,
+        "Narty Karpacz",
+    ),
+    (   #id_wycieczki = 4
+        datetime(2024, 2, 9, 7, 0, 0),
+        datetime(2024, 2, 11, 17, 0, 0),
+        20,
+        "Narty Karpacz",
+    ),
+    (   #id_wycieczki = 5
+        datetime(2024, 3, 9, 8, 0, 0),
+        datetime(2024, 3, 9, 18, 0, 0),
+        49,
+        "Góry Stołowe",
+    ),
+    (   #id_wycieczki = 6
+        datetime(2024, 3, 23, 8, 0, 0),
+        datetime(2024, 3, 23, 18, 0, 0),
+        45,
+        "Góry Stołowe",
+    ),
 ]
 
 # w pierwszych wycieczkach przelew byl po 7 dniach od zakończenia wycieczki
 
-# pls niech ktos obliczy :(
 # kwota, data transakcji, nazwa kontrahenta, id_wycieczki od 1!
 TRANSAKCJE_KONTRAHENCI = [
-    (500, WYCIECZKI[0][1] + timedelta(days=7), "Siec hoteli Gromada", 1),
-    (500, WYCIECZKI[1][1] + timedelta(days=7), "Siec hoteli Gromada", 2),
-    (400, WYCIECZKI[1][1] + timedelta(days=7), "Wypożyczalnia desek surfingowych", 1),
+    (5000, WYCIECZKI[0][1] + timedelta(days=7), "Siec hoteli Gromada", 1),
+    (4800, WYCIECZKI[1][1] + timedelta(days=7), "Siec hoteli Gromada", 2),
+    (2400, WYCIECZKI[1][1] + timedelta(days=7), "Wypożyczalnia desek surfingowych", 1),
+    (3290, WYCIECZKI[2][1] + timedelta(days=7), "Jarska Apartments", 3),
+    (20*MIEJSCA_WYCIECZKI["Narty Karpacz"][2], WYCIECZKI[3][1] + timedelta(days=7), "Jarska Apartments", 4),
+    (randint(10,14)*RODZAJE_USLUG_DODATKOWYCH["Sprzęt narciarski"][1], WYCIECZKI[2][1] + timedelta(days=7), "Wypożyczalnia sprzętu narciarskiego", 3), # losujemy ile osób nie miało nart i musiało wypożyczyć
+    (randint(8,12)*RODZAJE_USLUG_DODATKOWYCH["Sprzęt narciarski"][1], WYCIECZKI[3][1] + timedelta(days=7), "Wypożyczalnia sprzętu narciarskiego", 4),
+    (20*KOSZTY_U_KONTRAHENTOW["Karkonoskie fondue"][0], WYCIECZKI[3][1] + timedelta(days=7), "Jarska Apartments", 4),
+    (49*MIEJSCA_WYCIECZKI["Góry Stołowe"][2], WYCIECZKI[4][1] + timedelta(days=7), "Swojska Gastronomia", 5),
+    (randint(20,30)*RODZAJE_USLUG_DODATKOWYCH["Kijki do chodzenia"][1], WYCIECZKI[4][1] + timedelta(days=7), "Górpol", 5),
+    (45*MIEJSCA_WYCIECZKI["Góry Stołowe"][2], WYCIECZKI[5][1] + timedelta(days=7), "Swojska Gastronomia", 6),
+    (randint(20,30)*RODZAJE_USLUG_DODATKOWYCH["Kijki do chodzenia"][1], WYCIECZKI[5][1] + timedelta(days=7), "Górpol", 6),
 ]
 
 # kwota, data transakcji, id_klienta, id_wycieczki
