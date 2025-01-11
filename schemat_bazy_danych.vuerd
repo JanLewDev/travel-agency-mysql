@@ -4,9 +4,9 @@
   "settings": {
     "width": 3000,
     "height": 3000,
-    "scrollTop": 0,
-    "scrollLeft": -1566.4077,
-    "zoomLevel": 1,
+    "scrollTop": -121.4018,
+    "scrollLeft": -692.3957,
+    "zoomLevel": 0.79,
     "show": 511,
     "database": 1,
     "databaseName": "Wombat-Grylls",
@@ -2479,20 +2479,20 @@
       "IqX2OYDDoNRwkxg0Ol22L": {
         "id": "IqX2OYDDoNRwkxg0Ol22L",
         "tableId": "RD_nZcV5aYRpunRwppRph",
-        "name": "id_transportu",
+        "name": "id_rodzaju_transportu",
         "comment": "",
         "dataType": "INT",
         "default": "",
         "options": 8,
         "ui": {
           "keys": 2,
-          "widthName": 79,
+          "widthName": 128,
           "widthComment": 60,
           "widthDataType": 60,
           "widthDefault": 60
         },
         "meta": {
-          "updateAt": 1734539509065,
+          "updateAt": 1736548428415,
           "createAt": 1734539509064
         }
       },
@@ -4893,7 +4893,7 @@
           "columnIds": [
             "i8InqKyD94onXD1OJV_rC"
           ],
-          "x": 1414.1023029453568,
+          "x": 1427.6023029453568,
           "y": 359.8455547124641,
           "direction": 4
         },
@@ -5976,7 +5976,7 @@
       -1,
       {
         "options(notNull)": 1734539509060,
-        "name": 1734539509060,
+        "name": 1736548428414,
         "dataType": 1734539509060,
         "default": 1734539509060,
         "comment": 1734539509060

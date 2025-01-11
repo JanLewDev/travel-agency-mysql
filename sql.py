@@ -350,7 +350,6 @@ ORDER_TO_DROP = [
     "transakcje_pracownicy",
     "transakcje_kontrahenci",
     "transakcje_klienci",
-    "transakcje_pracownicy",
     "propozycja_koszt_u_kontrahenta",
     "wycieczki",
     "propozycje_wycieczki",
