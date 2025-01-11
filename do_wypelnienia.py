@@ -2,11 +2,11 @@
 
 from datetime import datetime, timedelta
 from random import randint
+from typing import List, Tuple, Optional, Dict
 
 # firma dziala w 2024 roku
 
 LICZBA_KLIENTOW = 200
-LICZBA_WYCIECZEK = 20
 
 # klucz to nazwa stanowiska, wartosc to pensja
 STANOWISKA = {
@@ -35,7 +35,7 @@ PRACOWNICY = {
 
 # autokar do 50 osob, bus do 20 osob
 # nazwa, opis
-TRANSPORT = [
+RODZAJE_TRANSPORTU = [
     ("Autokar 1", "Autokar niebieski"),
     ("Autokar 2", "Autokar zielony"),
     ("Bus 1", "Bus czerwony"),
@@ -44,7 +44,16 @@ TRANSPORT = [
 # najpierw zatrudnilismy wszystkich pracownikow,
 # a dopiero potem mielismy klientow (duzy kapital zakladowy)
 
-MIASTA = ["Warszawa", "Międzyzdroje", "Karpacz", "Sosnowiec","Legnica", "Szczecinek", "Polanica-Zdrój"]
+# klucz to miasto, wartosc to kraj
+MIASTA = {
+    "Warszawa": "Polska",
+    "Międzyzdroje": "Polska",
+    "Karpacz": "Polska",
+    "Sosnowiec": "Polska",
+    "Legnica": "Polska",
+    "Szczecinek": "Polska",
+    "Polanica-Zdrój": "Polska",
+}
 
 # transakcje najpierw posortowac
 # wyplaty pensji w 2024 roku, 10 dnia kazdego miesiaca
@@ -53,6 +62,11 @@ TRANSAKCJE_PRACOWNICY = [
     for i in range(1, 13)
     for pracownik, stanowisko in PRACOWNICY.items()
 ]
+
+# koszt, cena dla klienta
+KOSZTY_MIASTA = {
+    "Międzyzdroje": (2 * 100, 2 * 150),
+}
 
 # propozycja - dwudniowe morsowanie w Międzyzdrojach w styczniu
 # min osob 45, maks 50
@@ -85,95 +99,176 @@ TRANSAKCJE_PRACOWNICY = [
 # kontrahent Karczma "U Krysi"
 # ramy czasowe: poza zimą
 
-PROPOZYCJE = [
-    (
-        "Morsowanie Międzyzdroje",  # nazwa
-        "Dwudniowe morsowanie ze zwiedzaniem Międzyzdrojów",  # opis
-        None,  # ograniczenia
-        45,  # min osob
-        50,  # max osob
-        40,  # nasze koszty na osobe total
-        80,  # cena dla klienta za osobe za nasze koszty
+
+class PropozycjaWycieczki:
+    """Klasa reprezentujaca propozycje wycieczki"""
+
+    def __init__(
+        self,
+        nazwa: str,
+        opis: str,
+        ograniczenia: Optional[str],
+        min_osob: int,
+        max_osob: int,
+        nasze_koszty_na_osobe_total: int,
+        cena_dla_kilienta_za_osobe: int,
+        miasto_z_koszty_miasta: str,
+        miejsce_wycieczki_nazwa: str,
+        transport_propozycja_wycieczki: List[str],
+        propozycje_koszt_u_kontrahentow: Optional[List[str]] = None,
+    ):
+        self.nazwa = nazwa
+        self.opis = opis
+        self.ograniczenia = ograniczenia
+        self.min_osob = min_osob
+        self.max_osob = max_osob
+        self.nasze_koszty_na_osobe_total = nasze_koszty_na_osobe_total
+        self.cena_dla_kilienta_za_osobe = cena_dla_kilienta_za_osobe
+        self.miasto_z_koszty_miasta = miasto_z_koszty_miasta
+        self.miejsce_wycieczki_nazwa = miejsce_wycieczki_nazwa
+        self.transport_propozycja_wycieczki = transport_propozycja_wycieczki
+        self.propozycje_koszt_u_kontrahentow = propozycje_koszt_u_kontrahentow
+
+
+PROPOZYCJE: List[PropozycjaWycieczki] = [
+    PropozycjaWycieczki(
+        "Morsowanie Międzyzdroje",
+        "Dwudniowe morsowanie ze zwiedzaniem Międzyzdrojów",
+        None,
+        45,
+        50,
+        40,
+        80,
+        "Międzyzdroje",
+        "Hotel Gromada Międzyzdroje",
+        ["Autokar 1"],
+        ["Wieczorne ognisko"],
     ),
-    (
+    PropozycjaWycieczki(
         "Narty Karpacz",
-        "Trzy dni na nartach w Karpaczu z instruktorem",
+        "Trzydniowa wycieczka z instruktorem narciarstwa",
         None,
         10,
         20,
-        40,
-        90,
+        140,
+        235,
+        "Karpacz",
+        "Jarska Apartments",
+        ["Autokar 2"],
+        ["Karkonoskie fondue"],
     ),
-    (
+    PropozycjaWycieczki(
         "Wakeboard Szczecinek",
-        "Dwudniowy wypad na wakeboard na jeziorze Trzesiecko",
+        "Dwudniowy wypad na wakeboard",
         "Umiejętność pływania na wakeboardzie",
         30,
         50,
         140,
-        170,
+        175,
+        "Szczecinek",
+        "Hotel Zacisze",
+        ["Autokar 1"],
+        ["Masaż misami tybetańskimi"],
     ),
-    (
+    PropozycjaWycieczki(
         "Góry Stołowe",
-        "Jednodniowa wycieczka PN Gór Stołowych z obiadem w cenie",
+        "Jednodniowa wycieczka, bez kontrahenta",
         None,
         45,
         50,
-        15,
         30,
-    )
+        65,
+        "Polanica-Zdrój",
+        "Karczma U Krysi",
+        ["Autokar 2"],
+    ),
 ]
 
-# nazwa, id_adresu, ma byc w adres klucz taki jak tu, koszt, cena dla klienta, nazwa kontrahenta
-MIEJSCA_WYCIECZKI = {
-    "Morsowanie Międzyzdroje": (
+
+class MiejsceWycieczki:
+    """Klasa reprezentujaca miejsce wycieczki"""
+
+    def __init__(
+        self,
+        nazwa: str,
+        koszt: int,
+        cena_dla_kilienta: int,
+        nazwa_kontrahenta: str,
+    ):
+        self.nazwa = nazwa
+        self.koszt = koszt
+        self.cena_dla_kilienta = cena_dla_kilienta
+        self.nazwa_kontrahenta = nazwa_kontrahenta
+
+
+# klucz to nazwa miejsca wycieczki
+MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
+    "Hotel Gromada Międzyzdroje": MiejsceWycieczki(
         "Hotel Gromada Międzyzdroje",
-        None,
         100,
         150,
         "Siec hoteli Gromada",
     ),
-    "Narty Karpacz": (
-        "Pensjonat Jar",
-        None,
+    "Penjonat Jar": MiejsceWycieczki(
+        "Penjonat Jar",
         235,
         300,
         "Jarska Apartments",
     ),
-    "Wakeboard Szczecinek": (
+    "Hotel Zacisze": MiejsceWycieczki(
         "Hotel Zacisze",
-        None,
         70,
         105,
         "Siec hoteli Gromada",
     ),
-    "Góry Stołowe": ( # tutaj wyjątkowo obiad a nie spanie
+    "Karczma U Krysi": MiejsceWycieczki(
         "Karczma U Krysi",
-        None,
         30,
         65,
         "Swojska Gastronomia",
-    )
+    ),
 }
 
-# nazwa, linijka 1, linijka 2, id_miasto(potem), kod pocztowy
-ADRESY = {
-    "Morsowanie Międzyzdroje": ("ul. Wyzwolenia 1", None, "Międzyzdroje", "72-500"),
-    "Siec hoteli Gromada biuro": ("ul. Marszałkowska 1", None, "Warszawa", "00-500"),
-    "Wypożyczalnia desek surfingowych": (
-        "ul. Nadmorska 1",
-        None,
-        "Międzyzdroje",
-        "72-500",
+
+class Adres:
+    """Klasa reprezentujaca adres"""
+
+    def __init__(
+        self,
+        adres: str,
+        adres2: Optional[str],
+        miasto: str,
+        kod_pocztowy: str,
+    ):
+        self.adres = adres
+        self.adres2 = adres2
+        self.miasto = miasto
+        self.kod_pocztowy = kod_pocztowy
+
+
+ADRESY: Dict[str, Adres] = {
+    "Hotel Gromada Międzyzdroje": Adres(
+        "ul. Wyzwolenia 1", None, "Międzyzdroje", "72-500"
     ),
-    "Narty Karpacz": ("ul. Narutowicza 1", None, "Karpacz", "58-540"),
-    "Wypożyczalnia sprzętu narciarskiego": ("ul. Turystyczna 4", None, "Karpacz", "58-540"),
-    "Jarska Apartments": ("ul. Hetmańska 2", None, "Legnica", "59-220"),
-    "Wakeboard Szczecinek": ("ul. Polna 25", None, "Szczecinek", "78-400"),
-    "Wypożyczalnia wakeboardowa": ("ul. Kościuszki 14", None, "Szczecinek", "78-400"),
-    "Góry Stołowe": ("ul. Ogrodowa 11", None, "Polanica-Zdrój", "57-320"),
-    "Swojska Gastronomia": ("ul. Francuska 18", None, "Warszawa", "03-906"),
-    "Górpol": ("ul. Górska 1", None, "Polanica-Zdrój", "57-320"),
+    "Sieć hoteli Gromada": Adres("ul. Marszałkowska 1", None, "Warszawa", "00-500"),
+    "Wypożyczalnia desek surfingowych": Adres(
+        "ul. Nadmorska 1", None, "Międzyzdroje", "72-500"
+    ),
+    "Narty Karpacz": Adres("ul. Narutowicza 1", None, "Karpacz", "58-540"),
+    "Wypożyczalnia sprzętu narciarskiego": Adres(
+        "ul. Turystyczna 4",
+        None,
+        "Karpacz",
+        "58-540",
+    ),
+    "Jarska Apartments": Adres("ul. Hetmańska 2", None, "Legnica", "59-220"),
+    "Wakeboard Szczecinek": Adres("ul. Polna 25", None, "Szczecinek", "78-400"),
+    "Wypożyczalnia wakeboardowa": Adres(
+        "ul. Kościuszki 14", None, "Szczecinek", "78-400"
+    ),
+    "Góry Stołowe": Adres("ul. Ogrodowa 11", None, "Polanica-Zdrój", "57-320"),
+    "Swojska Gastronomia": Adres("ul. Francuska 18", None, "Warszawa", "03-906"),
+    "Górpol": Adres("ul. Górska 1", None, "Polanica-Zdrój", "57-320"),
 }
 
 # koszt, cena dla klienta
@@ -184,160 +279,185 @@ KOSZTY_MIASTA = {
     "Polanica-Zdrój": (2 * 50, 2 * 80),
 }
 
-# nazwa, opis_uslugi, koszt, cena dla klienta, nazwa kontrahenta
 # deska - mamy umowe ze dadza tyle desek ile beda potrzebowac klienci
 # sprzet narciarski - naturalnie tez
-RODZAJE_USLUG_DODATKOWYCH = {
-    "Deski surfingowe": (
+
+
+class RodzajUslugiDodatkowej:
+    """Klasa reprezentujaca rodzaj uslugi dodatkowej"""
+
+    def __init__(
+        self,
+        nazwa: str,
+        opis: str,
+        koszt: int,
+        cena_dla_kilienta: int,
+        nazwa_kontrahenta: str,
+    ):
+        self.nazwa = nazwa
+        self.opis = opis
+        self.koszt = koszt
+        self.cena_dla_kilienta = cena_dla_kilienta
+        self.nazwa_kontrahenta = nazwa_kontrahenta
+
+
+RODZAJE_USLUG_DODATKOWYCH: Dict[str, RodzajUslugiDodatkowej] = {
+    # deska - mamy umowe ze dadza tyle desek ile beda potrzebowac klienci
+    "Deski surfingowe": RodzajUslugiDodatkowej(
+        "Deski surfingowe",
         "Deska surfingowa wypożyczana nad Bałtykiem",
         50,
         80,
         "Wypożyczalnia desek surfingowych",
     ),
-    "Sprzęt narciarski" : (
+    "Sprzęt narciarski": RodzajUslugiDodatkowej(
+        "Sprzęt narciarski",
         "Narty i kijki wypożyczane w górach",
         100,
         125,
         "Wypożyczalnia sprzętu narciarskiego",
     ),
-    "Wakeboard, pianka, kask": (
+    "Wakeboard, pianka, kask": RodzajUslugiDodatkowej(
+        "Wakeboard, pianka, kask",
         "Sprzęt potrzebny do uprawiania wakeboardingu",
         140,
         175,
         "Wypożyczalnia wakeboardowa",
     ),
-    "Kijki do chodzenia": (
+    "Kijki do chodzenia": RodzajUslugiDodatkowej(
+        "Kijki do chodzenia",
         "Kijki ułatwiające poruszenia się po górach",
         15,
         25,
         "Górpol",
-    )
+    ),
 }
 
-# klucz to id_wycieczki, wartosc to lista z nazwami uslug
-USLUGI_DODATKOWE = {1: ["Deski surfingowe"], 2: ["Sprzęt narciarski"], 3:["Wakeboard, pianka, kask"], 4:["Kijki do chodzenia"]}
 
-# nazwa, opis, email, nazwa_adresu
-KONTRAHENCI = {
-    "Siec hoteli Gromada": (
-        "Siec hoteli Gromada",
-        "Siec hoteli Gromada działająca w Polsce",
+class Kontrahent:
+    """Klasa reprezentujaca kontrahenta"""
+
+    def __init__(self, nazwa: str, opis: Optional[str], email: str, adres: str):
+        self.nazwa = nazwa
+        self.opis = opis
+        self.email = email
+        self.adres = adres
+
+
+KONTRAHENCI: Dict[str, Kontrahent] = {
+    "Sieć hoteli Gromada": Kontrahent(
+        "Sieć hoteli Gromada",
+        "Sieć hoteli Gromada działająca w polsce",
         "gromada@office.pl",
-        "Siec hoteli Gromada biuro",
+        "Sieć hoteli Gromada biuro",
     ),
-    "Wypożyczalnia desek surfingowych": (
+    "Wypożyczalnia desek surfingowych": Kontrahent(
         "Wypożyczalnia desek surfingowych",
         "Wypożyczalnia desek surfingowych działająca nad Bałtykiem",
         "deski.baltyk@gmail.com",
         "Wypożyczalnia desek surfingowych",
     ),
-    "Wypożyczalnia sprzętu narciarskiego": (
-        "Wypożyczalnia sprzętu narciarskiego",
-        "Wypożyczalnia sprzętu narciarskiego działająca w górach",
-        "ski.rental@tlen.pl",
-        "Wypożyczalnia sprzętu narciarskiego",
-    ),
-    "Jarska Apartments": (
-        "Jarska Apartments",
-        "Sieć pensjonatów Jarska działające w Polsce",
-        "contact.jarska@hotmail.com",
-        "Sieć pensjonatów Jarska biuro",
-    ),
-    "Wypożyczalnia wakeboardowa": (
-        "Wypożyczalnia wakeboardowa",
-        "Wypożyczalnia desek wakeboardowych, pianek i kasków",
-        "wakeboard.szczecinek@wp.pl",
-        "Wypożyczalnia wakeboardowa",
-    ),
-    "Swojska Gastronomia": (
-        "Swojska Gastronomia",
-        "Firma obsługujące restauracje w Polsce",
-        "swojska.gastro@gmail.com",
-        "Swojska Gastronomia",
-    ),
-    "Górpol": (
-        "Górpol",
-        "Firma zajmująca się górskim sprzętem",
-        "gorpol@interia.pl",
-        "Górpol",
-    ),
-}
-
-# nazwa, koszt, cena dla klienta, id_kontrahenta (potem)
-KOSZTY_U_KONTRAHENTOW = {
-    "Wieczorne ognisko": (50, 80, "Siec hoteli Gromada"),
-    "Karkonoskie fondue": (15, 40, "Jarska Apartments"),
-    "Masaż misami tybetańskimi": (40, 70, "Siec hoteli Gromada")
-}
-
-# klucz to nazwa propozycji, wartosc to lista z nazwami z KOSZTY_U_KONTRAHENTOW
-PROPOZYCJE_KOSZT_U_KONTRAHENTOW = {
-    "Morsowanie Międzyzdroje": ["Wieczorne ognisko"],
-    "Narty Karpacz": ["Karkonoskie fondue"],
-    "Wakeboard Szczecinek": ["Masaż misami tybetańskimi"],
-}
-
-# klucz to nazwa propozycji, wartosci to (nazwa_transportu, koszty_miasta_klucz)
-TRANSPORT_PROPOZYCJA_WYCIECZKI = {
-    "Morsowanie Międzyzdroje": ("Autokar 1", "Międzyzdroje"),
-    "Narty Karpacz": ("Bus 1", "Karpacz"),
-    "Wakeboard Szczecinek": ("Autokar 2", "Szczecinek"),
-    "Góry Stołowe": ("Autokar 1", "Polanica-Zdrój"),
-}
-
-# klucz to id_wycieczki, wartosc to lista nazw pracownikow
-PRACOWNIK_WYCIECZKA = {
-    1: ["Kierowca1", "Organizator1"],
-    2: ["Kierowca1", "Organizator2"],
-    3: ["Kierowca2", "Organizator1"],
-    # do ustalenia gdy id wycieczki będą ustawione dopiero imo
 }
 
 
-# klucz to id wycieczki, wartosc to lista z id klientow (one sa od 1)
-KLIENCI_WYCIECZKI = {i: [] for i in range(LICZBA_WYCIECZEK)}
+class KosztUKontrahenta:
+    """Klasa reprezentujaca koszt u kontrahenta"""
 
-for i in range(1, 51):
-    KLIENCI_WYCIECZKI[0].append(i)
+    def __init__(
+        self, nazwa: str, koszt: int, cena_dla_kilienta: int, nazwa_kontrahenta: str
+    ):
+        self.nazwa = nazwa
+        self.koszt = koszt
+        self.cena_dla_kilienta = cena_dla_kilienta
+        self.nazwa_kontrahenta = nazwa_kontrahenta
 
-for i in range(1, 49, randint(1, 3)):
-    KLIENCI_WYCIECZKI[1].append(i)
 
-# dalej w miary potrzeb dodawanie
+KOSZTY_U_KONTRAHENTOW: Dict[str, KosztUKontrahenta] = {
+    "Wieczorne ognisko": KosztUKontrahenta(
+        "Wieczorne ognisko", 50, 80, "Sieć hoteli Gromada"
+    ),
+    "Karkonoskie fondue": KosztUKontrahenta(
+        "Karkonoskie fondue", 15, 40, "Jarska Apartments"
+    ),
+    "Masaż misami tybetańskimi": KosztUKontrahenta(
+        "Masaż misami tybetańskimi", 40, 70, "Siec hoteli Gromada"
+    ),
+}
 
-# data wyjazdu, data powrotu, liczba osob, nazwa propozycji
-WYCIECZKI = [
-    (   #id_wycieczki = 1
+
+class Wycieczka:
+    """Klasa reprezentujaca wycieczke"""
+
+    def __init__(
+        self,
+        data_wyjazdu: datetime,
+        data_powrotu: datetime,
+        liczba_osob: int,
+        nazwa_propozycji: str,
+        klienci_wycieczki: List[int],  # id klientow od 1
+        transakcje_kontrahenci: List[Tuple[int, str]],  # kwota, nazwa kontrahenta
+        koszty_klienta_razem: int,
+        pracownicy_wycieczki: List[str],
+        uslugi_dodatkowe: Optional[List[str]] = None,
+    ):
+        self.data_wyjazdu = data_wyjazdu
+        self.data_powrotu = data_powrotu
+        self.liczba_osob = liczba_osob
+        self.nazwa_propozycji = nazwa_propozycji
+        self.klienci_wycieczki = klienci_wycieczki
+        self.transakcje_kontrahenci = transakcje_kontrahenci
+        self.koszty_klienta_razem = koszty_klienta_razem
+        self.pracownicy_wycieczki = pracownicy_wycieczki
+        self.uslugi_dodatkowe = uslugi_dodatkowe
+
+
+def dokladnie_iles_co_random(
+    start: int, ile: int, jaki_random: Tuple[int, int]
+) -> List[int]:
+    """Funkcja zwracajaca liste od min do ile co co_ile"""
+    ret = []
+    for _ in range(ile):
+        ret.append(start)
+        start += randint(*jaki_random)
+    return ret
+
+
+WYCIECZKI: List[Wycieczka] = [
+    Wycieczka(
         datetime(2024, 1, 3, 6, 0, 0),
         datetime(2024, 1, 4, 22, 0, 0),
         50,
         "Morsowanie Międzyzdroje",
+        range(1, 51),
+        [(500, "Sieć hoteli Gromada")],
+        610,
+        ["Kierowca1", "Organizator1"],
     ),
-    (   #id_wycieczki = 2
+    Wycieczka(
         datetime(2024, 1, 26, 6, 0, 0),
         datetime(2024, 1, 27, 22, 0, 0),
         48,
         "Morsowanie Międzyzdroje",
     ),
-    (   #id_wycieczki = 3
+    (  # id_wycieczki = 3
         datetime(2024, 2, 2, 7, 0, 0),
         datetime(2024, 2, 4, 17, 0, 0),
         14,
         "Narty Karpacz",
     ),
-    (   #id_wycieczki = 4
+    (  # id_wycieczki = 4
         datetime(2024, 2, 9, 7, 0, 0),
         datetime(2024, 2, 11, 17, 0, 0),
         20,
         "Narty Karpacz",
     ),
-    (   #id_wycieczki = 5
+    (  # id_wycieczki = 5
         datetime(2024, 3, 9, 8, 0, 0),
         datetime(2024, 3, 9, 18, 0, 0),
         49,
         "Góry Stołowe",
     ),
-    (   #id_wycieczki = 6
+    (  # id_wycieczki = 6
         datetime(2024, 3, 23, 8, 0, 0),
         datetime(2024, 3, 23, 18, 0, 0),
         45,
@@ -345,37 +465,44 @@ WYCIECZKI = [
     ),
 ]
 
+# klucz to id wycieczki, od 1
+KLIENCI_WYCIECZKI = {
+    i + 1: WYCIECZKI[i].klienci_wycieczki for i in range(len(WYCIECZKI))
+}
+
+
 # w pierwszych wycieczkach przelew byl po 7 dniach od zakończenia wycieczki
 
 # kwota, data transakcji, nazwa kontrahenta, id_wycieczki od 1!
-TRANSAKCJE_KONTRAHENCI = [
-    (5000, WYCIECZKI[0][1] + timedelta(days=7), "Siec hoteli Gromada", 1),
-    (4800, WYCIECZKI[1][1] + timedelta(days=7), "Siec hoteli Gromada", 2),
-    (2400, WYCIECZKI[1][1] + timedelta(days=7), "Wypożyczalnia desek surfingowych", 1),
-    (3290, WYCIECZKI[2][1] + timedelta(days=7), "Jarska Apartments", 3),
-    (20*MIEJSCA_WYCIECZKI["Narty Karpacz"][2], WYCIECZKI[3][1] + timedelta(days=7), "Jarska Apartments", 4),
-    (randint(10,14)*RODZAJE_USLUG_DODATKOWYCH["Sprzęt narciarski"][1], WYCIECZKI[2][1] + timedelta(days=7), "Wypożyczalnia sprzętu narciarskiego", 3), # losujemy ile osób nie miało nart i musiało wypożyczyć
-    (randint(8,12)*RODZAJE_USLUG_DODATKOWYCH["Sprzęt narciarski"][1], WYCIECZKI[3][1] + timedelta(days=7), "Wypożyczalnia sprzętu narciarskiego", 4),
-    (20*KOSZTY_U_KONTRAHENTOW["Karkonoskie fondue"][0], WYCIECZKI[3][1] + timedelta(days=7), "Jarska Apartments", 4),
-    (49*MIEJSCA_WYCIECZKI["Góry Stołowe"][2], WYCIECZKI[4][1] + timedelta(days=7), "Swojska Gastronomia", 5),
-    (randint(20,30)*RODZAJE_USLUG_DODATKOWYCH["Kijki do chodzenia"][1], WYCIECZKI[4][1] + timedelta(days=7), "Górpol", 5),
-    (45*MIEJSCA_WYCIECZKI["Góry Stołowe"][2], WYCIECZKI[5][1] + timedelta(days=7), "Swojska Gastronomia", 6),
-    (randint(20,30)*RODZAJE_USLUG_DODATKOWYCH["Kijki do chodzenia"][1], WYCIECZKI[5][1] + timedelta(days=7), "Górpol", 6),
-]
+TRANSAKCJE_KONTRAHENCI = []
+
+for i, wycieczka in enumerate(WYCIECZKI, start=1):
+    for j in wycieczka.transakcje_kontrahenci:
+        TRANSAKCJE_KONTRAHENCI.append(
+            (
+                j[0],
+                wycieczka.data_powrotu + timedelta(days=7),
+                j[1],
+                i,
+            )
+        )
+
+TRANSAKCJE_KONTRAHENCI.sort(key=lambda x: x[1])
+
 
 # kwota, data transakcji, id_klienta, id_wycieczki
-TRANSAKCJE_KLIENCI = {}
-
-# klucz to id wycieczki
-KOSZTY_KLIENTA_RAZEM = {
-    0: 610,
-    1: 690,
-}
+TRANSAKCJE_KLIENCI = []
 
 # klienci placa do dnia przed wycieczka
-for i in range(LICZBA_WYCIECZEK):
+for i, wycieczka in enumerate(WYCIECZKI, start=1):
     for j in KLIENCI_WYCIECZKI[i]:
-        TRANSAKCJE_KLIENCI[(j, i + 1)] = (
-            KOSZTY_KLIENTA_RAZEM[i],
-            WYCIECZKI[i][0] - timedelta(days=randint(1, 3)),
+        TRANSAKCJE_KLIENCI.append(
+            (
+                wycieczka.koszty_klienta_razem,
+                wycieczka.data_wyjazdu - timedelta(days=randint(1, 3)),
+                j,
+                i,
+            )
         )
+
+TRANSAKCJE_KLIENCI.sort(key=lambda x: x[1])
