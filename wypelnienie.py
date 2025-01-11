@@ -9,7 +9,25 @@ import mysql.connector
 from mysql.connector import errorcode
 from dotenv import load_dotenv
 from sql import DB_NAME, TABLES, ORDER_TO_CREATE, ORDER_TO_DROP
-from do_wypelnienia import *
+from do_wypelnienia import (
+    LICZBA_KLIENTOW,
+    STANOWISKA,
+    PRACOWNICY,
+    RODZAJE_TRANSPORTU,
+    MIASTA,
+    TRANSAKCJE_PRACOWNICY,
+    TRANSAKCJE_KONTRAHENCI,
+    TRANSAKCJE_KLIENCI,
+    KONTRAHENCI,
+    ADRESY,
+    KOSZTY_MIASTA,
+    KOSZTY_U_KONTRAHENTOW,
+    MIEJSCA_WYCIECZKI,
+    PROPOZYCJE,
+    WYCIECZKI,
+    RODZAJE_USLUG_DODATKOWYCH,
+    Adres,
+)
 
 load_dotenv()
 parser = argparse.ArgumentParser(description="Wypelnienie bazy danych")

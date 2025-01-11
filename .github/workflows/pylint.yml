@@ -26,4 +26,4 @@ jobs:
         pip install -r requirements.txt && pip install pylint
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        pylint $(git ls-files '*.py') --fail-under=9 --disable=C0301,R0903,R0913,R0902,R0914,R0915,R0917

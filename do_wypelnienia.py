@@ -324,14 +324,14 @@ KLIENCI_WYCIECZKI = {
 # kwota, data transakcji, nazwa kontrahenta, id_wycieczki od 1!
 TRANSAKCJE_KONTRAHENCI = []
 
-for i in range(len(WYCIECZKI)):
-    for j in WYCIECZKI[i].transakcje_kontrahenci:
+for i, wycieczka in enumerate(WYCIECZKI, start=1):
+    for j in wycieczka.transakcje_kontrahenci:
         TRANSAKCJE_KONTRAHENCI.append(
             (
                 j[0],
-                WYCIECZKI[i].data_powrotu + timedelta(days=7),
+                wycieczka.data_powrotu + timedelta(days=7),
                 j[1],
-                i + 1,
+                i,
             )
         )
 
@@ -340,13 +340,13 @@ for i in range(len(WYCIECZKI)):
 TRANSAKCJE_KLIENCI = []
 
 # klienci placa do dnia przed wycieczka
-for i in range(len(WYCIECZKI)):
+for i, wycieczka in enumerate(WYCIECZKI, start=1):
     for j in KLIENCI_WYCIECZKI[i + 1]:
         TRANSAKCJE_KLIENCI.append(
             (
-                WYCIECZKI[i].koszty_klienta_razem,
-                WYCIECZKI[i].data_wyjazdu - timedelta(days=randint(1, 3)),
+                wycieczka.koszty_klienta_razem,
+                wycieczka.data_wyjazdu - timedelta(days=randint(1, 3)),
                 j,
-                i + 1,
+                i,
             )
         )
