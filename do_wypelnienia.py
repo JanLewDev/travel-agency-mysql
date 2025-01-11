@@ -335,13 +335,15 @@ for i, wycieczka in enumerate(WYCIECZKI, start=1):
             )
         )
 
+TRANSAKCJE_KONTRAHENCI.sort(key=lambda x: x[1])
+
 
 # kwota, data transakcji, id_klienta, id_wycieczki
 TRANSAKCJE_KLIENCI = []
 
 # klienci placa do dnia przed wycieczka
 for i, wycieczka in enumerate(WYCIECZKI, start=1):
-    for j in KLIENCI_WYCIECZKI[i + 1]:
+    for j in KLIENCI_WYCIECZKI[i]:
         TRANSAKCJE_KLIENCI.append(
             (
                 wycieczka.koszty_klienta_razem,
@@ -350,3 +352,5 @@ for i, wycieczka in enumerate(WYCIECZKI, start=1):
                 i,
             )
         )
+
+TRANSAKCJE_KLIENCI.sort(key=lambda x: x[1])
