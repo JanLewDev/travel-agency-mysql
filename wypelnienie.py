@@ -478,18 +478,18 @@ def fill_propozycje(connection):
                     "INSERT INTO propozycja_koszt_u_kontrahenta (id_propozycji, id_kosztu_u_kontrahenta) VALUES (%s, %s)",
                     (id_propozycji, id_kosztu),
                 )
-
-        cursor.close()
         connection.commit()
+
+    cursor.close()
 
 
 def fill_wycieczki(connection):
     """Funkcja wypelniajaca tabele wycieczki i powiazane"""
+    cursor = connection.cursor()
     for wycieczka in WYCIECZKI:
         id_propozycji = get_id_from_table(
             connection, "propozycje_wycieczki", "nazwa", wycieczka.nazwa_propozycji
         )
-        cursor = connection.cursor()
         cursor.execute(
             "INSERT INTO wycieczki (czas_wyjazdu, czas_powrotu, liczba_osob, id_propozycji) VALUES (%s, %s, %s, %s)",
             (
@@ -562,9 +562,9 @@ def fill_wycieczki(connection):
                 "INSERT INTO pracownik_wycieczka (id_wycieczki, id_pracownika) VALUES (%s, %s)",
                 (id_wycieczki, pracownik_id),
             )
-
-        cursor.close()
         connection.commit()
+
+    cursor.close()
 
 
 def fill_transakcje_pracownicy(connection):

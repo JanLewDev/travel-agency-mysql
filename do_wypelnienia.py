@@ -6,7 +6,7 @@ from typing import List, Tuple, Optional, Dict
 
 # firma dziala w 2024 roku
 
-LICZBA_KLIENTOW = 200
+LICZBA_KLIENTOW = 250
 
 # klucz to nazwa stanowiska, wartosc to pensja
 STANOWISKA = {
@@ -66,6 +66,9 @@ TRANSAKCJE_PRACOWNICY = [
 # koszt, cena dla klienta
 KOSZTY_MIASTA = {
     "Międzyzdroje": (2 * 100, 2 * 150),
+    "Karpacz": (2 * 65, 2 * 100),
+    "Szczecinek": (2 * 90, 2 * 130),
+    "Polanica-Zdrój": (2 * 50, 2 * 80),
 }
 
 # propozycja - dwudniowe morsowanie w Międzyzdrojach w styczniu
@@ -153,13 +156,13 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         140,
         235,
         "Karpacz",
-        "Jarska Apartments",
+        "Pensjonat Jar",
         ["Autokar 2"],
         ["Karkonoskie fondue"],
     ),
     PropozycjaWycieczki(
         "Wakeboard Szczecinek",
-        "Dwudniowy wypad na wakeboard",
+        "Dwudniowy wypad na wakeboard na jeziorze Trzesiecko",
         "Umiejętność pływania na wakeboardzie",
         30,
         50,
@@ -172,12 +175,12 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
     ),
     PropozycjaWycieczki(
         "Góry Stołowe",
-        "Jednodniowa wycieczka, bez kontrahenta",
+        "Jednodniowa wycieczka PN Góry Stołowe z obiadem w karczmie",
         None,
         45,
         50,
+        15,
         30,
-        65,
         "Polanica-Zdrój",
         "Karczma U Krysi",
         ["Autokar 2"],
@@ -207,10 +210,10 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
         "Hotel Gromada Międzyzdroje",
         100,
         150,
-        "Siec hoteli Gromada",
+        "Sieć hoteli Gromada",
     ),
-    "Penjonat Jar": MiejsceWycieczki(
-        "Penjonat Jar",
+    "Pensjonat Jar": MiejsceWycieczki(
+        "Pensjonat Jar",
         235,
         300,
         "Jarska Apartments",
@@ -219,7 +222,7 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
         "Hotel Zacisze",
         70,
         105,
-        "Siec hoteli Gromada",
+        "Sieć hoteli Gromada",
     ),
     "Karczma U Krysi": MiejsceWycieczki(
         "Karczma U Krysi",
@@ -262,12 +265,15 @@ ADRESY: Dict[str, Adres] = {
         "58-540",
     ),
     "Jarska Apartments": Adres("ul. Hetmańska 2", None, "Legnica", "59-220"),
+    "Pensjonat Jar": Adres("ul. Narutowicza 1", None, "Karpacz", "58-540"),
+    "Hotel Zacisze": Adres("ul. Polna 25", None, "Szczecinek", "78-400"),
     "Wakeboard Szczecinek": Adres("ul. Polna 25", None, "Szczecinek", "78-400"),
     "Wypożyczalnia wakeboardowa": Adres(
         "ul. Kościuszki 14", None, "Szczecinek", "78-400"
     ),
     "Góry Stołowe": Adres("ul. Ogrodowa 11", None, "Polanica-Zdrój", "57-320"),
     "Swojska Gastronomia": Adres("ul. Francuska 18", None, "Warszawa", "03-906"),
+    "Karczma U Krysi": Adres("ul. Górska 10", None, "Polanica-Zdrój", "57-320"),
     "Górpol": Adres("ul. Górska 1", None, "Polanica-Zdrój", "57-320"),
 }
 
@@ -357,6 +363,36 @@ KONTRAHENCI: Dict[str, Kontrahent] = {
         "deski.baltyk@gmail.com",
         "Wypożyczalnia desek surfingowych",
     ),
+    "Wypożyczalnia sprzętu narciarskiego": Kontrahent(
+        "Wypożyczalnia sprzętu narciarskiego",
+        "Wypożyczalnia sprzętu narciarskiego działająca w górach",
+        "ski.rental@tlen.pl",
+        "Wypożyczalnia sprzętu narciarskiego",
+    ),
+    "Jarska Apartments": Kontrahent(
+        "Jarska Apartments",
+        "Sieć pensjonatów Jarska działające w Polsce",
+        "contact.jarska@hotmail.com",
+        "Sieć pensjonatów Jarska biuro",
+    ),
+    "Wypożyczalnia wakeboardowa": Kontrahent(
+        "Wypożyczalnia wakeboardowa",
+        "Wypożyczalnia desek wakeboardowych, pianek i kasków",
+        "wakeboard.szczecinek@wp.pl",
+        "Wypożyczalnia wakeboardowa",
+    ),
+    "Swojska Gastronomia": Kontrahent(
+        "Swojska Gastronomia",
+        "Firma obsługujące restauracje w Polsce",
+        "swojska.gastro@gmail.com",
+        "Swojska Gastronomia",
+    ),
+    "Górpol": Kontrahent(
+        "Górpol",
+        "Firma zajmująca się górskim sprzętem",
+        "gorpol@interia.pl",
+        "Górpol",
+    ),
 }
 
 
@@ -380,7 +416,7 @@ KOSZTY_U_KONTRAHENTOW: Dict[str, KosztUKontrahenta] = {
         "Karkonoskie fondue", 15, 40, "Jarska Apartments"
     ),
     "Masaż misami tybetańskimi": KosztUKontrahenta(
-        "Masaż misami tybetańskimi", 40, 70, "Siec hoteli Gromada"
+        "Masaż misami tybetańskimi", 40, 70, "Sieć hoteli Gromada"
     ),
 }
 
@@ -429,7 +465,7 @@ WYCIECZKI: List[Wycieczka] = [
         50,
         "Morsowanie Międzyzdroje",
         range(1, 51),
-        [(500, "Sieć hoteli Gromada")],
+        [(5000, "Sieć hoteli Gromada")],
         610,
         ["Kierowca1", "Organizator1"],
     ),
@@ -438,36 +474,82 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 1, 27, 22, 0, 0),
         48,
         "Morsowanie Międzyzdroje",
+        dokladnie_iles_co_random(1, 48, (1, 2)),
+        [(4800, "Sieć hoteli Gromada"), (2400, "Wypożyczalnia desek surfingowych")],
+        690,
+        ["Kierowca1", "Organizator2"],
+        ["Deski surfingowe"],
     ),
-    (  # id_wycieczki = 3
+    Wycieczka(
         datetime(2024, 2, 2, 7, 0, 0),
         datetime(2024, 2, 4, 17, 0, 0),
         14,
         "Narty Karpacz",
+        range(100, 114),  # zaadaptowac
+        [
+            (3290, "Jarska Apartments"),
+            (
+                randint(10, 14) * RODZAJE_USLUG_DODATKOWYCH["Sprzęt narciarski"].koszt,
+                "Wypożyczalnia sprzętu narciarskiego",
+            ),
+        ],
+        20,  # poprawic
+        ["Kierowca2", "Organizator1"],
+        ["Sprzęt narciarski"],
     ),
-    (  # id_wycieczki = 4
+    Wycieczka(
         datetime(2024, 2, 9, 7, 0, 0),
         datetime(2024, 2, 11, 17, 0, 0),
         20,
         "Narty Karpacz",
+        range(120, 140),  # zaadaptowac
+        [
+            (
+                20 * 235 + 20 * KOSZTY_U_KONTRAHENTOW["Karkonoskie fondue"].koszt,
+                "Jarska Apartments",
+            ),
+            (
+                20 * RODZAJE_USLUG_DODATKOWYCH["Sprzęt narciarski"].koszt,
+                "Wypożyczalnia sprzętu narciarskiego",
+            ),
+        ],
+        20,  # poprawic
+        ["Kierowca2", "Organizator1"],
+        ["Sprzęt narciarski"],
     ),
-    (  # id_wycieczki = 5
+    Wycieczka(
         datetime(2024, 3, 9, 8, 0, 0),
         datetime(2024, 3, 9, 18, 0, 0),
         49,
         "Góry Stołowe",
+        range(140, 189),  # zaadaptowac
+        [
+            (49 * MIEJSCA_WYCIECZKI["Karczma U Krysi"].koszt, "Swojska Gastronomia"),
+            (49 * RODZAJE_USLUG_DODATKOWYCH["Kijki do chodzenia"].koszt, "Górpol"),
+        ],
+        20,  # poprawic
+        ["Kierowca3", "Organizator2"],
+        ["Kijki do chodzenia"],
     ),
-    (  # id_wycieczki = 6
+    Wycieczka(
         datetime(2024, 3, 23, 8, 0, 0),
         datetime(2024, 3, 23, 18, 0, 0),
         45,
         "Góry Stołowe",
+        range(190, 235),  # zaaadaptowac
+        [
+            (45 * MIEJSCA_WYCIECZKI["Karczma U Krysi"].koszt, "Swojska Gastronomia"),
+            (45 * RODZAJE_USLUG_DODATKOWYCH["Kijki do chodzenia"].koszt, "Górpol"),
+        ],
+        20,
+        ["Kierowca3", "Organizator2"],
+        ["Kijki do chodzenia"],
     ),
 ]
 
 # klucz to id wycieczki, od 1
 KLIENCI_WYCIECZKI = {
-    i + 1: WYCIECZKI[i].klienci_wycieczki for i in range(len(WYCIECZKI))
+    i: wycieczka.klienci_wycieczki for i, wycieczka in enumerate(WYCIECZKI, start=1)
 }
 
 
