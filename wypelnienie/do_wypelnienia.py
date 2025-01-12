@@ -567,7 +567,7 @@ WYCIECZKI: List[Wycieczka] = [
     Wycieczka(
         datetime(2024, 7, 14, 7, 0, 0),
         datetime(2024, 7, 28, 22, 0, 0),
-        48,
+        45,
         "Wypoczynek na Helu",
         range(200, 248),  # zaadaptowac
         [],
@@ -701,12 +701,24 @@ def test():
     assert len(TRANSAKCJE_PRACOWNICY) == 12 * len(PRACOWNICY)
 
     czasy_wycieczek_klienta: Dict[int, List[tuple[datetime, datetime]]] = {}
-    for wycieczkaa in WYCIECZKI:
-        for klient in wycieczkaa.klienci_wycieczki:
+    for wycieczka in WYCIECZKI:
+        propozycja = next(
+            propozycja
+            for propozycja in PROPOZYCJE
+            if propozycja.nazwa == wycieczka.nazwa_propozycji
+        )
+        assert (
+            wycieczka.data_wyjazdu < wycieczka.data_powrotu
+        ), f"{wycieczka.nazwa_propozycji} -> koniec przed startem"
+        assert (
+            propozycja.min_osob <= wycieczka.liczba_osob <= propozycja.max_osob
+        ), f"{wycieczka.nazwa_propozycji} -> niepoprawna liczba osob"
+
+        for klient in wycieczka.klienci_wycieczki:
             if klient not in czasy_wycieczek_klienta:
                 czasy_wycieczek_klienta[klient] = []
             czasy_wycieczek_klienta[klient].append(
-                (wycieczkaa.data_wyjazdu, wycieczkaa.data_powrotu)
+                (wycieczka.data_wyjazdu, wycieczka.data_powrotu)
             )
 
     for klient, czasy in czasy_wycieczek_klienta.items():

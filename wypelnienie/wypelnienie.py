@@ -574,7 +574,8 @@ def fill_wycieczki(connection):
 def fill_transakcje_pracownicy(connection):
     """Funkcja wypelniajaca tabele transakcje pracownicy"""
     cursor = connection.cursor()
-    for data, pracownik, kwota in TRANSAKCJE_PRACOWNICY:
+    for i in progressbar(range(len(TRANSAKCJE_PRACOWNICY))):
+        data, pracownik, kwota = TRANSAKCJE_PRACOWNICY[i]
         id_pracownika = get_id_from_table(connection, "pracownicy", "uwagi", pracownik)
         cursor.execute(
             "INSERT INTO transakcje_pracownicy (kwota, data_transakcji, id_pracownika) VALUES (%s, %s, %s)",
@@ -587,7 +588,8 @@ def fill_transakcje_pracownicy(connection):
 def fill_transakcje_kontrahenci(connection):
     """Funkcja wypelniajaca tabele transakcje kontrahenci"""
     cursor = connection.cursor()
-    for kwota, data, kontrahent, id_wycieczki in TRANSAKCJE_KONTRAHENCI:
+    for i in progressbar(range(len(TRANSAKCJE_KONTRAHENCI))):
+        kwota, data, kontrahent, id_wycieczki = TRANSAKCJE_KONTRAHENCI[i]
         id_kontrahenta = get_id_from_table(
             connection, "kontrahenci", "nazwa", kontrahent
         )
