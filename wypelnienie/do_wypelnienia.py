@@ -30,6 +30,7 @@ PRACOWNICY = {
     "Marketingowiec": "Marketingowiec",
     "Organizator1": "Organizator",
     "Organizator2": "Organizator",
+    "Organizator3": "Organizator",
 }
 
 # tablice zeby potem sie odwolywac po indeksie
@@ -54,6 +55,7 @@ MIASTA = {
     "Legnica": "Polska",
     "Szczecinek": "Polska",
     "Polanica-Zdrój": "Polska",
+    "Hel": "Polska",
 }
 
 # transakcje najpierw posortowac
@@ -186,6 +188,21 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         "Karczma U Krysi",
         ["Autokar 2"],
     ),
+    PropozycjaWycieczki(
+        "Wypoczynek na Helu",
+        "Polskie morze w ostatnich latach cieszy się coraz większym zainteresowaniem ze strony \
+            turystów. Oferujemy dwutygodniowe wakacje na tym malowniczym półwyspie, opalanie się \
+                na plaży, pływanie w Bałtyku albo poznawanie historii w Muzeum Obrony Wybrzeża - \
+                    każdy znajdzie coś dla siebie.",
+        None,
+        30,
+        45,
+        100,
+        150,
+        "Hel",
+        "Hotel Gromada Hel",
+        ["Autokar 2"],
+    ),
 ]
 
 
@@ -231,6 +248,12 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
         65,
         "Swojska Gastronomia",
     ),
+    "Hotel Gromada Hel": MiejsceWycieczki(
+        "Hotel Gromada Hel",
+        2000,
+        3000,
+        "Sieć hoteli Gromada",
+    ),
 }
 
 
@@ -254,6 +277,7 @@ ADRESY: Dict[str, Adres] = {
     "Hotel Gromada Międzyzdroje": Adres(
         "ul. Wyzwolenia 1", None, "Międzyzdroje", "72-500"
     ),
+    "Hotel Gromada Hel": Adres("ul. J. Piłsudzkiego 64", None, "Hel", "84-150"),
     "Sieć hoteli Gromada": Adres("ul. Marszałkowska 1", None, "Warszawa", "00-500"),
     "Wypożyczalnia desek surfingowych": Adres(
         "ul. Nadmorska 1", None, "Międzyzdroje", "72-500"
@@ -276,6 +300,7 @@ ADRESY: Dict[str, Adres] = {
     "Swojska Gastronomia": Adres("ul. Francuska 18", None, "Warszawa", "03-906"),
     "Karczma U Krysi": Adres("ul. Górska 10", None, "Polanica-Zdrój", "57-320"),
     "Górpol": Adres("ul. Górska 1", None, "Polanica-Zdrój", "57-320"),
+    "Szkoła kitesurfingu ProKajciarz": Adres("ul. Pogodna 15", None, "Hel", "84-150"),
 }
 
 # koszt, cena dla klienta
@@ -284,6 +309,7 @@ KOSZTY_MIASTA = {
     "Karpacz": (2 * 65, 2 * 100),
     "Szczecinek": (2 * 90, 2 * 130),
     "Polanica-Zdrój": (2 * 50, 2 * 80),
+    "Hel": (2 * 150, 2 * 200),
 }
 
 # deska - mamy umowe ze dadza tyle desek ile beda potrzebowac klienci
@@ -337,6 +363,13 @@ RODZAJE_USLUG_DODATKOWYCH: Dict[str, RodzajUslugiDodatkowej] = {
         15,
         25,
         "Górpol",
+    ),
+    "Kurs kitesurfingu": RodzajUslugiDodatkowej(
+        "Kurs kitesurfingu",
+        "Kurs szkoleniowy kitesurfingu po Bałtyku pod okiem doświadczonych instruktorów.",
+        1000,
+        1500,
+        "Szkoła kitesurfingu ProKajciarz",
     ),
 }
 
@@ -393,6 +426,12 @@ KONTRAHENCI: Dict[str, Kontrahent] = {
         "Firma zajmująca się górskim sprzętem",
         "gorpol@interia.pl",
         "Górpol",
+    ),
+    "Szkoła kitesurfingu ProKajciarz": Kontrahent(
+        "Szkoła kitesurfingu ProKajciarz",
+        "Szkoła kitesurfingu działająca na Helu",
+        "kontakt@prokajciarz.com",
+        "Szkoła kitesurfingu ProKajciarz",
     ),
 }
 
@@ -521,9 +560,20 @@ WYCIECZKI: List[Wycieczka] = [
         "Góry Stołowe",
         range(190, 235),  # zaaadaptowac
         [],
-        20,
+        0,
         ["Kierowca3", "Organizator2"],
         ["Kijki do chodzenia"],
+    ),
+    Wycieczka(
+        datetime(2024, 7, 14, 7, 0, 0),
+        datetime(2024, 7, 28, 22, 0, 0),
+        48,
+        "Wypoczynek na Helu",
+        range(200, 248),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca2", "Organizator3"],
+        ["Kurs kitesurfingu"],
     ),
 ]
 
