@@ -628,7 +628,8 @@ def calculate_koszty_klienta_razem():
         )
         miejsce_wycieczki = MIEJSCA_WYCIECZKI[propozycja.miejsce_wycieczki_nazwa]
         wycieczka.koszty_klienta_razem = (
-            miejsce_wycieczki.cena_dla_kilienta
+            propozycja.nasze_koszty_na_osobe_total
+            + miejsce_wycieczki.cena_dla_kilienta
             + sum(
                 (
                     KOSZTY_U_KONTRAHENTOW[koszt_u_kontrahenta].cena_dla_kilienta
