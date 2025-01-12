@@ -81,9 +81,8 @@ PROPOZYCJE = [
         30,
         45,
         100,
-        150
-    )
-
+        150,
+    ),
 ]
 
 # nazwa, id_adresu, ma byc w adres klucz taki jak tu, koszt, cena dla klienta, nazwa kontrahenta
@@ -100,16 +99,14 @@ MIEJSCA_WYCIECZKI = {
         None,
         2000,
         3000,
-        "Siec hoteli Gromada"
-    )
+        "Siec hoteli Gromada",
+    ),
 }
 
 # nazwa, linijka 1, linijka 2, id_miasto(potem), kod pocztowy
 ADRESY = {
     "Morsowanie Międzyzdroje": ("ul. Wyzwolenia 1", None, "Międzyzdroje", "72-500"),
-    "Wypoczynek na Helu": (
-        "ul. J. Piłsudzkiego 64", None, "Hel", "84-150"
-    ),
+    "Wypoczynek na Helu": ("ul. J. Piłsudzkiego 64", None, "Hel", "84-150"),
     "Siec hoteli Gromada biuro": ("ul. Marszałkowska 1", None, "Warszawa", "00-500"),
     "Wypożyczalnia desek surfingowych": (
         "ul. Nadmorska 1",
@@ -117,19 +114,11 @@ ADRESY = {
         "Międzyzdroje",
         "72-500",
     ),
-    "Szkoła kitesurfingu ProKajciarz": (
-        "ul. Pogodna 15",
-        None,
-        "Hel",
-        "84-150"
-    )
+    "Szkoła kitesurfingu ProKajciarz": ("ul. Pogodna 15", None, "Hel", "84-150"),
 }
 
 # koszt, cena dla klienta
-KOSZTY_MIASTA = {
-    "Międzyzdroje": (2 * 100, 2 * 150),
-    "Hel": (2*150, 2*200)
-}
+KOSZTY_MIASTA = {"Międzyzdroje": (2 * 100, 2 * 150), "Hel": (2 * 150, 2 * 200)}
 
 # nazwa, opis_uslugi, koszt, cena dla klienta, nazwa kontrahenta
 # deska - mamy umowe ze dadza tyle desek ile beda potrzebowac klienci
@@ -145,12 +134,12 @@ RODZAJE_USLUG_DODATKOWYCH = {
         "Kurs szkoleniowy kitesurfingu po Bałtyku pod okiem doświadczonych instruktorów.",
         1000,
         1500,
-        "Szkoła kitesurfingu ProKajciarz"
-    )
+        "Szkoła kitesurfingu ProKajciarz",
+    ),
 }
 
 # klucz to id_wycieczki, wartosc to lista z nazwami uslug
-USLUGI_DODATKOWE = {1: ["Deski surfingowe"], 2:["Kurs kitesurfingu"]}
+USLUGI_DODATKOWE = {1: ["Deski surfingowe"], 2: ["Kurs kitesurfingu"]}
 
 # nazwa, opis, email, nazwa_adresu
 KONTRAHENCI = {
@@ -170,8 +159,8 @@ KONTRAHENCI = {
         "Szkoła kitesurfingu Prokajciarz",
         "Kursu kitesurfingu po Bałtyku",
         "kontakt@prokajciarz.com",
-        "Szkoła kitesurfingu Prokajciarz"
-    )
+        "Szkoła kitesurfingu Prokajciarz",
+    ),
 }
 
 # nazwa, koszt, cena dla klienta, id_kontrahenta (potem)
@@ -185,14 +174,14 @@ PROPOZYCJE_KOSZT_U_KONTRAHENTOW = {"Morsowanie Międzyzdroje": ["Wieczorne ognis
 # klucz to nazwa propozycji, wartosci to (nazwa_transportu, koszty_miasta_klucz)
 TRANSPORT_PROPOZYCJA_WYCIECZKI = {
     "Morsowanie Międzyzdroje": ("Autokar 1", "Międzyzdroje"),
-    "Wypoczynek na Helu": ("Autokar 2", "Hel")
+    "Wypoczynek na Helu": ("Autokar 2", "Hel"),
 }
 
 # klucz to id_wycieczki, wartosc to lista nazw pracownikow
 PRACOWNIK_WYCIECZKA = {
     1: ["Kierowca1", "Organizator1"],
     2: ["Kierowca1", "Organizator2"],
-    3: ["Kierowca2", "Organizator3"]
+    3: ["Kierowca2", "Organizator3"],
 }
 
 
@@ -225,11 +214,11 @@ WYCIECZKI = [
         "Morsowanie Międzyzdroje",
     ),
     (
-        datetime(2024, 7,14,7,0,0),
-        datetime(2024, 7,28,7,0,0),
+        datetime(2024, 7, 14, 7, 0, 0),
+        datetime(2024, 7, 28, 7, 0, 0),
         45,
-        "Wypoczynek na Helu"
-    )
+        "Wypoczynek na Helu",
+    ),
 ]
 
 # w pierwszych wycieczkach przelew byl po 7 dniach od zakończenia wycieczki
@@ -246,11 +235,7 @@ TRANSAKCJE_KONTRAHENCI = [
 TRANSAKCJE_KLIENCI = {}
 
 # klucz to id wycieczki
-KOSZTY_KLIENTA_RAZEM = {
-    0: 610,
-    1: 690,
-    2: 3550
-}
+KOSZTY_KLIENTA_RAZEM = {0: 610, 1: 690, 2: 3550}
 
 # klienci placa do dnia przed wycieczka
 for i in range(LICZBA_WYCIECZEK):
