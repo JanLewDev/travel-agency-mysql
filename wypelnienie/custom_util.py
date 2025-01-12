@@ -4,6 +4,7 @@ import sys
 import time
 
 
+# https://stackoverflow.com/a/34482761
 def progressbar(it, prefix="", size=60, out=sys.stdout):
     """Funkcja generujaca pasek postepu."""
     count = len(it)
