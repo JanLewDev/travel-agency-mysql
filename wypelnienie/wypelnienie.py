@@ -29,6 +29,8 @@ from do_wypelnienia import (
     Adres,
 )
 
+from custom_util import progressbar
+
 DIRNAME = os.path.dirname(os.path.abspath(__file__))
 
 load_dotenv(dotenv_path=f"{DIRNAME}/../.env")
@@ -243,7 +245,7 @@ def unpolish_string(string: str) -> str:
 
 def fill_klienci(connection):
     """Funkcja wypelniajaca tabele klienci"""
-    for _ in range(LICZBA_KLIENTOW):
+    for _ in progressbar(range(LICZBA_KLIENTOW)):
         imie, nazwisko, plec = get_random_name()
         telefon = f"{randint(500, 999)}-{randint(100, 999)}-{randint(100, 999)}"
         numer_bliskiego = (
@@ -601,7 +603,8 @@ def fill_transakcje_kontrahenci(connection):
 
 def fill_transakcje_klienci(connection):
     """Funkcja wypelniajaca tabele transakcje klienci"""
-    for kwota, data, id_klienta, id_wycieczki in TRANSAKCJE_KLIENCI:
+    for i in progressbar(range(len(TRANSAKCJE_KLIENCI))):
+        kwota, data, id_klienta, id_wycieczki = TRANSAKCJE_KLIENCI[i]
         cursor = connection.cursor()
         cursor.execute(
             "INSERT INTO transakcje_klienci (kwota, data_transakcji, id_klienta, id_wycieczki) VALUES (%s, %s, %s, %s)",

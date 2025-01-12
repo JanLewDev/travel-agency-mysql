@@ -3,6 +3,7 @@
 from datetime import datetime, timedelta
 from random import randint
 from typing import List, Tuple, Optional, Dict
+from collections import defaultdict
 
 # firma dziala w 2024 roku
 
@@ -157,7 +158,7 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         235,
         "Karpacz",
         "Pensjonat Jar",
-        ["Autokar 2"],
+        ["Bus 1"],
         ["Karkonoskie fondue"],
     ),
     PropozycjaWycieczki(
@@ -465,8 +466,8 @@ WYCIECZKI: List[Wycieczka] = [
         50,
         "Morsowanie Międzyzdroje",
         range(1, 51),
-        [(5000, "Sieć hoteli Gromada")],
-        610,
+        [],
+        0,
         ["Kierowca1", "Organizator1"],
     ),
     Wycieczka(
@@ -475,8 +476,8 @@ WYCIECZKI: List[Wycieczka] = [
         48,
         "Morsowanie Międzyzdroje",
         dokladnie_iles_co_random(1, 48, (1, 2)),
-        [(4800, "Sieć hoteli Gromada"), (2400, "Wypożyczalnia desek surfingowych")],
-        690,
+        [],
+        0,
         ["Kierowca1", "Organizator2"],
         ["Deski surfingowe"],
     ),
@@ -486,14 +487,8 @@ WYCIECZKI: List[Wycieczka] = [
         14,
         "Narty Karpacz",
         range(100, 114),  # zaadaptowac
-        [
-            (3290, "Jarska Apartments"),
-            (
-                randint(10, 14) * RODZAJE_USLUG_DODATKOWYCH["Sprzęt narciarski"].koszt,
-                "Wypożyczalnia sprzętu narciarskiego",
-            ),
-        ],
-        20,  # poprawic
+        [],
+        0,
         ["Kierowca2", "Organizator1"],
         ["Sprzęt narciarski"],
     ),
@@ -503,17 +498,8 @@ WYCIECZKI: List[Wycieczka] = [
         20,
         "Narty Karpacz",
         range(120, 140),  # zaadaptowac
-        [
-            (
-                20 * 235 + 20 * KOSZTY_U_KONTRAHENTOW["Karkonoskie fondue"].koszt,
-                "Jarska Apartments",
-            ),
-            (
-                20 * RODZAJE_USLUG_DODATKOWYCH["Sprzęt narciarski"].koszt,
-                "Wypożyczalnia sprzętu narciarskiego",
-            ),
-        ],
-        20,  # poprawic
+        [],
+        0,
         ["Kierowca2", "Organizator1"],
         ["Sprzęt narciarski"],
     ),
@@ -523,11 +509,8 @@ WYCIECZKI: List[Wycieczka] = [
         49,
         "Góry Stołowe",
         range(140, 189),  # zaadaptowac
-        [
-            (49 * MIEJSCA_WYCIECZKI["Karczma U Krysi"].koszt, "Swojska Gastronomia"),
-            (49 * RODZAJE_USLUG_DODATKOWYCH["Kijki do chodzenia"].koszt, "Górpol"),
-        ],
-        20,  # poprawic
+        [],
+        0,
         ["Kierowca3", "Organizator2"],
         ["Kijki do chodzenia"],
     ),
@@ -537,10 +520,7 @@ WYCIECZKI: List[Wycieczka] = [
         45,
         "Góry Stołowe",
         range(190, 235),  # zaaadaptowac
-        [
-            (45 * MIEJSCA_WYCIECZKI["Karczma U Krysi"].koszt, "Swojska Gastronomia"),
-            (45 * RODZAJE_USLUG_DODATKOWYCH["Kijki do chodzenia"].koszt, "Górpol"),
-        ],
+        [],
         20,
         ["Kierowca3", "Organizator2"],
         ["Kijki do chodzenia"],
@@ -551,6 +531,73 @@ WYCIECZKI: List[Wycieczka] = [
 KLIENCI_WYCIECZKI = {
     i: wycieczka.klienci_wycieczki for i, wycieczka in enumerate(WYCIECZKI, start=1)
 }
+
+
+def create_transakcje_kontrahenci():
+    """Funkcja tworzaca transakcje kontrahentow"""
+    for wycieczka in WYCIECZKI:
+        wycieczka.transakcje_kontrahenci = []
+        wysokosc_transakcji: Dict[str, int] = defaultdict(lambda: 0)
+        ile_osob = wycieczka.liczba_osob
+        propozycja = next(
+            propozycja
+            for propozycja in PROPOZYCJE
+            if propozycja.nazwa == wycieczka.nazwa_propozycji
+        )
+        miejsce_wycieczki = MIEJSCA_WYCIECZKI[propozycja.miejsce_wycieczki_nazwa]
+        wysokosc_transakcji[miejsce_wycieczki.nazwa_kontrahenta] += (
+            ile_osob * miejsce_wycieczki.koszt
+        )
+
+        propozycja_koszty_u_kontrahentow = propozycja.propozycje_koszt_u_kontrahentow
+        for koszt_u_kontrahenta in propozycja_koszty_u_kontrahentow or []:
+            koszt_u_kontrahenta = KOSZTY_U_KONTRAHENTOW[koszt_u_kontrahenta]
+            wysokosc_transakcji[koszt_u_kontrahenta.nazwa_kontrahenta] += (
+                ile_osob * koszt_u_kontrahenta.koszt
+            )
+
+        for usluga_dodatkowa in wycieczka.uslugi_dodatkowe or []:
+            usluga_dodatkowa = RODZAJE_USLUG_DODATKOWYCH[usluga_dodatkowa]
+            wysokosc_transakcji[usluga_dodatkowa.nazwa_kontrahenta] += (
+                ile_osob * usluga_dodatkowa.koszt
+            )
+
+        for nazwa_kontrahenta, kwota in wysokosc_transakcji.items():
+            wycieczka.transakcje_kontrahenci.append((kwota, nazwa_kontrahenta))
+
+        print(wycieczka.transakcje_kontrahenci)
+
+
+def calculate_koszty_klienta_razem():
+    """Funckja obliczajaca koszty klienta razem"""
+    for wycieczka in WYCIECZKI:
+        propozycja = next(
+            propozycja
+            for propozycja in PROPOZYCJE
+            if propozycja.nazwa == wycieczka.nazwa_propozycji
+        )
+        miejsce_wycieczki = MIEJSCA_WYCIECZKI[propozycja.miejsce_wycieczki_nazwa]
+        wycieczka.koszty_klienta_razem = (
+            miejsce_wycieczki.cena_dla_kilienta
+            + sum(
+                (
+                    KOSZTY_U_KONTRAHENTOW[koszt_u_kontrahenta].cena_dla_kilienta
+                    for koszt_u_kontrahenta in propozycja.propozycje_koszt_u_kontrahentow
+                    or []
+                ),
+                0,
+            )
+            + sum(
+                (
+                    RODZAJE_USLUG_DODATKOWYCH[usluga_dodatkowa].cena_dla_kilienta
+                    for usluga_dodatkowa in wycieczka.uslugi_dodatkowe or []
+                ),
+                0,
+            )
+            + KOSZTY_MIASTA[propozycja.miasto_z_koszty_miasta][1]
+        )
+
+        print(wycieczka.nazwa_propozycji, wycieczka.koszty_klienta_razem)
 
 
 TRANSAKCJE_KONTRAHENCI = []
@@ -620,6 +667,8 @@ def test():
                 ), f"Klient {klient} ma nakładające się wycieczki"
 
 
+create_transakcje_kontrahenci()
+calculate_koszty_klienta_razem()
 gen_transakcje_kontrahenci()
 gen_transakcje_klienci()
 test()
