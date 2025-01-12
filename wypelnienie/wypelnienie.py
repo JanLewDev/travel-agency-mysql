@@ -29,7 +29,9 @@ from do_wypelnienia import (
     Adres,
 )
 
-load_dotenv()
+DIRNAME = os.path.dirname(os.path.abspath(__file__))
+
+load_dotenv(dotenv_path=f"{DIRNAME}/../.env")
 parser = argparse.ArgumentParser(description="Wypelnienie bazy danych")
 parser.add_argument(
     "--nodrop",
@@ -49,9 +51,9 @@ cnx = mysql.connector.connect(
 )
 
 data_paths = {
-    "naz_zenskie": "dane_statystyczne/nazwiska_zenskie.csv",
-    "naz_meskie": "dane_statystyczne/nazwiska_meskie.csv",
-    "imiona": "dane_statystyczne/Imiona_nadane_dzieciom_w_Polsce_w_I_polowie_2024.csv",
+    "naz_zenskie": f"{DIRNAME}/../dane_statystyczne/nazwiska_zenskie.csv",
+    "naz_meskie": f"{DIRNAME}/../dane_statystyczne/nazwiska_meskie.csv",
+    "imiona": f"{DIRNAME}/../dane_statystyczne/Imiona_nadane_dzieciom_w_Polsce_w_I_polowie_2024.csv",
 }
 
 

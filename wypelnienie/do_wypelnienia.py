@@ -553,38 +553,73 @@ KLIENCI_WYCIECZKI = {
 }
 
 
-# w pierwszych wycieczkach przelew byl po 7 dniach od zakończenia wycieczki
-
-# kwota, data transakcji, nazwa kontrahenta, id_wycieczki od 1!
 TRANSAKCJE_KONTRAHENCI = []
 
-for i, wycieczka in enumerate(WYCIECZKI, start=1):
-    for j in wycieczka.transakcje_kontrahenci:
-        TRANSAKCJE_KONTRAHENCI.append(
-            (
-                j[0],
-                wycieczka.data_powrotu + timedelta(days=7),
-                j[1],
-                i,
+
+def gen_transakcje_kontrahenci():
+    """Funkcja generujaca transakcje kontrahentow"""
+    # w pierwszych wycieczkach przelew byl po 7 dniach od zakończenia wycieczki
+
+    # kwota, data transakcji, nazwa kontrahenta, id_wycieczki od 1!
+
+    for i, wycieczka in enumerate(WYCIECZKI, start=1):
+        for j in wycieczka.transakcje_kontrahenci:
+            TRANSAKCJE_KONTRAHENCI.append(
+                (
+                    j[0],
+                    wycieczka.data_powrotu + timedelta(days=7),
+                    j[1],
+                    i,
+                )
             )
-        )
 
-TRANSAKCJE_KONTRAHENCI.sort(key=lambda x: x[1])
+    TRANSAKCJE_KONTRAHENCI.sort(key=lambda x: x[1])
 
 
-# kwota, data transakcji, id_klienta, id_wycieczki
 TRANSAKCJE_KLIENCI = []
 
-# klienci placa do dnia przed wycieczka
-for i, wycieczka in enumerate(WYCIECZKI, start=1):
-    for j in KLIENCI_WYCIECZKI[i]:
-        TRANSAKCJE_KLIENCI.append(
-            (
-                wycieczka.koszty_klienta_razem,
-                wycieczka.data_wyjazdu - timedelta(days=randint(1, 3)),
-                j,
-                i,
-            )
-        )
 
-TRANSAKCJE_KLIENCI.sort(key=lambda x: x[1])
+def gen_transakcje_klienci():
+    """Funkcja generujaca transakcje klientow"""
+    # kwota, data transakcji, id_klienta, id_wycieczki
+    # klienci placa do dnia przed wycieczka
+    for i, wycieczka in enumerate(WYCIECZKI, start=1):
+        for j in KLIENCI_WYCIECZKI[i]:
+            TRANSAKCJE_KLIENCI.append(
+                (
+                    wycieczka.koszty_klienta_razem,
+                    wycieczka.data_wyjazdu - timedelta(days=randint(1, 3)),
+                    j,
+                    i,
+                )
+            )
+
+    TRANSAKCJE_KLIENCI.sort(key=lambda x: x[1])
+
+
+# Sprawdzenia poprawnosci danych
+def test():
+    """Funkcja testujaca poprawnosc danych"""
+    assert len(TRANSAKCJE_PRACOWNICY) == 12 * len(PRACOWNICY)
+
+    czasy_wycieczek_klienta: Dict[int, List[tuple[datetime, datetime]]] = {}
+    for wycieczkaa in WYCIECZKI:
+        for klient in wycieczkaa.klienci_wycieczki:
+            if klient not in czasy_wycieczek_klienta:
+                czasy_wycieczek_klienta[klient] = []
+            czasy_wycieczek_klienta[klient].append(
+                (wycieczkaa.data_wyjazdu, wycieczkaa.data_powrotu)
+            )
+
+    for klient, czasy in czasy_wycieczek_klienta.items():
+        czasy.sort(key=lambda x: x[0])
+        if len(czasy) > 1:
+            for i in range(1, len(czasy)):
+                assert (
+                    czasy[i][0] >= czasy[i - 1][1]
+                ), f"Klient {klient} ma nakładające się wycieczki"
+
+
+gen_transakcje_kontrahenci()
+gen_transakcje_klienci()
+test()
