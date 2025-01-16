@@ -56,6 +56,9 @@ MIASTA = {
     "Szczecinek": "Polska",
     "Polanica-Zdrój": "Polska",
     "Hel": "Polska",
+    "Zator":"Polska",
+
+
 }
 
 # transakcje najpierw posortowac
@@ -66,13 +69,6 @@ TRANSAKCJE_PRACOWNICY = [
     for pracownik, stanowisko in PRACOWNICY.items()
 ]
 
-# koszt, cena dla klienta
-KOSZTY_MIASTA = {
-    "Międzyzdroje": (2 * 100, 2 * 150),
-    "Karpacz": (2 * 65, 2 * 100),
-    "Szczecinek": (2 * 90, 2 * 130),
-    "Polanica-Zdrój": (2 * 50, 2 * 80),
-}
 
 # propozycja - dwudniowe morsowanie w Międzyzdrojach w styczniu
 # min osob 45, maks 50
@@ -203,6 +199,22 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         "Hotel Gromada Hel",
         ["Autokar 2"],
     ),
+    PropozycjaWycieczki(
+        "Emocje w Zatorze",
+        "Wizyta w Energylandii, parku linowym oraz escape roomie",
+        "Wszyscy uczestnicy powinni mieć wzrost co najmniej 150 cm oraz mieć 12 lat.",
+        25,
+        45,
+        400,
+        700,
+        "Zator",
+        "Hotel Tygrys",
+        ["Autokar 1"],
+        ["Grupowe pieczenie pianek przy ognisku", "Energylandia"]
+        
+
+    ),
+
 ]
 
 
@@ -254,6 +266,12 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
         3000,
         "Sieć hoteli Gromada",
     ),
+    "Hotel Tygrys": MiejsceWycieczki(
+        "Hotel Tygrys",
+        500,
+        700,
+        "Hotel Tygrys" 
+    )
 }
 
 
@@ -301,6 +319,8 @@ ADRESY: Dict[str, Adres] = {
     "Karczma U Krysi": Adres("ul. Górska 10", None, "Polanica-Zdrój", "57-320"),
     "Górpol": Adres("ul. Górska 1", None, "Polanica-Zdrój", "57-320"),
     "Szkoła kitesurfingu ProKajciarz": Adres("ul. Pogodna 15", None, "Hel", "84-150"),
+    "Hotel Tygrys": Adres("ul. Wyspiańskiego 35", None, "Zator", "32-640"),
+    "Energylandia sp. z o.o.": Adres("aleja 3 Maja 2", None, "Zator", "32-640")
 }
 
 # koszt, cena dla klienta
@@ -310,6 +330,7 @@ KOSZTY_MIASTA = {
     "Szczecinek": (2 * 90, 2 * 130),
     "Polanica-Zdrój": (2 * 50, 2 * 80),
     "Hel": (2 * 150, 2 * 200),
+    "Zator": (2*200, 2*300)
 }
 
 # deska - mamy umowe ze dadza tyle desek ile beda potrzebowac klienci
@@ -433,6 +454,18 @@ KONTRAHENCI: Dict[str, Kontrahent] = {
         "kontakt@prokajciarz.com",
         "Szkoła kitesurfingu ProKajciarz",
     ),
+    "Hotel Tygrys": Kontrahent(
+        "Hotel Tygrys",
+        "Hotel w Zatorze",
+        "kontakt@hotel.tygrys.com",
+        "ul. Wyspiańskiego 35"
+    ),
+    "Energylandia sp. z o.o.": Kontrahent(
+        "Park rozrywki Energylandia",
+        "Największy park rozrywki w Polsce",
+        "energylandia@kontakt.com",
+        "aleja 3 Maja 2"
+    )
 }
 
 
@@ -458,6 +491,18 @@ KOSZTY_U_KONTRAHENTOW: Dict[str, KosztUKontrahenta] = {
     "Masaż misami tybetańskimi": KosztUKontrahenta(
         "Masaż misami tybetańskimi", 40, 70, "Sieć hoteli Gromada"
     ),
+    "Grupowe pieczenie pianek przy ognisku": KosztUKontrahenta(
+        "Grupowe pieczenie pianek przy ognisku",
+        50,
+        80,
+        "Hotel Tygrys"
+    ),
+    "Energylandia": KosztUKontrahenta(
+        "Energylandia",
+        120,
+        150,
+        "Energylandia sp. z o.o."
+    )
 }
 
 
@@ -504,7 +549,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 1, 4, 22, 0, 0),
         50,
         "Morsowanie Międzyzdroje",
-        range(1, 51),
+        list(range(1, 51)),
         [],
         0,
         ["Kierowca1", "Organizator1"],
@@ -525,7 +570,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 2, 4, 17, 0, 0),
         14,
         "Narty Karpacz",
-        range(100, 114),  # zaadaptowac
+        list(range(100, 114)),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator1"],
@@ -536,7 +581,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 2, 11, 17, 0, 0),
         20,
         "Narty Karpacz",
-        range(120, 140),  # zaadaptowac
+        list(range(120, 140)),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator1"],
@@ -547,7 +592,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 3, 9, 18, 0, 0),
         49,
         "Góry Stołowe",
-        range(140, 189),  # zaadaptowac
+        list(range(140, 189)),  # zaadaptowac
         [],
         0,
         ["Kierowca3", "Organizator2"],
@@ -558,7 +603,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 3, 23, 18, 0, 0),
         45,
         "Góry Stołowe",
-        range(190, 235),  # zaaadaptowac
+        list(range(190, 235)),  # zaaadaptowac
         [],
         0,
         ["Kierowca3", "Organizator2"],
@@ -569,12 +614,68 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 7, 28, 22, 0, 0),
         45,
         "Wypoczynek na Helu",
-        range(200, 248),  # zaadaptowac
+        list(range(200, 248)),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator3"],
         ["Kurs kitesurfingu"],
     ),
+    Wycieczka(
+        datetime(2024,4,5,6,0,0),
+        datetime(2024,4,8,19,0,0),
+        38,
+        "Emocje w Zatorze",
+        list(range(15,53)),
+        [],
+        0,
+        ["Kierowca2", "Organizator2"],
+        []
+    ),
+    Wycieczka(
+        datetime(2024,9,21,6,0,0),
+        datetime(2024,9,24,19,0,0),
+        25,
+        "Emocje w Zatorze",
+        list(range(15,40)),
+        [],
+        0,
+        ["Kierowca1", "Organizator1"],
+        []
+    ),
+    Wycieczka(
+        datetime(2024,10,13,6,0,0),
+        datetime(2024,10,16,19,0,0),
+        30,
+        "Emocje w Zatorze",
+        list(range(15,45)),
+        [],
+        0,
+        ["Kierowca2", "Organizator1"],
+        []
+    ),
+    Wycieczka(
+        datetime(2024, 8, 14, 7, 0, 0),
+        datetime(2024, 8, 28, 22, 0, 0),
+        36,
+        "Wypoczynek na Helu",
+        list(range(170, 206)),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca1", "Organizator3"],
+        [],
+    ),
+    Wycieczka(
+        datetime(2024, 8, 1, 7, 0, 0),
+        datetime(2024, 8, 15, 22, 0, 0),
+        31,
+        "Wypoczynek na Helu",
+        list(range(120, 151)),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca2", "Organizator3"],
+        ["Kurs kitesurfingu"],
+    ),
+
 ]
 
 # klucz to id wycieczki, od 1
