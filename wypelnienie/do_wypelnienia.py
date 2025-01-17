@@ -56,9 +56,7 @@ MIASTA = {
     "Szczecinek": "Polska",
     "Polanica-Zdrój": "Polska",
     "Hel": "Polska",
-    "Zator":"Polska",
-
-
+    "Zator": "Polska",
 }
 
 # transakcje najpierw posortowac
@@ -210,11 +208,8 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         "Zator",
         "Hotel Tygrys",
         ["Autokar 1"],
-        ["Grupowe pieczenie pianek przy ognisku", "Energylandia"]
-        
-
+        ["Grupowe pieczenie pianek przy ognisku", "Energylandia"],
     ),
-
 ]
 
 
@@ -266,12 +261,7 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
         3000,
         "Sieć hoteli Gromada",
     ),
-    "Hotel Tygrys": MiejsceWycieczki(
-        "Hotel Tygrys",
-        500,
-        700,
-        "Hotel Tygrys" 
-    )
+    "Hotel Tygrys": MiejsceWycieczki("Hotel Tygrys", 500, 700, "Hotel Tygrys"),
 }
 
 
@@ -320,7 +310,7 @@ ADRESY: Dict[str, Adres] = {
     "Górpol": Adres("ul. Górska 1", None, "Polanica-Zdrój", "57-320"),
     "Szkoła kitesurfingu ProKajciarz": Adres("ul. Pogodna 15", None, "Hel", "84-150"),
     "Hotel Tygrys": Adres("ul. Wyspiańskiego 35", None, "Zator", "32-640"),
-    "Energylandia sp. z o.o.": Adres("aleja 3 Maja 2", None, "Zator", "32-640")
+    "Energylandia sp. z o.o.": Adres("aleja 3 Maja 2", None, "Zator", "32-640"),
 }
 
 # koszt, cena dla klienta
@@ -330,7 +320,7 @@ KOSZTY_MIASTA = {
     "Szczecinek": (2 * 90, 2 * 130),
     "Polanica-Zdrój": (2 * 50, 2 * 80),
     "Hel": (2 * 150, 2 * 200),
-    "Zator": (2*200, 2*300)
+    "Zator": (2 * 200, 2 * 300),
 }
 
 # deska - mamy umowe ze dadza tyle desek ile beda potrzebowac klienci
@@ -458,14 +448,14 @@ KONTRAHENCI: Dict[str, Kontrahent] = {
         "Hotel Tygrys",
         "Hotel w Zatorze",
         "kontakt@hotel.tygrys.com",
-        "ul. Wyspiańskiego 35"
+        "ul. Wyspiańskiego 35",
     ),
     "Energylandia sp. z o.o.": Kontrahent(
         "Park rozrywki Energylandia",
         "Największy park rozrywki w Polsce",
         "energylandia@kontakt.com",
-        "aleja 3 Maja 2"
-    )
+        "aleja 3 Maja 2",
+    ),
 }
 
 
@@ -492,17 +482,11 @@ KOSZTY_U_KONTRAHENTOW: Dict[str, KosztUKontrahenta] = {
         "Masaż misami tybetańskimi", 40, 70, "Sieć hoteli Gromada"
     ),
     "Grupowe pieczenie pianek przy ognisku": KosztUKontrahenta(
-        "Grupowe pieczenie pianek przy ognisku",
-        50,
-        80,
-        "Hotel Tygrys"
+        "Grupowe pieczenie pianek przy ognisku", 50, 80, "Hotel Tygrys"
     ),
     "Energylandia": KosztUKontrahenta(
-        "Energylandia",
-        120,
-        150,
-        "Energylandia sp. z o.o."
-    )
+        "Energylandia", 120, 150, "Energylandia sp. z o.o."
+    ),
 }
 
 
@@ -516,8 +500,8 @@ class Wycieczka:
         liczba_osob: int,
         nazwa_propozycji: str,
         klienci_wycieczki: List[int],  # id klientow od 1
-        transakcje_kontrahenci: List[Tuple[int, str]],  # kwota, nazwa kontrahenta
-        koszty_klienta_razem: int,
+        transakcje_kontrahenci: List[Tuple[int, str]],  # samo sie oblicza
+        koszty_klienta_razem: int,  # samo sie oblicza
         pracownicy_wycieczki: List[str],
         uslugi_dodatkowe: Optional[List[str]] = None,
     ):
@@ -533,13 +517,13 @@ class Wycieczka:
 
 
 def dokladnie_iles_co_random(
-    start: int, ile: int, jaki_random: Tuple[int, int]
+    start: int, ile: int, jaki_random: Optional[Tuple[int, int]] = None
 ) -> List[int]:
     """Funkcja zwracajaca liste od min do ile co co_ile"""
     ret = []
     for _ in range(ile):
         ret.append(start)
-        start += randint(*jaki_random)
+        start += randint(*jaki_random) if jaki_random else 1
     return ret
 
 
@@ -549,7 +533,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 1, 4, 22, 0, 0),
         50,
         "Morsowanie Międzyzdroje",
-        list(range(1, 51)),
+        dokladnie_iles_co_random(1, 50),
         [],
         0,
         ["Kierowca1", "Organizator1"],
@@ -570,7 +554,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 2, 4, 17, 0, 0),
         14,
         "Narty Karpacz",
-        list(range(100, 114)),  # zaadaptowac
+        dokladnie_iles_co_random(100, 14),
         [],
         0,
         ["Kierowca2", "Organizator1"],
@@ -581,7 +565,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 2, 11, 17, 0, 0),
         20,
         "Narty Karpacz",
-        list(range(120, 140)),  # zaadaptowac
+        dokladnie_iles_co_random(120, 20),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator1"],
@@ -592,7 +576,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 3, 9, 18, 0, 0),
         49,
         "Góry Stołowe",
-        list(range(140, 189)),  # zaadaptowac
+        dokladnie_iles_co_random(140, 49),  # zaadaptowac
         [],
         0,
         ["Kierowca3", "Organizator2"],
@@ -603,7 +587,7 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 3, 23, 18, 0, 0),
         45,
         "Góry Stołowe",
-        list(range(190, 235)),  # zaaadaptowac
+        dokladnie_iles_co_random(190, 45),  # zaaadaptowac
         [],
         0,
         ["Kierowca3", "Organizator2"],
@@ -614,54 +598,51 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 7, 28, 22, 0, 0),
         45,
         "Wypoczynek na Helu",
-        list(range(200, 248)),  # zaadaptowac
+        dokladnie_iles_co_random(200, 45),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator3"],
         ["Kurs kitesurfingu"],
     ),
     Wycieczka(
-        datetime(2024,4,5,6,0,0),
-        datetime(2024,4,8,19,0,0),
+        datetime(2024, 4, 5, 6, 0, 0),
+        datetime(2024, 4, 8, 19, 0, 0),
         38,
         "Emocje w Zatorze",
-        list(range(15,53)),
+        dokladnie_iles_co_random(15, 38),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator2"],
-        []
     ),
     Wycieczka(
-        datetime(2024,9,21,6,0,0),
-        datetime(2024,9,24,19,0,0),
+        datetime(2024, 9, 21, 6, 0, 0),
+        datetime(2024, 9, 24, 19, 0, 0),
         25,
         "Emocje w Zatorze",
-        list(range(15,40)),
+        dokladnie_iles_co_random(15, 25),  # zaadaptowac
         [],
         0,
         ["Kierowca1", "Organizator1"],
-        []
     ),
     Wycieczka(
-        datetime(2024,10,13,6,0,0),
-        datetime(2024,10,16,19,0,0),
+        datetime(2024, 10, 13, 6, 0, 0),
+        datetime(2024, 10, 16, 19, 0, 0),
         30,
         "Emocje w Zatorze",
-        list(range(15,45)),
+        dokladnie_iles_co_random(50, 30),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator1"],
-        []
     ),
     Wycieczka(
         datetime(2024, 8, 14, 7, 0, 0),
         datetime(2024, 8, 28, 22, 0, 0),
         36,
         "Wypoczynek na Helu",
-        list(range(170, 206)),  # zaadaptowac
+        dokladnie_iles_co_random(170, 36),  # zaadaptowac
         [],
         0,
-        ["Kierowca1", "Organizator3"],
+        ["Kierowca1", "Organizator2"],
         [],
     ),
     Wycieczka(
@@ -669,13 +650,12 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 8, 15, 22, 0, 0),
         31,
         "Wypoczynek na Helu",
-        list(range(120, 151)),  # zaadaptowac
+        dokladnie_iles_co_random(120, 31),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator3"],
         ["Kurs kitesurfingu"],
     ),
-
 ]
 
 # klucz to id wycieczki, od 1
@@ -811,9 +791,14 @@ def test():
         assert (
             wycieczka.data_wyjazdu < wycieczka.data_powrotu
         ), f"{wycieczka.nazwa_propozycji} -> koniec przed startem"
+
         assert (
             propozycja.min_osob <= wycieczka.liczba_osob <= propozycja.max_osob
         ), f"{wycieczka.nazwa_propozycji} -> niepoprawna liczba osob"
+
+        assert (
+            len(wycieczka.klienci_wycieczki) == wycieczka.liczba_osob
+        ), f"{wycieczka.nazwa_propozycji} -> niepoprawna liczba klientow"
 
         for klient in wycieczka.klienci_wycieczki:
             if klient not in czasy_wycieczek_klienta:
@@ -822,6 +807,7 @@ def test():
                 (wycieczka.data_wyjazdu, wycieczka.data_powrotu)
             )
 
+    # sprawdzanie czy wycieczki sie nie nakladaja (klienci)
     for klient, czasy in czasy_wycieczek_klienta.items():
         czasy.sort(key=lambda x: x[0])
         if len(czasy) > 1:
@@ -830,9 +816,29 @@ def test():
                     czasy[i][0] >= czasy[i - 1][1]
                 ), f"Klient {klient} ma nakładające się wycieczki"
 
+    # sprawdzanie czy wycieczki sie nie nakladaja (pracownicy)
+    czasy_wycieczek_pracownika: Dict[str, List[tuple[datetime, datetime]]] = {}
+    for wycieczka in WYCIECZKI:
+        for pracownik in wycieczka.pracownicy_wycieczki:
+            if pracownik not in czasy_wycieczek_pracownika:
+                czasy_wycieczek_pracownika[pracownik] = []
+            czasy_wycieczek_pracownika[pracownik].append(
+                (wycieczka.data_wyjazdu, wycieczka.data_powrotu)
+            )
+
+    for pracownik, czasy in czasy_wycieczek_pracownika.items():
+        czasy.sort(key=lambda x: x[0])
+        if len(czasy) > 1:
+            for i in range(1, len(czasy)):
+                assert (
+                    czasy[i][0] >= czasy[i - 1][1]
+                ), f"Pracownik {pracownik} ma nakładające się wycieczki"
+
 
 create_transakcje_kontrahenci()
 calculate_koszty_klienta_razem()
 gen_transakcje_kontrahenci()
 gen_transakcje_klienci()
 test()
+
+print("Wygenerowano dane wycieczek poprawnie\n\n")

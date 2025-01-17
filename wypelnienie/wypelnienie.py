@@ -657,3 +657,5 @@ def dry_fill(connection):
 dry_fill(cnx)
 
 cnx.close()
+
+print("Wypelniono baze danych.\n\n")
