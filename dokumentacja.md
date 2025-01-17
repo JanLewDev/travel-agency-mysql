@@ -2,6 +2,7 @@
 
 ## Struktura projektu
 
+```
 .
 ├── dane_statystyczne/
 │ ├── imiona_nadane_dzieciom.csv
@@ -19,6 +20,7 @@
 ├── README.md
 ├── requirements.txt
 └── schemat_bazy_danych.vuerd
+```
 
 ## Instrukcja do uruchomienia
 
