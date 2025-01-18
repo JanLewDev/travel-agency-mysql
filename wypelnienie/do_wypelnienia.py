@@ -57,6 +57,7 @@ MIASTA = {
     "Polanica-Zdrój": "Polska",
     "Hel": "Polska",
     "Zator": "Polska",
+    "Kraków": "Polska"
 }
 
 # transakcje najpierw posortowac
@@ -210,6 +211,19 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         ["Autokar 1"],
         ["Grupowe pieczenie pianek przy ognisku", "Energylandia"],
     ),
+    PropozycjaWycieczki(
+        "Królewski Kraków – podróż w serce historii i magii",
+        "Odkryj magię królewskiego Krakowa! Wybierz się na niezapomnianą podróż przez Stare Miasto, Wawel i klimatyczny Kazimierz. Zanurz się w historii, podziwiaj zabytki i delektuj się lokalnymi przysmakami. Spacer po królewskich uliczkach, wizyta w Smoczej Jamie i chwila relaksu nad Wisłą to tylko początek tej wyjątkowej przygody!",
+        None,
+        20,
+        30,
+        300,
+        450,
+        "Kraków",
+        "Hotel Marriott Kraków",
+        ["Autokar 2"],
+        []
+    )
 ]
 
 
@@ -236,6 +250,12 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
         100,
         150,
         "Sieć hoteli Gromada",
+    ),
+    "Hotel Marriott Kraków": MiejsceWycieczki(
+        "Hotel Marriott Kraków",
+        400,
+        600,
+        "Hotel Marriott Kraków"
     ),
     "Pensjonat Jar": MiejsceWycieczki(
         "Pensjonat Jar",
@@ -285,6 +305,15 @@ ADRESY: Dict[str, Adres] = {
     "Hotel Gromada Międzyzdroje": Adres(
         "ul. Wyzwolenia 1", None, "Międzyzdroje", "72-500"
     ),
+    "Hotel Marriott Kraków": Adres(
+        "aleja 3 Maja 51", None, "Kraków", "30-062"
+    ),
+    "Hotel Marriot biuro": Adres (
+        "ul. Dmowskiego 42", None, "Warszawa", "03-906"
+    ),
+    "Muzeum Schindlera": Adres(
+        "ul. Lipowa 4", None, "Kraków","30-702"
+    ),
     "Hotel Gromada Hel": Adres("ul. J. Piłsudzkiego 64", None, "Hel", "84-150"),
     "Sieć hoteli Gromada": Adres("ul. Marszałkowska 1", None, "Warszawa", "00-500"),
     "Wypożyczalnia desek surfingowych": Adres(
@@ -321,6 +350,7 @@ KOSZTY_MIASTA = {
     "Polanica-Zdrój": (2 * 50, 2 * 80),
     "Hel": (2 * 150, 2 * 200),
     "Zator": (2 * 200, 2 * 300),
+    "Kraków": (2*150, 2*200)
 }
 
 # deska - mamy umowe ze dadza tyle desek ile beda potrzebowac klienci
@@ -382,6 +412,13 @@ RODZAJE_USLUG_DODATKOWYCH: Dict[str, RodzajUslugiDodatkowej] = {
         1500,
         "Szkoła kitesurfingu ProKajciarz",
     ),
+    "Wizyta w Muzeum Schindlera": RodzajUslugiDodatkowej(
+        "Wizyta w Muzeum Schindlera",
+        "Wizyta w muzeum opowiadającym historię Krakowa podczas II wojny światowek",
+        50,
+        70,
+        "Muzeum Schindlera"
+    )
 }
 
 
@@ -398,9 +435,21 @@ class Kontrahent:
 KONTRAHENCI: Dict[str, Kontrahent] = {
     "Sieć hoteli Gromada": Kontrahent(
         "Sieć hoteli Gromada",
-        "Sieć hoteli Gromada działająca w polsce",
+        "Sieć hoteli Gromada działająca w Polsce",
         "gromada@office.pl",
         "Sieć hoteli Gromada biuro",
+    ),
+    "Hotel Marriott": Kontrahent(
+        "Hotel Marriott",
+        "Sieć hoteli Marriott działająca w Polsce",
+        "marriott@kontakt.com",
+        "Sieć hoteli Marriott biuro"
+    ),
+    "Muzeum Schindlera": Kontrahent(
+        "Muzeum Schindlera",
+        "Muzeum II wojny światowej w Krakowie",
+        "muzeum_schindlera@gmail.com",
+        "Muzeum Schindlera"
     ),
     "Wypożyczalnia desek surfingowych": Kontrahent(
         "Wypożyczalnia desek surfingowych",
@@ -593,6 +642,62 @@ WYCIECZKI: List[Wycieczka] = [
         ["Kierowca3", "Organizator2"],
         ["Kijki do chodzenia"],
     ),
+    Wycieczka(
+        datetime(2024,1, 8,7,0,0),
+        datetime(2024,1,10,12,0,0),
+        23,
+        "Królewski Kraków – podróż w serce historii i magii",
+        dokladnie_iles_co_random(120, 23),
+        [],
+        0,
+        ["Kierowca2", "Organizator1"],
+        ["Wizyta w Muzeum Schindlera"]
+    ),
+    Wycieczka(
+        datetime(2024,12, 8,7,0,0),
+        datetime(2024,12,10,12,0,0),
+        20,
+        "Królewski Kraków – podróż w serce historii i magii",
+        dokladnie_iles_co_random(124, 20),
+        [],
+        0,
+        ["Kierowca2", "Organizator1"],
+
+    ),
+    Wycieczka(
+        datetime(2024,10, 8,7,0,0),
+        datetime(2024,10,10,12,0,0),
+        30,
+        "Królewski Kraków – podróż w serce historii i magii",
+        dokladnie_iles_co_random(120, 30),
+        [],
+        0,
+        ["Kierowca2", "Organizator1"],
+        ["Wizyta w Muzeum Schindlera"]
+    ),
+    Wycieczka(
+        datetime(2024,4, 8,7,0,0),
+        datetime(2024,4,10,12,0,0),
+        25,
+        "Królewski Kraków – podróż w serce historii i magii",
+        dokladnie_iles_co_random(70, 25),
+        [],
+        0,
+        ["Kierowca1", "Organizator1"],
+        ["Wizyta w Muzeum Schindlera"]
+    ),
+    Wycieczka(
+        datetime(2024,1, 8,7,0,0),
+        datetime(2024,1,10,12,0,0),
+        23,
+        "Królewski Kraków – podróż w serce historii i magii",
+        dokladnie_iles_co_random(70, 23),
+        [],
+        0,
+        ["Kierowca1", "Organizator2"],
+        ["Wizyta w Muzeum Schindlera"]
+    ),
+
     Wycieczka(
         datetime(2024, 7, 14, 7, 0, 0),
         datetime(2024, 7, 28, 22, 0, 0),
