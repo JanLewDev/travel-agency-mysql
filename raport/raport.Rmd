@@ -11,7 +11,7 @@ output:
     toc_float: true
     theme: united
 ---
-
+wlaczyc instalacje pakietow
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(repos = list(CRAN="http://cran.rstudio.com/"))
@@ -19,11 +19,13 @@ options(repos = list(CRAN="http://cran.rstudio.com/"))
 #install.packages("RMariaDB")
 #install.packages("ggplot2")
 #install.packages("lattice")
+# install.packages("dplyr")
 
 
 library(lattice)
 library(ggplot2)
 library(RMariaDB)
+library(dplyr)
 ```
 
 ```{r}
@@ -33,37 +35,276 @@ library(RMariaDB)
 # Schemat
 
 
-```{r, out.width="60%",  fig.align="center", fig.cap="Schemat naszej bazy danych"}
-knitr::include_graphics("zdjecia/Wombat.png")
+```{r, out.width="60%",  fig.align="center", fig.cap="Uproszczony schemat naszej bazy danych"}
+knitr::include_graphics("../obrazy/baza_danych.png")
+```
+
+```{r, out.width="60%",  fig.align="center", fig.cap="Dokładny schemat naszej bazy danych"}
+knitr::include_graphics("../obrazy/baza_danych_fullsize.png")
 ```
 
 # Analiza danych
 
-```{r}
-#tutaj dam wykresy, trendy, itp. itd.
+```{r najpopularniejsze rodzaje wycieczek, fig.align="center"} 
+# Moze dokladna ilosc osob ktora bbyla na kazdej z wycieczek
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+
+query <- "SELECT
+            pw.nazwa AS Rodzaj_wycieczki,
+            SUM(w.liczba_osob) AS Liczba_uczestników,
+            SUM(pw.maks_liczba_osob) AS Maksymalna_liczba_uczestników,
+            (SUM(w.liczba_osob) / SUM(pw.maks_liczba_osob)) * 100 AS Procent_popularności
+          FROM
+            wycieczki w
+          JOIN
+            propozycje_wycieczki pw ON w.id_propozycji = pw.id_propozycji
+          GROUP BY
+            pw.nazwa
+          ORDER BY
+            (SUM(w.liczba_osob) / SUM(pw.maks_liczba_osob)) * 100 DESC;"
+
+df <- dbGetQuery(con, query)
+
+# ggplot(data = df, mapping = aes(x = Rodzaj_wycieczki,y = Procent_popularności, fill = Rodzaj_wycieczki)) +
+#   geom_bar(stat = 'identity', width = 0.7) +
+#   theme(axis.text.x = element_blank(),
+#         axis.ticks.x = element_blank())
+
+ggplot(data = df, mapping = aes(x = reorder(Rodzaj_wycieczki, -Procent_popularności),
+                                y = Procent_popularności, 
+                                fill = Rodzaj_wycieczki)) +
+  geom_bar(stat = 'identity', 
+           width = 0.55,) +
+  geom_text(label = round(df$Procent_popularności, 0),
+            check_overlap = TRUE,
+            nudge_y = 10) +
+  scale_y_continuous(breaks = seq(from=0, to=100, by=25)) +
+  ggtitle("Najpopularniejsze rodzaje wycieczek wśród naszych klientów") +
+  ylab("Procent popularności") +
+  theme(axis.text.x = element_text(angle = 80, 
+                                   face = "bold", 
+                                   size = 10,
+                                   hjust = 0.9),
+        axis.ticks.x = element_blank(),
+        axis.title.x = element_blank(),
+        legend.position = 'none')
+
+dbDisconnect(con)
 ```
 
+```{r Porównanie kosztów i zysków wycieczek, fig.align='center'}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query = "WITH wplywy AS (
+    SELECT tk.id_wycieczki, SUM(tk.kwota) AS suma
+    FROM transakcje_klienci AS tk
+    GROUP BY tk.id_wycieczki
+), wydatki_nasze AS (
+    SELECT
+        w.id_wycieczki,
+        ((km.koszt + pw.nasze_koszty_razem) * w.liczba_osob) AS nasze_koszty
+    FROM
+        wycieczki w
+    JOIN
+        propozycje_wycieczki pw ON w.id_propozycji = pw.id_propozycji
+    JOIN
+        transport_propozycja_wycieczki tpw ON pw.id_propozycji = tpw.id_propozycji
+    JOIN
+        koszty_miasta km ON tpw.id_kosztu_miasta = km.id_kosztu
+), wydatki_kontrahenci AS (
+    SELECT
+        tko.id_wycieczki,
+        SUM(tko.kwota) AS wydatki_kontrahenci
+    FROM
+        transakcje_kontrahenci AS tko
+    GROUP BY
+        tko.id_wycieczki
+) SELECT
+    pw.id_propozycji AS id_propozycji,
+    pw.nazwa AS nazwa,
+    SUM(wplywy.suma) AS Całkowite_wpływy,
+    SUM(wydatki_nasze.nasze_koszty + wydatki_kontrahenci.wydatki_kontrahenci) AS Całkowite_wydatki,
+    SUM(wplywy.suma) - SUM(wydatki_nasze.nasze_koszty + wydatki_kontrahenci.wydatki_kontrahenci) AS Zysk
+    FROM wycieczki w
+    JOIN wplywy ON w.id_wycieczki = wplywy.id_wycieczki
+    JOIN wydatki_nasze ON w.id_wycieczki = wydatki_nasze.id_wycieczki
+    JOIN wydatki_kontrahenci ON w.id_wycieczki = wydatki_kontrahenci.id_wycieczki
+    JOIN propozycje_wycieczki pw ON w.id_propozycji = pw.id_propozycji
+    GROUP BY pw.id_propozycji
+    ORDER BY Zysk DESC;"
+
+df <- dbGetQuery(con, query)
+
+ggplot(data = df, mapping = aes(x = reorder(nazwa, -Zysk),
+                                y = Zysk,
+                                fill = nazwa)) +
+  geom_bar(stat = 'identity',
+           width = 0.55) +
+  geom_text(label = df$Zysk,
+            check_overlap = TRUE,
+            nudge_y = 10) +
+  ggtitle("Zysk przyniesiony przez dany rodzaj wycieczki (w zł)") +
+  theme(axis.text.x = element_text(angle = 80, 
+                                   face = "bold", 
+                                   size = 10,
+                                   hjust = 0.9),
+        axis.ticks.x = element_blank(),
+        axis.title = element_blank(),
+        legend.position = 'none')
+
+ggplot(data = df, mapping = aes(x = "",
+                                y = Zysk,
+                                fill = nazwa)) +
+  geom_col(color = 'black') +
+  coord_polar(theta = 'y') +
+  geom_text(aes(label = Zysk),
+            position = position_stack(vjust=0.5),
+            ) +
+  theme_void()
+
+dbDisconnect(con)
+```
+
+```{r Najbardziej dochodowe dla nas usługi dodatkowe, fig.align='center'}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query = "SELECT
+    rud.nazwa AS usluga_dodatkowa,
+    SUM((rud.cena_dla_klienta - rud.koszt) * w.liczba_osob) AS zysk
+FROM
+    uslugi_dodatkowe ud
+JOIN
+    wycieczki w ON ud.id_wycieczki = w.id_wycieczki
+JOIN
+    rodzaje_uslug_dodatkowych rud ON ud.id_uslugi = rud.id_uslugi_dodatkowej
+GROUP BY
+    rud.id_uslugi_dodatkowej
+ORDER BY
+    zysk DESC;"
+
+df <- dbGetQuery(con, query)
+
+ggplot(data = df, mapping = aes(x = reorder(usluga_dodatkowa, -zysk),
+                                y = zysk,
+                                fill = usluga_dodatkowa)) +
+  geom_bar(stat = 'identity', 
+           width = 0.55) +
+  geom_text(label = df$zysk,
+            check_overlap = TRUE,
+            nudge_y = 10) +
+  ggtitle("Zysk przyniesiony przez dany rodzaj usługi dodatkowej (w zł)") +
+  theme(axis.text.x = element_text(angle = 80, 
+                                   face = "bold", 
+                                   size = 10,
+                                   hjust = 0.9),
+        axis.ticks.x = element_blank(),
+        axis.title = element_blank(),
+        legend.position = 'none')
+
+dbDisconnect(con)
+```
+
+```{r Średni procent poweracajacych klientow, fig.align='center'}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query = "SELECT
+    w.id_wycieczki,
+    w.id_propozycji,
+    pw.nazwa,
+    w.czas_wyjazdu,
+    w.czas_powrotu,
+    COUNT(DISTINCT k.id_klienta) AS Liczba_klientów,
+    COUNT(DISTINCT CASE WHEN k.id_klienta IN (
+        SELECT
+            kw2.id_klienta
+        FROM
+            klient_wycieczka kw2
+        WHERE
+            kw2.id_wycieczki != w.id_wycieczki
+    ) THEN k.id_klienta END) AS Liczba_powracajacych_klientow,
+    (COUNT(DISTINCT CASE WHEN k.id_klienta IN (
+        SELECT
+            kw2.id_klienta
+        FROM
+            klient_wycieczka kw2
+        WHERE
+            kw2.id_wycieczki != w.id_wycieczki
+    ) THEN k.id_klienta END) / COUNT(DISTINCT k.id_klienta)) * 100 AS Procent_powracających_klientów
+FROM
+    wycieczki w
+JOIN
+    klient_wycieczka kw ON w.id_wycieczki = kw.id_wycieczki
+JOIN
+    klienci k ON kw.id_klienta = k.id_klienta
+JOIN
+    propozycje_wycieczki pw ON w.id_propozycji = pw.id_propozycji
+GROUP BY
+    w.id_wycieczki
+ORDER BY
+    Liczba_powracajacych_klientow DESC;"
+
+df <- dbGetQuery(con, query)
+
+df2 <- df %>%
+  group_by(nazwa) %>%
+  summarise(procent = mean(Procent_powracających_klientów, na.rm = TRUE))
+
+
+ggplot(data = df2, mapping = aes(x = reorder(nazwa, -procent),
+                                y = procent,
+                                fill = nazwa)) +
+  geom_bar(stat = 'identity', 
+           width = 0.55) +
+  geom_text(label = round(df2$procent, 0),
+            check_overlap = TRUE,
+            nudge_y = 10) +
+  scale_y_continuous(breaks = seq(from=0, to=100, by=25)) +
+  ggtitle("Procent powracających klientów po danej wycieczce") +
+  theme(axis.text.x = element_text(angle = 80, 
+                                   face = "bold", 
+                                   size = 10,
+                                   hjust = 0.9),
+        axis.ticks.x = element_blank(),
+        axis.title = element_blank(),
+        legend.position = 'none')
+
+dbDisconnect(con)
+```
 # Podsumowanie
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc blandit sagittis nibh at venenatis. Duis ut pharetra nibh. Aliquam erat volutpat. Nunc faucibus elit sed faucibus blandit. Nam fermentum, lacus at scelerisque interdum, ipsum arcu viverra mi, non pulvinar lorem dolor eu elit. Etiam sagittis erat libero, id eleifend tortor posuere quis. Aliquam erat volutpat. Proin eget nunc accumsan sapien consequat pulvinar. In vel rhoncus velit, ac sodales ipsum.
-
-Nam vel turpis sed erat feugiat finibus. Nulla egestas fermentum risus, sit amet venenatis leo fermentum non. Aliquam dignissim elit id leo auctor suscipit. Proin non turpis quam. Mauris auctor nisl risus, at venenatis lacus lobortis sit amet. Aliquam rhoncus quam eu convallis posuere. Sed euismod tellus felis. Curabitur pulvinar nunc dui, in volutpat diam volutpat non. Sed finibus arcu vel felis condimentum, id auctor velit fringilla. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vivamus laoreet, sapien vel sollicitudin mollis, urna lacus faucibus erat, sit amet egestas odio lorem ut nulla. Ut blandit aliquet placerat. Nunc et aliquet augue. Curabitur nec augue orci.
-
-Duis non neque feugiat, euismod orci eu, tempus velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Ut iaculis pharetra nulla, feugiat sodales nibh ornare ac. Praesent iaculis eros ex, id hendrerit dolor eleifend eu. Phasellus feugiat elit feugiat nisi gravida sagittis. Aenean rutrum tincidunt commodo. Curabitur convallis id mi sit amet elementum. Aliquam a consectetur risus, vel sagittis lacus. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-
-Aenean mauris ipsum, molestie quis turpis et, dictum molestie nisl. Cras accumsan condimentum libero. Vestibulum iaculis, dui quis luctus consectetur, elit eros tincidunt turpis, non vehicula ex sem id magna. Aenean non aliquam velit, ut blandit ipsum. Donec blandit ullamcorper libero a consectetur. Donec at lacus turpis. Aenean ut rhoncus augue, nec rhoncus orci. Integer non ex a lacus sagittis ultrices. Suspendisse porttitor lacus finibus enim blandit convallis. Nam varius, arcu sed efficitur vulputate, nibh nisi scelerisque erat, eu faucibus sem eros et nibh. Sed leo metus, posuere nec nibh at, placerat molestie est. Quisque pretium ante efficitur ligula mollis rutrum. In rutrum arcu nec mi vehicula aliquet. Sed blandit magna volutpat turpis commodo auctor. Donec ut turpis et metus lacinia maximus.
-
-Suspendisse sit amet nulla leo. Nam in justo et elit aliquet porta et quis magna. Aenean dolor ex, ornare vel rutrum non, consequat sit amet sapien. Nunc eu dolor quis elit facilisis posuere. Donec non varius mauris. Nam ullamcorper quis mauris sit amet scelerisque. Proin ut erat non nunc egestas rhoncus eget nec nibh. Morbi efficitur orci a lectus malesuada consequat. Phasellus vestibulum pharetra justo, vel molestie erat congue sed.
-
-Etiam pellentesque dui at vulputate egestas. Maecenas faucibus diam a sapien hendrerit, vitae blandit ligula iaculis. Interdum et malesuada fames ac ante ipsum primis in faucibus. Aliquam accumsan varius felis vitae cursus. Nam vitae dictum sem. Duis interdum ante a sem convallis, eu tincidunt nibh dictum. Aenean non tincidunt mi, a pharetra est. Morbi non maximus tortor, nec tempus magna. Ut enim nunc, tincidunt bibendum est vel, faucibus venenatis lectus. Fusce posuere commodo ex, quis mattis elit porttitor sit amet. Mauris dapibus turpis non dolor congue, eu congue magna egestas. Nunc vulputate nisl id commodo facilisis. Praesent at augue cursus neque auctor convallis. Nam vel est velit.
-
-In at neque vel sem euismod mollis ac non sem. Pellentesque ac nisi ut mauris dictum placerat at ut diam. Quisque quis velit nec libero sodales pellentesque eu nec tortor. Fusce rhoncus lorem eget justo viverra viverra. Pellentesque faucibus ipsum id arcu lobortis vehicula. Curabitur ut magna posuere, pulvinar nibh a, tincidunt elit. Duis molestie, ipsum eget ultricies maximus, arcu nisi consequat sapien, non egestas dui purus pharetra nisi. Nam vitae erat eu ipsum laoreet rutrum quis porttitor est. Curabitur a interdum dolor.
-
-Sed ac vestibulum neque. Nulla facilisi. Ut luctus quam eros, a rhoncus diam pulvinar eu. Integer in porttitor risus, eu dignissim dolor. Phasellus pellentesque dui scelerisque enim iaculis, at tincidunt nisi pulvinar. Maecenas orci ante, gravida non enim ac, dignissim laoreet neque. Sed venenatis lorem et metus fringilla venenatis.
-
-Donec ac leo vel ante rhoncus porttitor. Nullam eu egestas erat. Nam convallis feugiat vestibulum. Fusce tincidunt neque ut augue porttitor sodales. Donec et ullamcorper nibh, aliquam hendrerit felis. Curabitur diam leo, gravida ut ultrices in, imperdiet vitae mi. Curabitur in hendrerit lorem. Ut sollicitudin pulvinar orci, vitae porta odio finibus at. Fusce tincidunt molestie quam quis finibus. Mauris cursus, leo vel volutpat tristique, metus tellus gravida sem, ut ultricies risus urna nec urna. Maecenas mattis varius laoreet. Aenean efficitur, urna porta dignissim iaculis, orci quam bibendum ex, non scelerisque massa justo sed mauris. Integer et mollis ante. Etiam scelerisque tortor consectetur, rhoncus arcu vitae, gravida odio. Morbi erat metus, pellentesque et orci at, ornare consequat augue. Praesent semper orci sit amet mauris bibendum hendrerit.
-
-# Lorem
-Aenean at lectus risus. Etiam vitae mauris eget neque suscipit volutpat. Etiam imperdiet, risus sit amet efficitur lobortis, felis urna tempor magna, at fermentum arcu felis eu mauris. In aliquet at metus non congue. Aenean elementum dui varius varius tempor. Cras ornare nunc accumsan, consectetur libero a, rutrum nulla. Donec metus lorem, convallis at est eget, pulvinar ullamcorper urna. Sed dapibus ultrices purus vel dignissim. Aenean pharetra eros orci, eu pharetra elit eleifend non. Praesent interdum tincidunt eros, id consectetur purus ullamcorper eu. Vestibulum ac hendrerit lectus. Sed hendrerit dui arcu, non congue erat sagittis a. Nulla facilisi. 
+ 
 
 
