@@ -7,7 +7,7 @@ from collections import defaultdict
 
 # firma dziala w 2024 roku
 
-LICZBA_KLIENTOW = 250
+LICZBA_KLIENTOW = 300
 
 # klucz to nazwa stanowiska, wartosc to pensja
 STANOWISKA = {
@@ -41,7 +41,6 @@ RODZAJE_TRANSPORTU = [
     ("Autokar 1", "Autokar niebieski"),
     ("Autokar 2", "Autokar zielony"),
     ("Bus 1", "Bus czerwony"),
-    ("Bus 2", "Bus zolty"),
 ]
 # najpierw zatrudnilismy wszystkich pracownikow,
 # a dopiero potem mielismy klientow (duzy kapital zakladowy)
@@ -57,7 +56,7 @@ MIASTA = {
     "Polanica-Zdrój": "Polska",
     "Hel": "Polska",
     "Zator": "Polska",
-    "Kraków": "Polska"
+    "Kraków": "Polska",
 }
 
 # transakcje najpierw posortowac
@@ -222,8 +221,7 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         "Kraków",
         "Hotel Marriott Kraków",
         ["Autokar 2"],
-        []
-    )
+    ),
 ]
 
 
@@ -252,10 +250,7 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
         "Sieć hoteli Gromada",
     ),
     "Hotel Marriott Kraków": MiejsceWycieczki(
-        "Hotel Marriott Kraków",
-        400,
-        600,
-        "Hotel Marriott Kraków"
+        "Hotel Marriott Kraków", 400, 600, "Sieć hoteli Marriott"
     ),
     "Pensjonat Jar": MiejsceWycieczki(
         "Pensjonat Jar",
@@ -305,15 +300,9 @@ ADRESY: Dict[str, Adres] = {
     "Hotel Gromada Międzyzdroje": Adres(
         "ul. Wyzwolenia 1", None, "Międzyzdroje", "72-500"
     ),
-    "Hotel Marriott Kraków": Adres(
-        "aleja 3 Maja 51", None, "Kraków", "30-062"
-    ),
-    "Hotel Marriot biuro": Adres (
-        "ul. Dmowskiego 42", None, "Warszawa", "03-906"
-    ),
-    "Muzeum Schindlera": Adres(
-        "ul. Lipowa 4", None, "Kraków","30-702"
-    ),
+    "Hotel Marriott Kraków": Adres("aleja 3 Maja 51", None, "Kraków", "30-062"),
+    "Sieć hoteli Marriott": Adres("ul. Dmowskiego 42", None, "Warszawa", "03-906"),
+    "Muzeum Schindlera": Adres("ul. Lipowa 4", None, "Kraków", "30-702"),
     "Hotel Gromada Hel": Adres("ul. J. Piłsudzkiego 64", None, "Hel", "84-150"),
     "Sieć hoteli Gromada": Adres("ul. Marszałkowska 1", None, "Warszawa", "00-500"),
     "Wypożyczalnia desek surfingowych": Adres(
@@ -350,7 +339,7 @@ KOSZTY_MIASTA = {
     "Polanica-Zdrój": (2 * 50, 2 * 80),
     "Hel": (2 * 150, 2 * 200),
     "Zator": (2 * 200, 2 * 300),
-    "Kraków": (2*150, 2*200)
+    "Kraków": (2 * 150, 2 * 200),
 }
 
 # deska - mamy umowe ze dadza tyle desek ile beda potrzebowac klienci
@@ -417,8 +406,8 @@ RODZAJE_USLUG_DODATKOWYCH: Dict[str, RodzajUslugiDodatkowej] = {
         "Wizyta w muzeum opowiadającym historię Krakowa podczas II wojny światowek",
         50,
         70,
-        "Muzeum Schindlera"
-    )
+        "Muzeum Schindlera",
+    ),
 }
 
 
@@ -439,17 +428,17 @@ KONTRAHENCI: Dict[str, Kontrahent] = {
         "gromada@office.pl",
         "Sieć hoteli Gromada biuro",
     ),
-    "Hotel Marriott": Kontrahent(
-        "Hotel Marriott",
+    "Sieć hoteli Marriott": Kontrahent(
+        "Sieć hoteli Marriott",
         "Sieć hoteli Marriott działająca w Polsce",
         "marriott@kontakt.com",
-        "Sieć hoteli Marriott biuro"
+        "Sieć hoteli Marriott biuro",
     ),
     "Muzeum Schindlera": Kontrahent(
         "Muzeum Schindlera",
         "Muzeum II wojny światowej w Krakowie",
         "muzeum_schindlera@gmail.com",
-        "Muzeum Schindlera"
+        "Muzeum Schindlera",
     ),
     "Wypożyczalnia desek surfingowych": Kontrahent(
         "Wypożyczalnia desek surfingowych",
@@ -643,64 +632,62 @@ WYCIECZKI: List[Wycieczka] = [
         ["Kijki do chodzenia"],
     ),
     Wycieczka(
-        datetime(2024,1, 8,7,0,0),
-        datetime(2024,1,10,12,0,0),
+        datetime(2024, 1, 8, 7, 0, 0),
+        datetime(2024, 1, 10, 12, 0, 0),
         23,
         "Królewski Kraków – podróż w serce historii i magii",
         dokladnie_iles_co_random(120, 23),
         [],
         0,
         ["Kierowca2", "Organizator1"],
-        ["Wizyta w Muzeum Schindlera"]
+        ["Wizyta w Muzeum Schindlera"],
     ),
     Wycieczka(
-        datetime(2024,12, 8,7,0,0),
-        datetime(2024,12,10,12,0,0),
+        datetime(2024, 12, 8, 7, 0, 0),
+        datetime(2024, 12, 10, 12, 0, 0),
         20,
         "Królewski Kraków – podróż w serce historii i magii",
         dokladnie_iles_co_random(124, 20),
         [],
         0,
         ["Kierowca2", "Organizator1"],
-
     ),
     Wycieczka(
-        datetime(2024,10, 8,7,0,0),
-        datetime(2024,10,10,12,0,0),
+        datetime(2024, 10, 8, 7, 0, 0),
+        datetime(2024, 10, 10, 12, 0, 0),
         30,
         "Królewski Kraków – podróż w serce historii i magii",
         dokladnie_iles_co_random(120, 30),
         [],
         0,
         ["Kierowca2", "Organizator1"],
-        ["Wizyta w Muzeum Schindlera"]
+        ["Wizyta w Muzeum Schindlera"],
     ),
     Wycieczka(
-        datetime(2024,4, 8,7,0,0),
-        datetime(2024,4,10,12,0,0),
+        datetime(2024, 4, 8, 7, 0, 0),
+        datetime(2024, 4, 10, 12, 0, 0),
         25,
         "Królewski Kraków – podróż w serce historii i magii",
         dokladnie_iles_co_random(70, 25),
         [],
         0,
         ["Kierowca1", "Organizator1"],
-        ["Wizyta w Muzeum Schindlera"]
+        ["Wizyta w Muzeum Schindlera"],
     ),
     Wycieczka(
-        datetime(2024,1, 8,7,0,0),
-        datetime(2024,1,10,12,0,0),
+        datetime(2024, 2, 8, 7, 0, 0),
+        datetime(2024, 2, 10, 12, 0, 0),
         23,
         "Królewski Kraków – podróż w serce historii i magii",
         dokladnie_iles_co_random(70, 23),
         [],
         0,
         ["Kierowca1", "Organizator2"],
-        ["Wizyta w Muzeum Schindlera"]
+        ["Wizyta w Muzeum Schindlera"],
     ),
-
     Wycieczka(
-        datetime(2024, 7, 14, 7, 0, 0),
-        datetime(2024, 7, 28, 22, 0, 0),
+        datetime(2024, 7, 16, 7, 0, 0),
+        datetime(2024, 7, 30, 22, 0, 0),
         45,
         "Wypoczynek na Helu",
         dokladnie_iles_co_random(200, 45),  # zaadaptowac
@@ -740,74 +727,74 @@ WYCIECZKI: List[Wycieczka] = [
         ["Kierowca2", "Organizator1"],
     ),
     Wycieczka(
-        datetime(2024, 12,29, 6,0,0 ),
-        datetime(2024, 12,31,12,0,0),
+        datetime(2024, 12, 29, 6, 0, 0),
+        datetime(2024, 12, 31, 12, 0, 0),
         46,
         "Morsowanie Międzyzdroje",
         dokladnie_iles_co_random(170, 46),
         [],
         0,
-        ["Kierowca1, Organizator2"],
-        ["Deski surfingowe"]
+        ["Kierowca1", "Organizator2"],
+        ["Deski surfingowe"],
     ),
     Wycieczka(
-        datetime(2024, 11,28, 6,0,0 ),
-        datetime(2024, 11,30,12,0,0),
+        datetime(2024, 11, 28, 6, 0, 0),
+        datetime(2024, 11, 30, 12, 0, 0),
         46,
         "Morsowanie Międzyzdroje",
         dokladnie_iles_co_random(180, 46),
         [],
         0,
-        ["Kierowca1, Organizator2"],
-        ["Deski surfingowe"]
+        ["Kierowca1", "Organizator2"],
+        ["Deski surfingowe"],
     ),
     Wycieczka(
-        datetime(2024, 12,12, 6,0,0 ),
-        datetime(2024, 12,14,12,0,0),
+        datetime(2024, 12, 12, 6, 0, 0),
+        datetime(2024, 12, 14, 12, 0, 0),
         46,
         "Morsowanie Międzyzdroje",
         dokladnie_iles_co_random(190, 46),
         [],
         0,
-        ["Kierowca1, Organizator2"],
-        ["Deski surfingowe"]
+        ["Kierowca1", "Organizator2"],
+        ["Deski surfingowe"],
     ),
     Wycieczka(
-        datetime(2024, 2,18, 6,0,0 ),
-        datetime(2024, 2,20,12,0,0),
+        datetime(2024, 2, 18, 6, 0, 0),
+        datetime(2024, 2, 20, 12, 0, 0),
         46,
         "Morsowanie Międzyzdroje",
         dokladnie_iles_co_random(21, 46),
         [],
         0,
-        ["Kierowca1, Organizator2"],
-        ["Deski surfingowe"]
+        ["Kierowca1", "Organizator2"],
+        ["Deski surfingowe"],
     ),
     Wycieczka(
-        datetime(2024,1,3,6,0,0),
-        datetime(2024,1,6,18,0,0),
+        datetime(2024, 1, 3, 6, 0, 0),
+        datetime(2024, 1, 6, 18, 0, 0),
         15,
         "Narty Karpacz",
         dokladnie_iles_co_random(88, 15),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator3"],
-        ["Sprzęt narciarski"]
+        ["Sprzęt narciarski"],
     ),
     Wycieczka(
-        datetime(2024,1,23,6,0,0),
-        datetime(2024,1,26,18,0,0),
+        datetime(2024, 1, 23, 6, 0, 0),
+        datetime(2024, 1, 26, 18, 0, 0),
         15,
         "Narty Karpacz",
         dokladnie_iles_co_random(155, 15),  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator3"],
-        ["Sprzęt narciarski"]
+        ["Sprzęt narciarski"],
     ),
     Wycieczka(
-        datetime(2024, 8, 14, 7, 0, 0),
-        datetime(2024, 8, 28, 22, 0, 0),
+        datetime(2024, 8, 16, 7, 0, 0),
+        datetime(2024, 8, 30, 22, 0, 0),
         36,
         "Wypoczynek na Helu",
         dokladnie_iles_co_random(170, 36),  # zaadaptowac
@@ -828,11 +815,11 @@ WYCIECZKI: List[Wycieczka] = [
         ["Kurs kitesurfingu"],
     ),
     Wycieczka(
-        datetime(2024, 8, 1, 7, 0, 0),
-        datetime(2024, 8, 15, 22, 0, 0),
+        datetime(2024, 7, 1, 7, 0, 0),
+        datetime(2024, 7, 15, 22, 0, 0),
         30,
         "Wypoczynek na Helu",
-        dokladnie_iles_co_random(220, 30),  # zaadaptowac
+        dokladnie_iles_co_random(250, 30),  # zaadaptowac
         [],
         0,
         ["Kierowca3", "Organizator1"],
@@ -992,9 +979,6 @@ WYCIECZKI: List[Wycieczka] = [
         ["Kierowca3", "Organizator3"],
         [],
     ),
-
-
-
 ]
 
 # klucz to id wycieczki, od 1
@@ -1121,6 +1105,7 @@ def test():
     assert len(TRANSAKCJE_PRACOWNICY) == 12 * len(PRACOWNICY)
 
     czasy_wycieczek_klienta: Dict[int, List[tuple[datetime, datetime]]] = {}
+    czasy_wycieczek_transportu: Dict[str, List[tuple[datetime, datetime]]] = {}
     for wycieczka in WYCIECZKI:
         propozycja = next(
             propozycja
@@ -1146,6 +1131,13 @@ def test():
                 (wycieczka.data_wyjazdu, wycieczka.data_powrotu)
             )
 
+        for transport in propozycja.transport_propozycja_wycieczki:
+            if transport not in czasy_wycieczek_transportu:
+                czasy_wycieczek_transportu[transport] = []
+            czasy_wycieczek_transportu[transport].append(
+                (wycieczka.data_wyjazdu, wycieczka.data_powrotu)
+            )
+
     # sprawdzanie czy wycieczki sie nie nakladaja (klienci)
     for klient, czasy in czasy_wycieczek_klienta.items():
         czasy.sort(key=lambda x: x[0])
@@ -1154,6 +1146,15 @@ def test():
                 assert (
                     czasy[i][0] >= czasy[i - 1][1]
                 ), f"Klient {klient} ma nakładające się wycieczki"
+
+    # sprawdzanie czy wycieczki sie nie nakladaja (transport)
+    for transport, czasy in czasy_wycieczek_transportu.items():
+        czasy.sort(key=lambda x: x[0])
+        if len(czasy) > 1:
+            for i in range(1, len(czasy)):
+                assert (
+                    czasy[i][0] >= czasy[i - 1][1]
+                ), f"Transport {transport} ma nakładające się wycieczki {czasy[i][0]} {czasy[i-1][1]}"
 
     # sprawdzanie czy wycieczki sie nie nakladaja (pracownicy)
     czasy_wycieczek_pracownika: Dict[str, List[tuple[datetime, datetime]]] = {}
