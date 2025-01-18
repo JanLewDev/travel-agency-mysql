@@ -200,12 +200,12 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
     ),
     PropozycjaWycieczki(
         "Emocje w Zatorze",
-        "Wizyta w Energylandii, parku linowym oraz escape roomie",
+        "Wizyta w Energylandii",
         "Wszyscy uczestnicy powinni mieć wzrost co najmniej 150 cm oraz mieć 12 lat.",
         25,
         45,
         400,
-        700,
+        500,
         "Zator",
         "Hotel Tygrys",
         ["Autokar 1"],
@@ -218,7 +218,7 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         20,
         30,
         300,
-        450,
+        400,
         "Kraków",
         "Hotel Marriott Kraków",
         ["Autokar 2"],
@@ -278,7 +278,7 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
     "Hotel Gromada Hel": MiejsceWycieczki(
         "Hotel Gromada Hel",
         2000,
-        3000,
+        2200,
         "Sieć hoteli Gromada",
     ),
     "Hotel Tygrys": MiejsceWycieczki("Hotel Tygrys", 500, 700, "Hotel Tygrys"),
@@ -409,7 +409,7 @@ RODZAJE_USLUG_DODATKOWYCH: Dict[str, RodzajUslugiDodatkowej] = {
         "Kurs kitesurfingu",
         "Kurs szkoleniowy kitesurfingu po Bałtyku pod okiem doświadczonych instruktorów.",
         1000,
-        1500,
+        1300,
         "Szkoła kitesurfingu ProKajciarz",
     ),
     "Wizyta w Muzeum Schindlera": RodzajUslugiDodatkowej(
@@ -740,6 +740,72 @@ WYCIECZKI: List[Wycieczka] = [
         ["Kierowca2", "Organizator1"],
     ),
     Wycieczka(
+        datetime(2024, 12,29, 6,0,0 ),
+        datetime(2024, 12,31,12,0,0),
+        46,
+        "Morsowanie Międzyzdroje",
+        dokladnie_iles_co_random(170, 46),
+        [],
+        0,
+        ["Kierowca1, Organizator2"],
+        ["Deski surfingowe"]
+    ),
+    Wycieczka(
+        datetime(2024, 11,28, 6,0,0 ),
+        datetime(2024, 11,30,12,0,0),
+        46,
+        "Morsowanie Międzyzdroje",
+        dokladnie_iles_co_random(180, 46),
+        [],
+        0,
+        ["Kierowca1, Organizator2"],
+        ["Deski surfingowe"]
+    ),
+    Wycieczka(
+        datetime(2024, 12,12, 6,0,0 ),
+        datetime(2024, 12,14,12,0,0),
+        46,
+        "Morsowanie Międzyzdroje",
+        dokladnie_iles_co_random(190, 46),
+        [],
+        0,
+        ["Kierowca1, Organizator2"],
+        ["Deski surfingowe"]
+    ),
+    Wycieczka(
+        datetime(2024, 2,18, 6,0,0 ),
+        datetime(2024, 2,20,12,0,0),
+        46,
+        "Morsowanie Międzyzdroje",
+        dokladnie_iles_co_random(21, 46),
+        [],
+        0,
+        ["Kierowca1, Organizator2"],
+        ["Deski surfingowe"]
+    ),
+    Wycieczka(
+        datetime(2024,1,3,6,0,0),
+        datetime(2024,1,6,18,0,0),
+        15,
+        "Narty Karpacz",
+        dokladnie_iles_co_random(88, 15),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca2", "Organizator3"],
+        ["Sprzęt narciarski"]
+    ),
+    Wycieczka(
+        datetime(2024,1,23,6,0,0),
+        datetime(2024,1,26,18,0,0),
+        15,
+        "Narty Karpacz",
+        dokladnie_iles_co_random(155, 15),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca2", "Organizator3"],
+        ["Sprzęt narciarski"]
+    ),
+    Wycieczka(
         datetime(2024, 8, 14, 7, 0, 0),
         datetime(2024, 8, 28, 22, 0, 0),
         36,
@@ -761,6 +827,174 @@ WYCIECZKI: List[Wycieczka] = [
         ["Kierowca2", "Organizator3"],
         ["Kurs kitesurfingu"],
     ),
+    Wycieczka(
+        datetime(2024, 8, 1, 7, 0, 0),
+        datetime(2024, 8, 15, 22, 0, 0),
+        30,
+        "Wypoczynek na Helu",
+        dokladnie_iles_co_random(220, 30),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator1"],
+        ["Kurs kitesurfingu"],
+    ),
+    Wycieczka(
+        datetime(2024, 9, 1, 7, 0, 0),
+        datetime(2024, 9, 15, 22, 0, 0),
+        30,
+        "Wypoczynek na Helu",
+        dokladnie_iles_co_random(220, 30),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator1"],
+        ["Kurs kitesurfingu"],
+    ),
+    Wycieczka(
+        datetime(2024, 6, 1, 7, 0, 0),
+        datetime(2024, 6, 15, 22, 0, 0),
+        30,
+        "Wypoczynek na Helu",
+        dokladnie_iles_co_random(169, 30),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator1"],
+        ["Kurs kitesurfingu"],
+    ),
+    Wycieczka(
+        datetime(2024, 4, 1, 7, 0, 0),
+        datetime(2024, 4, 1, 22, 0, 0),
+        50,
+        "Góry Stołowe",
+        dokladnie_iles_co_random(69, 50),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        ["Kijki do chodzenia"],
+    ),
+    Wycieczka(
+        datetime(2024, 4, 2, 7, 0, 0),
+        datetime(2024, 4, 2, 22, 0, 0),
+        50,
+        "Góry Stołowe",
+        dokladnie_iles_co_random(20, 50),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        ["Kijki do chodzenia"],
+    ),
+    Wycieczka(
+        datetime(2024, 4, 3, 7, 0, 0),
+        datetime(2024, 4, 3, 22, 0, 0),
+        50,
+        "Góry Stołowe",
+        dokladnie_iles_co_random(1, 50),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        ["Kijki do chodzenia"],
+    ),
+    Wycieczka(
+        datetime(2024, 4, 4, 7, 0, 0),
+        datetime(2024, 4, 4, 22, 0, 0),
+        50,
+        "Góry Stołowe",
+        dokladnie_iles_co_random(169, 50),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        ["Kijki do chodzenia"],
+    ),
+    Wycieczka(
+        datetime(2024, 4, 5, 7, 0, 0),
+        datetime(2024, 4, 5, 22, 0, 0),
+        50,
+        "Góry Stołowe",
+        dokladnie_iles_co_random(200, 50),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        ["Kijki do chodzenia"],
+    ),
+    Wycieczka(
+        datetime(2024, 4, 6, 7, 0, 0),
+        datetime(2024, 4, 6, 22, 0, 0),
+        50,
+        "Góry Stołowe",
+        dokladnie_iles_co_random(70, 50),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        ["Kijki do chodzenia"],
+    ),
+    Wycieczka(
+        datetime(2024, 5, 6, 7, 0, 0),
+        datetime(2024, 5, 7, 22, 0, 0),
+        30,
+        "Emocje w Zatorze",
+        dokladnie_iles_co_random(70, 30),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        [],
+    ),
+    Wycieczka(
+        datetime(2024, 5, 16, 7, 0, 0),
+        datetime(2024, 5, 17, 22, 0, 0),
+        30,
+        "Emocje w Zatorze",
+        dokladnie_iles_co_random(100, 30),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        [],
+    ),
+    Wycieczka(
+        datetime(2024, 5, 18, 7, 0, 0),
+        datetime(2024, 5, 19, 22, 0, 0),
+        30,
+        "Emocje w Zatorze",
+        dokladnie_iles_co_random(130, 30),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        [],
+    ),
+    Wycieczka(
+        datetime(2024, 10, 18, 7, 0, 0),
+        datetime(2024, 10, 20, 22, 0, 0),
+        40,
+        "Wakeboard Szczecinek",
+        dokladnie_iles_co_random(130, 40),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        [],
+    ),
+    Wycieczka(
+        datetime(2024, 9, 18, 7, 0, 0),
+        datetime(2024, 9, 20, 22, 0, 0),
+        40,
+        "Wakeboard Szczecinek",
+        dokladnie_iles_co_random(33, 40),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        [],
+    ),
+    Wycieczka(
+        datetime(2024, 6, 22, 7, 0, 0),
+        datetime(2024, 6, 24, 22, 0, 0),
+        40,
+        "Wakeboard Szczecinek",
+        dokladnie_iles_co_random(33, 40),  # zaadaptowac
+        [],
+        0,
+        ["Kierowca3", "Organizator3"],
+        [],
+    ),
+
+
+
 ]
 
 # klucz to id wycieczki, od 1
