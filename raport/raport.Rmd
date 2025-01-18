@@ -18,14 +18,18 @@ options(repos = list(CRAN="http://cran.rstudio.com/"))
 
 #install.packages("RMariaDB")
 #install.packages("ggplot2")
+# install.packages("ggrepel")
 #install.packages("lattice")
 # install.packages("dplyr")
+# install.packages("tidyverse")
 
 
 library(lattice)
 library(ggplot2)
+library(ggrepel)
 library(RMariaDB)
 library(dplyr)
+library(tidyverse)
 ```
 
 ```{r}
@@ -84,19 +88,15 @@ ggplot(data = df, mapping = aes(x = reorder(Rodzaj_wycieczki, -Procent_popularno
                                 fill = Rodzaj_wycieczki)) +
   geom_bar(stat = 'identity', 
            width = 0.55,) +
-  geom_text(label = round(df$Procent_popularności, 0),
+  geom_text(label = paste0(round(df$Procent_popularności, 0), '%'),
             check_overlap = TRUE,
-            nudge_y = 10) +
+            nudge_y = 5) +
   scale_y_continuous(breaks = seq(from=0, to=100, by=25)) +
   ggtitle("Najpopularniejsze rodzaje wycieczek wśród naszych klientów") +
   ylab("Procent popularności") +
-  theme(axis.text.x = element_text(angle = 80, 
-                                   face = "bold", 
-                                   size = 10,
-                                   hjust = 0.9),
-        axis.ticks.x = element_blank(),
-        axis.title.x = element_blank(),
-        legend.position = 'none')
+  xlab("Wycieczki") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank())
 
 dbDisconnect(con)
 ```
@@ -152,31 +152,40 @@ query = "WITH wplywy AS (
 
 df <- dbGetQuery(con, query)
 
-ggplot(data = df, mapping = aes(x = reorder(nazwa, -Zysk),
-                                y = Zysk,
-                                fill = nazwa)) +
-  geom_bar(stat = 'identity',
-           width = 0.55) +
-  geom_text(label = df$Zysk,
-            check_overlap = TRUE,
-            nudge_y = 10) +
-  ggtitle("Zysk przyniesiony przez dany rodzaj wycieczki (w zł)") +
-  theme(axis.text.x = element_text(angle = 80, 
-                                   face = "bold", 
-                                   size = 10,
-                                   hjust = 0.9),
-        axis.ticks.x = element_blank(),
-        axis.title = element_blank(),
-        legend.position = 'none')
+df2 <- df %>% 
+  mutate(csum = rev(cumsum(rev(Zysk))), 
+         pos = Zysk/2 + lead(csum, 1),
+         pos = if_else(is.na(pos), Zysk/2, pos))
+
+
+# ggplot(data = df, mapping = aes(x = reorder(nazwa, -Zysk),
+#                                 y = Zysk,
+#                                 fill = nazwa)) +
+#   geom_bar(stat = 'identity',
+#            width = 0.55) +
+#   geom_text(label = df$Zysk,
+#             check_overlap = TRUE,
+#             nudge_y = 10) +
+#   ggtitle("Zysk przyniesiony przez dany rodzaj wycieczki (w zł)") +
+#   theme(axis.text.x = element_text(angle = 80, 
+#                                    face = "bold", 
+#                                    size = 10,
+#                                    hjust = 0.9),
+#         axis.ticks.x = element_blank(),
+#         axis.title = element_blank(),
+#         legend.position = 'none')
 
 ggplot(data = df, mapping = aes(x = "",
                                 y = Zysk,
-                                fill = nazwa)) +
+                                fill = fct_inorder(nazwa))) +
   geom_col(color = 'black') +
   coord_polar(theta = 'y') +
-  geom_text(aes(label = Zysk),
-            position = position_stack(vjust=0.5),
-            ) +
+  geom_label_repel(data = df2,
+                   aes(y = pos, label = paste0(Zysk, "zł")),
+                   show.legend = FALSE,
+                   nudge_x = 1) +
+  guides(fill = guide_legend(title = "Wycieczka")) +
+  ggtitle("Zysk z każdego rodzaju wycieczki") +
   theme_void()
 
 dbDisconnect(con)
