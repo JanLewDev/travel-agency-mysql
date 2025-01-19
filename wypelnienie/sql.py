@@ -158,7 +158,7 @@ TABLES[
         id_propozycji INT UNSIGNED NOT NULL AUTO_INCREMENT,
 		nazwa VARCHAR(50) NOT NULL,
         opis TEXT DEFAULT NULL,
-        ograniczenia VARCHAR(50) DEFAULT NULL,
+        ograniczenia TEXT DEFAULT NULL,
         min_liczba_osob INT NOT NULL DEFAULT 0,
         maks_liczba_osob INT NOT NULL,
         nasze_koszty_razem DECIMAL(10, 2) NOT NULL,
