@@ -556,8 +556,8 @@ class Wycieczka:
 
 WYCIECZKI: List[Wycieczka] = [
     Wycieczka(
-        datetime(2024, 1, 3, 6, 0, 0),
-        datetime(2024, 1, 4, 22, 0, 0),
+        datetime(2024, 1, 4, 6, 0, 0),
+        datetime(2024, 1, 5, 22, 0, 0),
         50,
         "Morsowanie Międzyzdroje",
         [],
