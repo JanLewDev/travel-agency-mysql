@@ -87,6 +87,8 @@ ggplot(data = df, mapping = aes(x = reorder(Rodzaj_wycieczki, -Procent_popularno
 
 dbDisconnect(con)
 ```
+jeśli procent_popularności < 80 dla wycieczki x
+Wycieczka x nie cieszy się satysfakcjonującym poziomem popularności, po zakończeniu każdej wycieczki tej kategori, powiniśmy poprosić klientów o wyrażenie swoich opinii.
 
 ```{r Porównanie kosztów i zysków wycieczek, fig.align='center'}
 what <- readRenviron('../.env')
@@ -159,7 +161,7 @@ ggplot(data = df, mapping = aes(x = "",
 
 dbDisconnect(con)
 ```
-
+Trzy najbardziej dochodowe wycieczki to !!wymienić te wycieczki!!. W następnym roku naszej działalności powiniśmy zainwestować w infrastrukturę umożliwiającą zwiększenie liczby tych wycieczek, aby zmaksymalizować nasz zysk.
 ```{r Najbardziej dochodowe dla nas usługi dodatkowe, fig.align='center'}
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
@@ -278,6 +280,7 @@ ggplot(data = df2, mapping = aes(x = reorder(nazwa, -procent),
 dbDisconnect(con)
 ```
 
+Najwięcej zyskujemy z pośredniczenia w kursie kitesurfingu, niestety wycieczka, na której oferujemy ten kurs ma najmniejszy współczynnik osób powracających. Aby temu zaradzić powinniśmy udzielać zniżki klientom, którzy kolejny raz korzystają z naszych usług oraz poprawić zadowolenie klientów z naszej kadry.
 ```{r Proporcja klientek do klientow}
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
@@ -334,7 +337,14 @@ ggplot(df3, aes(x = Płeć,
 
 dbDisconnect(con)
 ```
+jeśli k>m i (k-m)/k > 0.1 dla wycieczki x, to:
+Wycieczka x cieszy się większą popularnością kobiet, powiniśmy pomyśleć o akcji marketingowej skupionej na tej grupie docelowej, aby w jeszcze większym stopniu zwiększyć jej popularność.
 
+jeśli m>k i (m-k)/m>0.1 dla wycieczki x, to:
+Więcej mężczyzn bierze udział w wycieczce x. W związku z tym powiniśmy zwiększyć liczbę reklam wycieczki x skierowanych specyficznie do mężczyzn w celu zwiększenia liczby osób, które będą wybierały ten wyjazd.
+
+else:
+Nie ma preferencji u kobiet i mężczyzn w częstości wybierania wycieczki x.
 ```{r Najbardziej kosztowni kontrahenci, fig.align='center'}
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
@@ -424,6 +434,7 @@ ggplot(df, aes(x = Miesiąc,
 dbDisconnect(con)
 ```
 
+Pomimo, że w marcu udzieliliśmy naszych usług drugiej największej liczbie osób to ponieśliśmy największe straty na przestrzeni roku. W związku z tym powiniśmy przenegocjować nasze umowy z kontrahentami wycieczek, które odbyły się w tym miesiącu oraz nałożyć większą marżę na nasze usługi.
 ```{r zyski w poszegolnych miesiacach, fig.align='center'}
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
@@ -501,13 +512,16 @@ ggplot(df, aes(x = Miesiąc,
             check_overlap = TRUE,
             nudge_y = 5) +
   ylab("Obsłużeni klienci") +
-  ggtitle("Liczba klientów w poszczególnych miesiącach 2024 roku") +
+  ggtitle("Zyski w poszczególnych miesiącach 2024 roku") +
   theme(legend.position = "none")
 
 dbDisconnect(con)
 ```
-# Podsumowanie
 
+Największe zyski odnosimy w miesiącach wakacyjnych, we wrześniu oraz w styczniu. Natomiast największe straty ponosimy w marcu i listopadzie, a w pozostałych miesiącach udało nam się utrzymać równowagę finansową. Warto zwiększyć liczbę i rodzaje wycieczek oferowanych latem oraz w styczniu. 
+
+# Podsumowanie
+Osiągnęliśmy zysk po pierwszym roku działalności, powinniśmy rozważyć rozszerzenie naszej kadry, listy proponowanych wycieczek oraz zakupienie nowych autokarów oraz zawarcie umowy z liniami lotniczymi.Kolejnym celem jest zwiększenie zysków w miesiącach zimowych i wiosennych. Możemy to osiągnąć poprzez renegocjacje i zawarcie nowych umów z kontrahentami.
  
 
 
