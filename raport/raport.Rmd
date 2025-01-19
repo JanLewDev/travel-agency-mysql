@@ -3,37 +3,35 @@ title: "Raport firmy"
 author: "Grupa Wombat Grylls"
 date: "`r Sys.Date()`"
 output:
-  pdf_document:
-    toc: true
   html_document:
     number_sections: false
     toc: true
     toc_float: true
     theme: united
+  pdf_document:
+    toc: true
 ---
 wlaczyc instalacje pakietow
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(repos = list(CRAN="http://cran.rstudio.com/"))
 
-#install.packages("RMariaDB")
-#install.packages("ggplot2")
+# install.packages("RMariaDB")
+# install.packages("ggplot2")
 # install.packages("ggrepel")
-#install.packages("lattice")
+# install.packages("lattice")
 # install.packages("dplyr")
 # install.packages("tidyverse")
-
+# install.packages("ggpubr")
 
 library(lattice)
 library(ggplot2)
 library(ggrepel)
+library(ggpubr)
+library(gridExtra)
 library(RMariaDB)
 library(dplyr)
 library(tidyverse)
-```
-
-```{r}
-#tutaj polaczenie z baza danych i selecty
 ```
 
 # Schemat
@@ -78,11 +76,6 @@ query <- "SELECT
 
 df <- dbGetQuery(con, query)
 
-# ggplot(data = df, mapping = aes(x = Rodzaj_wycieczki,y = Procent_popularności, fill = Rodzaj_wycieczki)) +
-#   geom_bar(stat = 'identity', width = 0.7) +
-#   theme(axis.text.x = element_blank(),
-#         axis.ticks.x = element_blank())
-
 ggplot(data = df, mapping = aes(x = reorder(Rodzaj_wycieczki, -Procent_popularności),
                                 y = Procent_popularności, 
                                 fill = Rodzaj_wycieczki)) +
@@ -97,6 +90,8 @@ ggplot(data = df, mapping = aes(x = reorder(Rodzaj_wycieczki, -Procent_popularno
   xlab("Wycieczki") +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
+
+# reorder(df$Rodzaj_wycieczki, -df$Procent_popularności)
 
 dbDisconnect(con)
 ```
@@ -223,22 +218,20 @@ ggplot(data = df, mapping = aes(x = reorder(usluga_dodatkowa, -zysk),
                                 fill = usluga_dodatkowa)) +
   geom_bar(stat = 'identity', 
            width = 0.55) +
-  geom_text(label = df$zysk,
+  geom_text(label = paste0(df$zysk, "zł"),
             check_overlap = TRUE,
-            nudge_y = 10) +
-  ggtitle("Zysk przyniesiony przez dany rodzaj usługi dodatkowej (w zł)") +
-  theme(axis.text.x = element_text(angle = 80, 
-                                   face = "bold", 
-                                   size = 10,
-                                   hjust = 0.9),
+            nudge_y = 5) +
+  xlab("Usługa") +
+  ylab("Zysk") +
+  ggtitle("Zysk przyniesiony przez dany rodzaj usługi dodatkowej") +
+  theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        axis.title = element_blank(),
-        legend.position = 'none')
+        axis.title = element_blank())
 
 dbDisconnect(con)
 ```
 
-```{r Średni procent poweracajacych klientow, fig.align='center'}
+```{r Średni procent powracajacych klientow, fig.align='center'}
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
 
@@ -297,20 +290,277 @@ ggplot(data = df2, mapping = aes(x = reorder(nazwa, -procent),
                                 fill = nazwa)) +
   geom_bar(stat = 'identity', 
            width = 0.55) +
-  geom_text(label = round(df2$procent, 0),
+  geom_text(label = paste0(round(df2$procent, 0), "%"),
             check_overlap = TRUE,
-            nudge_y = 10) +
+            nudge_y = 1) +
+  xlab("Wycieczka") +
+  ylab("Procent") +
   scale_y_continuous(breaks = seq(from=0, to=100, by=25)) +
   ggtitle("Procent powracających klientów po danej wycieczce") +
-  theme(axis.text.x = element_text(angle = 80, 
-                                   face = "bold", 
-                                   size = 10,
-                                   hjust = 0.9),
+  theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        axis.title = element_blank(),
-        legend.position = 'none')
+        axis.title = element_blank())
 
 dbDisconnect(con)
+```
+
+```{r Proporcja klientek do klientow}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query <- "SELECT
+    w.id_wycieczki,
+    pw.nazwa,
+    SUM(CASE WHEN k.plec = 'K' THEN 1 ELSE 0 END) AS liczba_kobiet,
+    SUM(CASE WHEN k.plec = 'M' THEN 1 ELSE 0 END) AS liczba_mezczyzn,
+    (SUM(CASE WHEN k.plec = 'K' THEN 1 ELSE 0 END) / SUM(CASE WHEN k.plec = 'M' THEN 1 ELSE 0 END)) AS Proporcja_kobiet_do_mężczyzn
+FROM
+    wycieczki w
+JOIN
+    klient_wycieczka kw ON w.id_wycieczki = kw.id_wycieczki
+JOIN
+    klienci k ON kw.id_klienta = k.id_klienta
+JOIN
+    propozycje_wycieczki pw ON pw.id_propozycji = w.id_propozycji
+GROUP BY
+    w.id_wycieczki;"
+
+df <- dbGetQuery(con, query)
+
+df2_males <- df %>%
+  group_by(nazwa) %>%
+  summarise(mężczyźni = sum(liczba_mezczyzn))
+
+df2_females <- df %>%
+  group_by(nazwa) %>%
+  summarise(kobiety = sum(liczba_kobiet))
+
+# df2_males
+# df2_females
+
+df2 <- merge(df2_males, df2_females)
+# df2
+
+# df2$males
+
+df3 <- df2 %>%
+  gather(Płeć, ilość, -nazwa)
+
+ggplot(df3, aes(x = Płeć,
+                y = ilość,
+                fill = nazwa)) +
+  geom_col(position = "dodge") +
+  geom_text(label = df3$ilość,
+            position = position_dodge(width=0.9),
+            vjust = -0.25,
+            check_overlap = TRUE,
+            show.legend = FALSE) +
+  ggtitle("Liczba mężczyzn i kobiet w zależności od propozycji wycieczki")
+
+dbDisconnect(con)
+```
+
+```{r Najbardziej kosztowni kontrahenci, fig.align='center'}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query = "SELECT k.nazwa, SUM(t.kwota) AS Łączna_Kwota
+FROM transakcje_kontrahenci t
+JOIN kontrahenci k ON t.id_kontrahenta = k.id_kontrahenta
+GROUP BY k.nazwa
+ORDER BY Łączna_Kwota DESC;"
+
+df <- dbGetQuery(con, query)
+
+all_cost <- sum(df$Łączna_Kwota)
+big_cost <- sum(df$Łączna_Kwota[which(df$Łączna_Kwota/all_cost > 0.05)])
+
+df_big <- df %>%
+  filter(Łączna_Kwota/all_cost > 0.05)
+
+df_other <- data.frame(nazwa = "Różne", Łączna_Kwota = all_cost - big_cost)
+
+df_ideal <- merge(df_big, df_other, all = TRUE)
+
+# big_cost
+# df_big
+# df_other
+# df_ideal
+
+df2 <- df_ideal %>%
+  mutate(csum = rev(cumsum(rev(Łączna_Kwota))),
+         pos = Łączna_Kwota/2 + lead(csum, 1),
+         pos = if_else(is.na(pos), Łączna_Kwota/2, pos))
+
+ggplot(data = df_ideal, mapping = aes(x = "",
+                                y = Łączna_Kwota,
+                                fill = fct_inorder(nazwa))) +
+  geom_col(color = 'black') +
+  # coord_polar(theta = 'y') +
+  geom_label_repel(data = df2,
+                   aes(y = pos, label = paste0(Łączna_Kwota), "zł"),
+                   show.legend = FALSE,
+                   nudge_x = 1) +
+  # guides(fill = guide_legend(title = "Kontrahent")) +
+  ggtitle("Koszty poniesione na rzecz kontrahentów") +
+  theme_void()
+
+# ggplot(data = df, mapping = aes(x = reorder(nazwa, -Łączna_Kwota),
+#                                 y = Łączna_Kwota,
+#                                 fill = nazwa)) +
+#   geom_bar(stat = 'identity', 
+#            width = 0.55) +
+#   geom_text(label = paste0(df$Łączna_Kwota, "zł"),
+#             check_overlap = TRUE,
+#             nudge_y = 5,
+#             vjust = -0.25) +
+#   scale_y_continuous(breaks = seq(from=0, to=1.1*max(df$Łączna_Kwota), length.out = 5)) +
+#   xlab("Kontrahent") +
+#   ylab("Poniesione koszty") +
+#   ggtitle("Koszty na rzecz kontrahentów") +
+#   theme(axis.text.x = element_blank(),
+#         axis.ticks.x = element_blank(),
+#         axis.title = element_blank())
+```
+
+```{r liczba obsluzonych klientow w kazdym miesiacu, fig.align='center'}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query = "SELECT
+    DATE_FORMAT(tk.data_transakcji, '%Y-%m') AS Miesiąc,
+    COUNT(DISTINCT tk.id_klienta) AS Liczba_obsłużonych_klientów
+FROM
+    transakcje_klienci tk
+GROUP BY
+    DATE_FORMAT(tk.data_transakcji, '%Y-%m')
+ORDER BY
+    Miesiąc;"
+
+df <- dbGetQuery(con, query)
+
+# df$Miesiąc <- lapply(df$Miesiąc, FUN = function(x) substring(x, 6))
+# # levels(df$Miesiąc)
+# df$Miesiąc
+
+# as.roman(unlist(lapply(df$Miesiąc, FUN = function(x) substring(x, 6))))
+
+
+ggplot(df, aes(x = Miesiąc,
+               y = Liczba_obsłużonych_klientów,
+               fill = Miesiąc)) +
+  geom_bar(stat = "identity",
+           width = 0.55) +
+  scale_x_discrete(labels = as.roman(unlist(lapply(df$Miesiąc, FUN = function(x) substring(x, 6))))) +
+  geom_text(label = df$Liczba_obsłużonych_klientów,
+            check_overlap = TRUE,
+            nudge_y = 5) +
+  ylab("Obsłużeni klienci") +
+  ggtitle("Liczba klientów w poszczególnych miesiącach 2024 roku") +
+  theme(legend.position = "none")
+  # theme(axis.text.x = element_blank())
+```
+
+```{r zyski w poszegolnych miesiacach, fig.align='center'}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query = "WITH wplywy AS (
+    SELECT tk.id_wycieczki, SUM(tk.kwota) AS suma
+    FROM transakcje_klienci AS tk
+    GROUP BY tk.id_wycieczki
+), wydatki_nasze AS (
+    SELECT
+        w.id_wycieczki,
+        ((km.koszt + pw.nasze_koszty_razem) * w.liczba_osob) AS nasze_koszty
+    FROM
+        wycieczki w
+    JOIN
+        propozycje_wycieczki pw ON w.id_propozycji = pw.id_propozycji
+    JOIN
+        transport_propozycja_wycieczki tpw ON pw.id_propozycji = tpw.id_propozycji
+    JOIN
+        koszty_miasta km ON tpw.id_kosztu_miasta = km.id_kosztu
+), wydatki_kontrahenci AS (
+    SELECT
+        tko.id_wycieczki,
+        SUM(tko.kwota) AS wydatki_kontrahenci
+    FROM
+        transakcje_kontrahenci AS tko
+    GROUP BY
+        tko.id_wycieczki
+), zysk_wycieczki AS (
+    SELECT
+        DATE_FORMAT(w.czas_wyjazdu, '%Y-%m') AS zwMiesiąc,
+        wplywy.suma - (wydatki_nasze.nasze_koszty + wydatki_kontrahenci.wydatki_kontrahenci) AS Zysk
+    FROM wycieczki w
+    JOIN wplywy ON w.id_wycieczki = wplywy.id_wycieczki
+    JOIN wydatki_nasze ON w.id_wycieczki = wydatki_nasze.id_wycieczki
+    JOIN wydatki_kontrahenci ON w.id_wycieczki = wydatki_kontrahenci.id_wycieczki
+    ORDER BY Zysk DESC
+), suma_pensji AS (
+    SELECT
+        DATE_FORMAT(tp.data_transakcji, '%Y-%m') AS spMiesiąc,
+        SUM(tp.kwota) AS suma_pensji
+    FROM
+        transakcje_pracownicy tp
+    GROUP BY
+        spMiesiąc
+) SELECT
+        zwMiesiąc AS Miesiąc,
+        SUM(Zysk) - suma_pensji AS Zysk
+    FROM
+        zysk_wycieczki
+    JOIN
+        suma_pensji ON zwMiesiąc = spMiesiąc
+    GROUP BY
+        Miesiąc
+    ORDER BY
+        Miesiąc;"
+
+df <- dbGetQuery(con, query)
+
+
+ggplot(df, aes(x = Miesiąc,
+               y = Zysk,
+               fill = Miesiąc)) +
+  geom_bar(stat = "identity",
+           width = 0.55) +
+  scale_x_discrete(labels = as.roman(unlist(lapply(df$Miesiąc, FUN = function(x) substring(x, 6))))) +
+  geom_text(label = df$Zysk,
+            check_overlap = TRUE,
+            nudge_y = 5) +
+  ylab("Obsłużeni klienci") +
+  ggtitle("Liczba klientów w poszczególnych miesiącach 2024 roku") +
+  theme(legend.position = "none")
 ```
 # Podsumowanie
 
