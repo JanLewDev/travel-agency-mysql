@@ -3,26 +3,26 @@ title: "Raport firmy"
 author: "Grupa Wombat Grylls"
 date: "`r Sys.Date()`"
 output:
+  pdf_document:
+    toc: true
   html_document:
     number_sections: false
     toc: true
     toc_float: true
     theme: united
-  pdf_document:
-    toc: true
 ---
-wlaczyc instalacje pakietow
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(repos = list(CRAN="http://cran.rstudio.com/"))
 
-# install.packages("RMariaDB")
-# install.packages("ggplot2")
-# install.packages("ggrepel")
-# install.packages("lattice")
-# install.packages("dplyr")
-# install.packages("tidyverse")
-# install.packages("ggpubr")
+install.packages("RMariaDB")
+install.packages("ggplot2")
+install.packages("ggrepel")
+install.packages("lattice")
+install.packages("dplyr")
+install.packages("tidyverse")
+install.packages("ggpubr")
 
 library(lattice)
 library(ggplot2)
@@ -34,21 +34,15 @@ library(dplyr)
 library(tidyverse)
 ```
 
-# Schemat
-
+# Schemat bazy
 
 ```{r, out.width="60%",  fig.align="center", fig.cap="Uproszczony schemat naszej bazy danych"}
 knitr::include_graphics("../obrazy/baza_danych.png")
 ```
 
-```{r, out.width="60%",  fig.align="center", fig.cap="Dokładny schemat naszej bazy danych"}
-knitr::include_graphics("../obrazy/baza_danych_fullsize.png")
-```
-
 # Analiza danych
 
 ```{r najpopularniejsze rodzaje wycieczek, fig.align="center"} 
-# Moze dokladna ilosc osob ktora bbyla na kazdej z wycieczek
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
 
@@ -90,8 +84,6 @@ ggplot(data = df, mapping = aes(x = reorder(Rodzaj_wycieczki, -Procent_popularno
   xlab("Wycieczki") +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
-
-# reorder(df$Rodzaj_wycieczki, -df$Procent_popularności)
 
 dbDisconnect(con)
 ```
@@ -151,24 +143,6 @@ df2 <- df %>%
   mutate(csum = rev(cumsum(rev(Zysk))), 
          pos = Zysk/2 + lead(csum, 1),
          pos = if_else(is.na(pos), Zysk/2, pos))
-
-
-# ggplot(data = df, mapping = aes(x = reorder(nazwa, -Zysk),
-#                                 y = Zysk,
-#                                 fill = nazwa)) +
-#   geom_bar(stat = 'identity',
-#            width = 0.55) +
-#   geom_text(label = df$Zysk,
-#             check_overlap = TRUE,
-#             nudge_y = 10) +
-#   ggtitle("Zysk przyniesiony przez dany rodzaj wycieczki (w zł)") +
-#   theme(axis.text.x = element_text(angle = 80, 
-#                                    face = "bold", 
-#                                    size = 10,
-#                                    hjust = 0.9),
-#         axis.ticks.x = element_blank(),
-#         axis.title = element_blank(),
-#         legend.position = 'none')
 
 ggplot(data = df, mapping = aes(x = "",
                                 y = Zysk,
@@ -342,13 +316,7 @@ df2_females <- df %>%
   group_by(nazwa) %>%
   summarise(kobiety = sum(liczba_kobiet))
 
-# df2_males
-# df2_females
-
 df2 <- merge(df2_males, df2_females)
-# df2
-
-# df2$males
 
 df3 <- df2 %>%
   gather(Płeć, ilość, -nazwa)
@@ -396,11 +364,6 @@ df_other <- data.frame(nazwa = "Różne", Łączna_Kwota = all_cost - big_cost)
 
 df_ideal <- merge(df_big, df_other, all = TRUE)
 
-# big_cost
-# df_big
-# df_other
-# df_ideal
-
 df2 <- df_ideal %>%
   mutate(csum = rev(cumsum(rev(Łączna_Kwota))),
          pos = Łączna_Kwota/2 + lead(csum, 1),
@@ -410,31 +373,16 @@ ggplot(data = df_ideal, mapping = aes(x = "",
                                 y = Łączna_Kwota,
                                 fill = fct_inorder(nazwa))) +
   geom_col(color = 'black') +
-  # coord_polar(theta = 'y') +
+  coord_polar(theta = 'y') +
   geom_label_repel(data = df2,
-                   aes(y = pos, label = paste0(Łączna_Kwota), "zł"),
+                   aes(y = pos, label = paste0(Łączna_Kwota, "zł")),
                    show.legend = FALSE,
                    nudge_x = 1) +
-  # guides(fill = guide_legend(title = "Kontrahent")) +
+  guides(fill = guide_legend(title = "Kontrahent")) +
   ggtitle("Koszty poniesione na rzecz kontrahentów") +
   theme_void()
 
-# ggplot(data = df, mapping = aes(x = reorder(nazwa, -Łączna_Kwota),
-#                                 y = Łączna_Kwota,
-#                                 fill = nazwa)) +
-#   geom_bar(stat = 'identity', 
-#            width = 0.55) +
-#   geom_text(label = paste0(df$Łączna_Kwota, "zł"),
-#             check_overlap = TRUE,
-#             nudge_y = 5,
-#             vjust = -0.25) +
-#   scale_y_continuous(breaks = seq(from=0, to=1.1*max(df$Łączna_Kwota), length.out = 5)) +
-#   xlab("Kontrahent") +
-#   ylab("Poniesione koszty") +
-#   ggtitle("Koszty na rzecz kontrahentów") +
-#   theme(axis.text.x = element_blank(),
-#         axis.ticks.x = element_blank(),
-#         axis.title = element_blank())
+dbDisconnect(con)
 ```
 
 ```{r liczba obsluzonych klientow w kazdym miesiacu, fig.align='center'}
@@ -460,13 +408,6 @@ ORDER BY
 
 df <- dbGetQuery(con, query)
 
-# df$Miesiąc <- lapply(df$Miesiąc, FUN = function(x) substring(x, 6))
-# # levels(df$Miesiąc)
-# df$Miesiąc
-
-# as.roman(unlist(lapply(df$Miesiąc, FUN = function(x) substring(x, 6))))
-
-
 ggplot(df, aes(x = Miesiąc,
                y = Liczba_obsłużonych_klientów,
                fill = Miesiąc)) +
@@ -479,7 +420,8 @@ ggplot(df, aes(x = Miesiąc,
   ylab("Obsłużeni klienci") +
   ggtitle("Liczba klientów w poszczególnych miesiącach 2024 roku") +
   theme(legend.position = "none")
-  # theme(axis.text.x = element_blank())
+
+dbDisconnect(con)
 ```
 
 ```{r zyski w poszegolnych miesiacach, fig.align='center'}
@@ -561,6 +503,8 @@ ggplot(df, aes(x = Miesiąc,
   ylab("Obsłużeni klienci") +
   ggtitle("Liczba klientów w poszczególnych miesiącach 2024 roku") +
   theme(legend.position = "none")
+
+dbDisconnect(con)
 ```
 # Podsumowanie
 
