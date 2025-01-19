@@ -9,12 +9,12 @@ from collections import defaultdict
 
 # klucz to nazwa stanowiska, wartosc to pensja
 STANOWISKA = {
-    "Menager": 10000,
+    "Menager": 8000,
     "Kierowca": 5000,
-    "Przewodnik": 6000,
     "Pracownik biurowy": 4666,
-    "Marketingowiec": 5500,
-    "Organizator": 7000,
+    # B2B tylko reklamy FB
+    "Marketingowiec": 500,
+    "Organizator": 6500,
 }
 
 # klucz to nazwa pracownika, wartosc to stanowisko
@@ -22,8 +22,6 @@ PRACOWNICY = {
     "Menager": "Menager",
     "Kierowca1": "Kierowca",
     "Kierowca2": "Kierowca",
-    "Kierowca3": "Kierowca",
-    "Przewodnik, język angielski": "Przewodnik",
     "Pracownik biurowy": "Pracownik biurowy",
     "Marketingowiec": "Marketingowiec",
     "Organizator1": "Organizator",
@@ -136,7 +134,7 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         45,
         50,
         40,
-        80,
+        200,
         "Międzyzdroje",
         "Hotel Gromada Międzyzdroje",
         ["Autokar 1"],
@@ -149,11 +147,11 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         10,
         20,
         140,
-        235,
+        200,
         "Karpacz",
         "Pensjonat Jar",
         ["Bus 1"],
-        ["Karkonoskie fondue"],
+        ["Karkonoskie fondue", "Instruktor narciarstwa"],
     ),
     PropozycjaWycieczki(
         "Wakeboard Szczecinek",
@@ -161,8 +159,8 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         "Umiejętność pływania na wakeboardzie",
         30,
         50,
-        140,
-        175,
+        100,
+        200,
         "Szczecinek",
         "Hotel Zacisze",
         ["Autokar 1"],
@@ -175,7 +173,7 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         45,
         50,
         15,
-        30,
+        45,
         "Polanica-Zdrój",
         "Karczma U Krysi",
         ["Autokar 2"],
@@ -187,7 +185,7 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
                 na plaży, pływanie w Bałtyku albo poznawanie historii w Muzeum Obrony Wybrzeża - \
                     każdy znajdzie coś dla siebie.",
         None,
-        30,
+        40,
         45,
         100,
         150,
@@ -252,7 +250,7 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
     ),
     "Pensjonat Jar": MiejsceWycieczki(
         "Pensjonat Jar",
-        235,
+        200,
         300,
         "Jarska Apartments",
     ),
@@ -270,8 +268,8 @@ MIEJSCA_WYCIECZKI: Dict[str, MiejsceWycieczki] = {
     ),
     "Hotel Gromada Hel": MiejsceWycieczki(
         "Hotel Gromada Hel",
-        2000,
-        2200,
+        1400,
+        2100,
         "Sieć hoteli Gromada",
     ),
     "Hotel Tygrys": MiejsceWycieczki("Hotel Tygrys", 500, 700, "Hotel Tygrys"),
@@ -374,15 +372,15 @@ RODZAJE_USLUG_DODATKOWYCH: Dict[str, RodzajUslugiDodatkowej] = {
     "Sprzęt narciarski": RodzajUslugiDodatkowej(
         "Sprzęt narciarski",
         "Narty i kijki wypożyczane w górach",
-        100,
-        125,
+        250,
+        400,
         "Wypożyczalnia sprzętu narciarskiego",
     ),
     "Wakeboard, pianka, kask": RodzajUslugiDodatkowej(
         "Wakeboard, pianka, kask",
         "Sprzęt potrzebny do uprawiania wakeboardingu",
-        140,
-        175,
+        300,
+        500,
         "Wypożyczalnia wakeboardowa",
     ),
     "Kijki do chodzenia": RodzajUslugiDodatkowej(
@@ -395,15 +393,15 @@ RODZAJE_USLUG_DODATKOWYCH: Dict[str, RodzajUslugiDodatkowej] = {
     "Kurs kitesurfingu": RodzajUslugiDodatkowej(
         "Kurs kitesurfingu",
         "Kurs szkoleniowy kitesurfingu po Bałtyku pod okiem doświadczonych instruktorów.",
-        1000,
-        1300,
+        2000,
+        2500,
         "Szkoła kitesurfingu ProKajciarz",
     ),
     "Wizyta w Muzeum Schindlera": RodzajUslugiDodatkowej(
         "Wizyta w Muzeum Schindlera",
-        "Wizyta w muzeum opowiadającym historię Krakowa podczas II wojny światowek",
-        50,
-        70,
+        "Wizyta w muzeum opowiadającym historię Krakowa podczas II wojny światowej",
+        37,
+        40,
         "Muzeum Schindlera",
     ),
 }
@@ -523,6 +521,9 @@ KOSZTY_U_KONTRAHENTOW: Dict[str, KosztUKontrahenta] = {
     "Energylandia": KosztUKontrahenta(
         "Energylandia", 120, 150, "Energylandia sp. z o.o."
     ),
+    "Instruktor narciarstwa": KosztUKontrahenta(
+        "Instruktor narciarstwa", 270, 350, "Wypożyczalnia sprzętu narciarskiego"
+    ),
 }
 
 
@@ -619,7 +620,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],  # zaadaptowac
         [],
         0,
-        ["Kierowca3", "Organizator2"],
+        ["Kierowca2", "Organizator2"],
         ile_osob_powroci=2,
         uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
@@ -631,7 +632,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],  # zaaadaptowac
         [],
         0,
-        ["Kierowca3", "Organizator2"],
+        ["Kierowca2", "Organizator2"],
         ile_osob_powroci=2,
         uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
@@ -781,8 +782,8 @@ WYCIECZKI: List[Wycieczka] = [
         uslugi_dodatkowe=["Deski surfingowe"],
     ),
     Wycieczka(
-        datetime(2024, 1, 3, 6, 0, 0),
-        datetime(2024, 1, 6, 18, 0, 0),
+        datetime(2024, 1, 4, 6, 0, 0),
+        datetime(2024, 1, 7, 18, 0, 0),
         15,
         "Narty Karpacz",
         [],
@@ -805,7 +806,7 @@ WYCIECZKI: List[Wycieczka] = [
     Wycieczka(
         datetime(2024, 8, 16, 7, 0, 0),
         datetime(2024, 8, 30, 22, 0, 0),
-        36,
+        42,
         "Wypoczynek na Helu",
         [],
         [],
@@ -815,7 +816,7 @@ WYCIECZKI: List[Wycieczka] = [
     Wycieczka(
         datetime(2024, 8, 1, 7, 0, 0),
         datetime(2024, 8, 15, 22, 0, 0),
-        31,
+        44,
         "Wypoczynek na Helu",
         [],
         [],
@@ -826,34 +827,34 @@ WYCIECZKI: List[Wycieczka] = [
     Wycieczka(
         datetime(2024, 7, 1, 7, 0, 0),
         datetime(2024, 7, 15, 22, 0, 0),
-        30,
+        40,
         "Wypoczynek na Helu",
         [],
         [],
         0,
-        ["Kierowca3", "Organizator1"],
+        ["Kierowca2", "Organizator1"],
         uslugi_dodatkowe=["Kurs kitesurfingu"],
     ),
     Wycieczka(
         datetime(2024, 9, 1, 7, 0, 0),
         datetime(2024, 9, 15, 22, 0, 0),
-        30,
+        40,
         "Wypoczynek na Helu",
         [],
         [],
         0,
-        ["Kierowca3", "Organizator1"],
+        ["Kierowca2", "Organizator1"],
         uslugi_dodatkowe=["Kurs kitesurfingu"],
     ),
     Wycieczka(
         datetime(2024, 6, 1, 7, 0, 0),
         datetime(2024, 6, 15, 22, 0, 0),
-        30,
+        40,
         "Wypoczynek na Helu",
         [],
         [],
         0,
-        ["Kierowca3", "Organizator1"],
+        ["Kierowca2", "Organizator1"],
         uslugi_dodatkowe=["Kurs kitesurfingu"],
     ),
     Wycieczka(
@@ -864,7 +865,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],
         [],
         0,
-        ["Kierowca3", "Organizator3"],
+        ["Kierowca2", "Organizator3"],
         uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
     Wycieczka(
@@ -875,7 +876,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],
         [],
         0,
-        ["Kierowca3", "Organizator3"],
+        ["Kierowca2", "Organizator3"],
         ile_osob_powroci=10,
         uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
@@ -887,7 +888,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],
         [],
         0,
-        ["Kierowca3", "Organizator3"],
+        ["Kierowca2", "Organizator3"],
         ile_osob_powroci=10,
         uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
@@ -899,7 +900,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],
         [],
         0,
-        ["Kierowca3", "Organizator3"],
+        ["Kierowca2", "Organizator3"],
     ),
     Wycieczka(
         datetime(2024, 5, 16, 7, 0, 0),
@@ -909,7 +910,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],
         [],
         0,
-        ["Kierowca3", "Organizator3"],
+        ["Kierowca2", "Organizator3"],
         ile_osob_powroci=10,
     ),
     Wycieczka(
@@ -920,7 +921,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],
         [],
         0,
-        ["Kierowca3", "Organizator3"],
+        ["Kierowca2", "Organizator3"],
     ),
     Wycieczka(
         datetime(2024, 10, 18, 7, 0, 0),
@@ -930,7 +931,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],
         [],
         0,
-        ["Kierowca3", "Organizator3"],
+        ["Kierowca2", "Organizator3"],
     ),
     Wycieczka(
         datetime(2024, 9, 18, 7, 0, 0),
@@ -940,7 +941,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],
         [],
         0,
-        ["Kierowca3", "Organizator3"],
+        ["Kierowca2", "Organizator3"],
     ),
     Wycieczka(
         datetime(2024, 6, 22, 7, 0, 0),
@@ -950,7 +951,7 @@ WYCIECZKI: List[Wycieczka] = [
         [],
         [],
         0,
-        ["Kierowca3", "Organizator3"],
+        ["Kierowca2", "Organizator3"],
     ),
 ]
 
