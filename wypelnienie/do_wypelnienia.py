@@ -7,8 +7,6 @@ from collections import defaultdict
 
 # firma dziala w 2024 roku
 
-LICZBA_KLIENTOW = 300
-
 # klucz to nazwa stanowiska, wartosc to pensja
 STANOWISKA = {
     "Menager": 10000,
@@ -211,7 +209,7 @@ PROPOZYCJE: List[PropozycjaWycieczki] = [
         ["Grupowe pieczenie pianek przy ognisku", "Energylandia"],
     ),
     PropozycjaWycieczki(
-        "Królewski Kraków – podróż w serce historii i magii",
+        "Królewski Kraków",
         "Odkryj magię królewskiego Krakowa! Wybierz się na niezapomnianą podróż przez Stare Miasto, Wawel i klimatyczny Kazimierz. Zanurz się w historii, podziwiaj zabytki i delektuj się lokalnymi przysmakami. Spacer po królewskich uliczkach, wizyta w Smoczej Jamie i chwila relaksu nad Wisłą to tylko początek tej wyjątkowej przygody!",
         None,
         20,
@@ -541,6 +539,7 @@ class Wycieczka:
         transakcje_kontrahenci: List[Tuple[int, str]],  # samo sie oblicza
         koszty_klienta_razem: int,  # samo sie oblicza
         pracownicy_wycieczki: List[str],
+        ile_osob_powroci: int = 0,
         uslugi_dodatkowe: Optional[List[str]] = None,
     ):
         self.data_wyjazdu = data_wyjazdu
@@ -551,18 +550,8 @@ class Wycieczka:
         self.transakcje_kontrahenci = transakcje_kontrahenci
         self.koszty_klienta_razem = koszty_klienta_razem
         self.pracownicy_wycieczki = pracownicy_wycieczki
+        self.ile_osob_powroci = ile_osob_powroci
         self.uslugi_dodatkowe = uslugi_dodatkowe
-
-
-def dokladnie_iles_co_random(
-    start: int, ile: int, jaki_random: Optional[Tuple[int, int]] = None
-) -> List[int]:
-    """Funkcja zwracajaca liste od min do ile co co_ile"""
-    ret = []
-    for _ in range(ile):
-        ret.append(start)
-        start += randint(*jaki_random) if jaki_random else 1
-    return ret
 
 
 WYCIECZKI: List[Wycieczka] = [
@@ -571,83 +560,99 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 1, 4, 22, 0, 0),
         50,
         "Morsowanie Międzyzdroje",
-        dokladnie_iles_co_random(1, 50),
+        [],
         [],
         0,
         ["Kierowca1", "Organizator1"],
+    ),
+    Wycieczka(
+        datetime(2024, 1, 10, 6, 0, 0),
+        datetime(2024, 1, 11, 22, 0, 0),
+        48,
+        "Morsowanie Międzyzdroje",
+        [],
+        [],
+        0,
+        ["Kierowca1", "Organizator2"],
+        uslugi_dodatkowe=["Deski surfingowe"],
     ),
     Wycieczka(
         datetime(2024, 1, 26, 6, 0, 0),
         datetime(2024, 1, 27, 22, 0, 0),
         48,
         "Morsowanie Międzyzdroje",
-        dokladnie_iles_co_random(1, 48, (1, 2)),
+        [],
         [],
         0,
         ["Kierowca1", "Organizator2"],
-        ["Deski surfingowe"],
+        ile_osob_powroci=2,
+        uslugi_dodatkowe=["Deski surfingowe"],
     ),
     Wycieczka(
         datetime(2024, 2, 2, 7, 0, 0),
         datetime(2024, 2, 4, 17, 0, 0),
         14,
         "Narty Karpacz",
-        dokladnie_iles_co_random(100, 14),
+        [],
         [],
         0,
         ["Kierowca2", "Organizator1"],
-        ["Sprzęt narciarski"],
+        ile_osob_powroci=2,
+        uslugi_dodatkowe=["Sprzęt narciarski"],
     ),
     Wycieczka(
         datetime(2024, 2, 9, 7, 0, 0),
         datetime(2024, 2, 11, 17, 0, 0),
         20,
         "Narty Karpacz",
-        dokladnie_iles_co_random(120, 20),  # zaadaptowac
+        [],  # zaadaptowac
         [],
         0,
         ["Kierowca2", "Organizator1"],
-        ["Sprzęt narciarski"],
+        uslugi_dodatkowe=["Sprzęt narciarski"],
     ),
     Wycieczka(
         datetime(2024, 3, 9, 8, 0, 0),
         datetime(2024, 3, 9, 18, 0, 0),
         49,
         "Góry Stołowe",
-        dokladnie_iles_co_random(140, 49),  # zaadaptowac
+        [],  # zaadaptowac
         [],
         0,
         ["Kierowca3", "Organizator2"],
-        ["Kijki do chodzenia"],
+        ile_osob_powroci=2,
+        uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
     Wycieczka(
         datetime(2024, 3, 23, 8, 0, 0),
         datetime(2024, 3, 23, 18, 0, 0),
         45,
         "Góry Stołowe",
-        dokladnie_iles_co_random(190, 45),  # zaaadaptowac
+        [],  # zaaadaptowac
         [],
         0,
         ["Kierowca3", "Organizator2"],
-        ["Kijki do chodzenia"],
+        ile_osob_powroci=2,
+        uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
     Wycieczka(
         datetime(2024, 1, 8, 7, 0, 0),
         datetime(2024, 1, 10, 12, 0, 0),
         23,
-        "Królewski Kraków – podróż w serce historii i magii",
-        dokladnie_iles_co_random(120, 23),
+        "Królewski Kraków",
+        [],
         [],
         0,
         ["Kierowca2", "Organizator1"],
-        ["Wizyta w Muzeum Schindlera"],
+        ile_osob_powroci=2,
+        uslugi_dodatkowe=["Wizyta w Muzeum Schindlera"],
     ),
     Wycieczka(
         datetime(2024, 12, 8, 7, 0, 0),
         datetime(2024, 12, 10, 12, 0, 0),
         20,
-        "Królewski Kraków – podróż w serce historii i magii",
-        dokladnie_iles_co_random(124, 20),
+        "Królewski Kraków",
+        [],
         [],
         0,
         ["Kierowca2", "Organizator1"],
@@ -656,52 +661,55 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 10, 8, 7, 0, 0),
         datetime(2024, 10, 10, 12, 0, 0),
         30,
-        "Królewski Kraków – podróż w serce historii i magii",
-        dokladnie_iles_co_random(120, 30),
+        "Królewski Kraków",
+        [],
         [],
         0,
         ["Kierowca2", "Organizator1"],
-        ["Wizyta w Muzeum Schindlera"],
+        ile_osob_powroci=20,
+        uslugi_dodatkowe=["Wizyta w Muzeum Schindlera"],
     ),
     Wycieczka(
         datetime(2024, 4, 8, 7, 0, 0),
         datetime(2024, 4, 10, 12, 0, 0),
         25,
-        "Królewski Kraków – podróż w serce historii i magii",
-        dokladnie_iles_co_random(70, 25),
+        "Królewski Kraków",
+        [],
         [],
         0,
         ["Kierowca1", "Organizator1"],
-        ["Wizyta w Muzeum Schindlera"],
+        uslugi_dodatkowe=["Wizyta w Muzeum Schindlera"],
     ),
     Wycieczka(
         datetime(2024, 2, 8, 7, 0, 0),
         datetime(2024, 2, 10, 12, 0, 0),
         23,
-        "Królewski Kraków – podróż w serce historii i magii",
-        dokladnie_iles_co_random(70, 23),
+        "Królewski Kraków",
+        [],
         [],
         0,
         ["Kierowca1", "Organizator2"],
-        ["Wizyta w Muzeum Schindlera"],
+        uslugi_dodatkowe=["Wizyta w Muzeum Schindlera"],
     ),
     Wycieczka(
         datetime(2024, 7, 16, 7, 0, 0),
         datetime(2024, 7, 30, 22, 0, 0),
         45,
         "Wypoczynek na Helu",
-        dokladnie_iles_co_random(200, 45),  # zaadaptowac
+        # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca2", "Organizator3"],
-        ["Kurs kitesurfingu"],
+        uslugi_dodatkowe=["Kurs kitesurfingu"],
     ),
     Wycieczka(
         datetime(2024, 4, 5, 6, 0, 0),
         datetime(2024, 4, 8, 19, 0, 0),
         38,
         "Emocje w Zatorze",
-        dokladnie_iles_co_random(15, 38),  # zaadaptowac
+        # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca2", "Organizator2"],
@@ -711,7 +719,8 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 9, 24, 19, 0, 0),
         25,
         "Emocje w Zatorze",
-        dokladnie_iles_co_random(15, 25),  # zaadaptowac
+        # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca1", "Organizator1"],
@@ -721,7 +730,8 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 10, 16, 19, 0, 0),
         30,
         "Emocje w Zatorze",
-        dokladnie_iles_co_random(50, 30),  # zaadaptowac
+        # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca2", "Organizator1"],
@@ -731,260 +741,283 @@ WYCIECZKI: List[Wycieczka] = [
         datetime(2024, 12, 31, 12, 0, 0),
         46,
         "Morsowanie Międzyzdroje",
-        dokladnie_iles_co_random(170, 46),
+        [],
         [],
         0,
         ["Kierowca1", "Organizator2"],
-        ["Deski surfingowe"],
+        uslugi_dodatkowe=["Deski surfingowe"],
     ),
     Wycieczka(
         datetime(2024, 11, 28, 6, 0, 0),
         datetime(2024, 11, 30, 12, 0, 0),
         46,
         "Morsowanie Międzyzdroje",
-        dokladnie_iles_co_random(180, 46),
+        [],
         [],
         0,
         ["Kierowca1", "Organizator2"],
-        ["Deski surfingowe"],
+        uslugi_dodatkowe=["Deski surfingowe"],
     ),
     Wycieczka(
         datetime(2024, 12, 12, 6, 0, 0),
         datetime(2024, 12, 14, 12, 0, 0),
         46,
         "Morsowanie Międzyzdroje",
-        dokladnie_iles_co_random(190, 46),
+        [],
         [],
         0,
         ["Kierowca1", "Organizator2"],
-        ["Deski surfingowe"],
+        uslugi_dodatkowe=["Deski surfingowe"],
     ),
     Wycieczka(
         datetime(2024, 2, 18, 6, 0, 0),
         datetime(2024, 2, 20, 12, 0, 0),
         46,
         "Morsowanie Międzyzdroje",
-        dokladnie_iles_co_random(21, 46),
+        [],
         [],
         0,
         ["Kierowca1", "Organizator2"],
-        ["Deski surfingowe"],
+        uslugi_dodatkowe=["Deski surfingowe"],
     ),
     Wycieczka(
         datetime(2024, 1, 3, 6, 0, 0),
         datetime(2024, 1, 6, 18, 0, 0),
         15,
         "Narty Karpacz",
-        dokladnie_iles_co_random(88, 15),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca2", "Organizator3"],
-        ["Sprzęt narciarski"],
+        uslugi_dodatkowe=["Sprzęt narciarski"],
     ),
     Wycieczka(
         datetime(2024, 1, 23, 6, 0, 0),
         datetime(2024, 1, 26, 18, 0, 0),
         15,
         "Narty Karpacz",
-        dokladnie_iles_co_random(155, 15),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca2", "Organizator3"],
-        ["Sprzęt narciarski"],
+        uslugi_dodatkowe=["Sprzęt narciarski"],
     ),
     Wycieczka(
         datetime(2024, 8, 16, 7, 0, 0),
         datetime(2024, 8, 30, 22, 0, 0),
         36,
         "Wypoczynek na Helu",
-        dokladnie_iles_co_random(170, 36),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca1", "Organizator2"],
-        [],
     ),
     Wycieczka(
         datetime(2024, 8, 1, 7, 0, 0),
         datetime(2024, 8, 15, 22, 0, 0),
         31,
         "Wypoczynek na Helu",
-        dokladnie_iles_co_random(120, 31),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca2", "Organizator3"],
-        ["Kurs kitesurfingu"],
+        uslugi_dodatkowe=["Kurs kitesurfingu"],
     ),
     Wycieczka(
         datetime(2024, 7, 1, 7, 0, 0),
         datetime(2024, 7, 15, 22, 0, 0),
         30,
         "Wypoczynek na Helu",
-        dokladnie_iles_co_random(250, 30),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator1"],
-        ["Kurs kitesurfingu"],
+        uslugi_dodatkowe=["Kurs kitesurfingu"],
     ),
     Wycieczka(
         datetime(2024, 9, 1, 7, 0, 0),
         datetime(2024, 9, 15, 22, 0, 0),
         30,
         "Wypoczynek na Helu",
-        dokladnie_iles_co_random(220, 30),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator1"],
-        ["Kurs kitesurfingu"],
+        uslugi_dodatkowe=["Kurs kitesurfingu"],
     ),
     Wycieczka(
         datetime(2024, 6, 1, 7, 0, 0),
         datetime(2024, 6, 15, 22, 0, 0),
         30,
         "Wypoczynek na Helu",
-        dokladnie_iles_co_random(169, 30),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator1"],
-        ["Kurs kitesurfingu"],
+        uslugi_dodatkowe=["Kurs kitesurfingu"],
     ),
     Wycieczka(
         datetime(2024, 4, 1, 7, 0, 0),
         datetime(2024, 4, 1, 22, 0, 0),
         50,
         "Góry Stołowe",
-        dokladnie_iles_co_random(69, 50),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator3"],
-        ["Kijki do chodzenia"],
+        uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
     Wycieczka(
         datetime(2024, 4, 2, 7, 0, 0),
         datetime(2024, 4, 2, 22, 0, 0),
         50,
         "Góry Stołowe",
-        dokladnie_iles_co_random(20, 50),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator3"],
-        ["Kijki do chodzenia"],
+        ile_osob_powroci=10,
+        uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
     Wycieczka(
         datetime(2024, 4, 3, 7, 0, 0),
         datetime(2024, 4, 3, 22, 0, 0),
         50,
         "Góry Stołowe",
-        dokladnie_iles_co_random(1, 50),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator3"],
-        ["Kijki do chodzenia"],
-    ),
-    Wycieczka(
-        datetime(2024, 4, 4, 7, 0, 0),
-        datetime(2024, 4, 4, 22, 0, 0),
-        50,
-        "Góry Stołowe",
-        dokladnie_iles_co_random(169, 50),  # zaadaptowac
-        [],
-        0,
-        ["Kierowca3", "Organizator3"],
-        ["Kijki do chodzenia"],
-    ),
-    Wycieczka(
-        datetime(2024, 4, 5, 7, 0, 0),
-        datetime(2024, 4, 5, 22, 0, 0),
-        50,
-        "Góry Stołowe",
-        dokladnie_iles_co_random(200, 50),  # zaadaptowac
-        [],
-        0,
-        ["Kierowca3", "Organizator3"],
-        ["Kijki do chodzenia"],
-    ),
-    Wycieczka(
-        datetime(2024, 4, 6, 7, 0, 0),
-        datetime(2024, 4, 6, 22, 0, 0),
-        50,
-        "Góry Stołowe",
-        dokladnie_iles_co_random(70, 50),  # zaadaptowac
-        [],
-        0,
-        ["Kierowca3", "Organizator3"],
-        ["Kijki do chodzenia"],
+        ile_osob_powroci=10,
+        uslugi_dodatkowe=["Kijki do chodzenia"],
     ),
     Wycieczka(
         datetime(2024, 5, 6, 7, 0, 0),
         datetime(2024, 5, 7, 22, 0, 0),
         30,
         "Emocje w Zatorze",
-        dokladnie_iles_co_random(70, 30),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator3"],
-        [],
     ),
     Wycieczka(
         datetime(2024, 5, 16, 7, 0, 0),
         datetime(2024, 5, 17, 22, 0, 0),
         30,
         "Emocje w Zatorze",
-        dokladnie_iles_co_random(100, 30),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator3"],
-        [],
+        ile_osob_powroci=10,
     ),
     Wycieczka(
         datetime(2024, 5, 18, 7, 0, 0),
         datetime(2024, 5, 19, 22, 0, 0),
         30,
         "Emocje w Zatorze",
-        dokladnie_iles_co_random(130, 30),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator3"],
-        [],
     ),
     Wycieczka(
         datetime(2024, 10, 18, 7, 0, 0),
         datetime(2024, 10, 20, 22, 0, 0),
         40,
         "Wakeboard Szczecinek",
-        dokladnie_iles_co_random(130, 40),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator3"],
-        [],
     ),
     Wycieczka(
         datetime(2024, 9, 18, 7, 0, 0),
         datetime(2024, 9, 20, 22, 0, 0),
         40,
         "Wakeboard Szczecinek",
-        dokladnie_iles_co_random(33, 40),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator3"],
-        [],
     ),
     Wycieczka(
         datetime(2024, 6, 22, 7, 0, 0),
         datetime(2024, 6, 24, 22, 0, 0),
         40,
         "Wakeboard Szczecinek",
-        dokladnie_iles_co_random(33, 40),  # zaadaptowac
+        [],
         [],
         0,
         ["Kierowca3", "Organizator3"],
-        [],
     ),
 ]
 
-# klucz to id wycieczki, od 1
-KLIENCI_WYCIECZKI = {
-    i: wycieczka.klienci_wycieczki for i, wycieczka in enumerate(WYCIECZKI, start=1)
-}
+
+# przygotowanie wycieczek
+def prepare_wycieczki() -> int:
+    """Funkcja przygotowujaca wycieczki"""
+    czasy_wycieczek_klienta: Dict[int, List[tuple[datetime, datetime]]] = {}
+
+    def czy_moze_teraz_jechac(klient: int, data_wyjazdu: datetime) -> bool:
+        for czas in czasy_wycieczek_klienta.get(klient, []):
+            if data_wyjazdu < czas[1]:
+                return False
+        return True
+
+    WYCIECZKI.sort(key=lambda wycieczka: wycieczka.data_wyjazdu)
+
+    curr_klient_idx = 1
+    lista_do_powrotu: List[int] = []
+    for wycieczka in WYCIECZKI:
+        ile_tu_powraca = min(
+            randint(1, len(lista_do_powrotu)) if len(lista_do_powrotu) > 0 else 0,
+            wycieczka.liczba_osob,
+        )
+
+        ile_nowych = wycieczka.liczba_osob - ile_tu_powraca
+        wycieczka.klienci_wycieczki = list(
+            range(curr_klient_idx, curr_klient_idx + ile_nowych)
+        )
+
+        curr_klient_idx += ile_nowych
+
+        do_usuniecia_z_listy_do_powrotu = []
+        curr_powrot_idx = 0
+        while len(
+            wycieczka.klienci_wycieczki
+        ) < wycieczka.liczba_osob and curr_powrot_idx < len(lista_do_powrotu):
+            if czy_moze_teraz_jechac(
+                lista_do_powrotu[curr_powrot_idx], wycieczka.data_wyjazdu
+            ):
+                wycieczka.klienci_wycieczki.append(lista_do_powrotu[curr_powrot_idx])
+                do_usuniecia_z_listy_do_powrotu.append(
+                    lista_do_powrotu[curr_powrot_idx]
+                )
+            curr_powrot_idx += 1
+
+        ile_brakuje = wycieczka.liczba_osob - len(wycieczka.klienci_wycieczki)
+        if ile_brakuje > 0:
+            wycieczka.klienci_wycieczki += list(
+                range(curr_klient_idx, curr_klient_idx + ile_brakuje)
+            )
+            curr_klient_idx += ile_brakuje
+
+        for klient in do_usuniecia_z_listy_do_powrotu:
+            lista_do_powrotu.remove(klient)
+
+        for klient in wycieczka.klienci_wycieczki:
+            if klient not in czasy_wycieczek_klienta:
+                czasy_wycieczek_klienta[klient] = []
+            czasy_wycieczek_klienta[klient].append(
+                (wycieczka.data_wyjazdu, wycieczka.data_powrotu)
+            )
+
+        lista_do_powrotu += wycieczka.klienci_wycieczki[: wycieczka.ile_osob_powroci]
+
+    print("koniec preparacji", curr_klient_idx)
+    return curr_klient_idx - 1
 
 
 def create_transakcje_kontrahenci():
@@ -1086,7 +1119,7 @@ def gen_transakcje_klienci():
     # kwota, data transakcji, id_klienta, id_wycieczki
     # klienci placa do dnia przed wycieczka
     for i, wycieczka in enumerate(WYCIECZKI, start=1):
-        for j in KLIENCI_WYCIECZKI[i]:
+        for j in wycieczka.klienci_wycieczki:
             TRANSAKCJE_KLIENCI.append(
                 (
                     wycieczka.koszty_klienta_razem,
@@ -1175,6 +1208,7 @@ def test():
                 ), f"Pracownik {pracownik} ma nakładające się wycieczki"
 
 
+LICZBA_KLIENTOW = prepare_wycieczki()
 create_transakcje_kontrahenci()
 calculate_koszty_klienta_razem()
 gen_transakcje_kontrahenci()

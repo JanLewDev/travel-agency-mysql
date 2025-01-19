@@ -205,9 +205,10 @@ def get_random_name() -> tuple[str, str, str]:
 
 def fill_pracownicy(connection):
     """Funkcja wypelniajaca tabele pracownicy"""
+    local_cursor = connection.cursor()
     for uwaga, stanowisko in PRACOWNICY.items():
         imie, nazwisko, _ = get_random_name()
-        local_cursor = connection.cursor()
+
         local_cursor.execute(
             "SELECT id_stanowiska FROM stanowiska WHERE nazwa_stanowiska = %s",
             (stanowisko,),
@@ -224,8 +225,8 @@ def fill_pracownicy(connection):
             "INSERT INTO pracownicy (imie, nazwisko, id_stanowiska, id_telefonu, uwagi) VALUES (%s, %s, %s, %s, %s)",
             (imie, nazwisko, id_stanowiska, id_telefonu, uwaga),
         )
-        local_cursor.close()
-        connection.commit()
+    local_cursor.close()
+    connection.commit()
 
 
 def unpolish_string(string: str) -> str:
@@ -245,6 +246,9 @@ def unpolish_string(string: str) -> str:
 
 def fill_klienci(connection):
     """Funkcja wypelniajaca tabele klienci"""
+    local_cursor = connection.cursor()
+    bulk_params = []
+    sql = "INSERT INTO klienci (imie, nazwisko, plec, email, id_telefonu) VALUES (%s, %s, %s, %s, %s)"
     for _ in progressbar(range(LICZBA_KLIENTOW)):
         imie, nazwisko, plec = get_random_name()
         telefon = f"{randint(500, 999)}-{randint(100, 999)}-{randint(100, 999)}"
@@ -262,30 +266,29 @@ def fill_klienci(connection):
         if email:
             email = unpolish_string(email)
 
-        local_cursor = connection.cursor()
         local_cursor.execute(
             "INSERT INTO telefony (telefon, numer_bliskiego) VALUES (%s, %s)",
             (telefon, numer_bliskiego),
         )
         id_telefonu = local_cursor.lastrowid
-        local_cursor.execute(
-            "INSERT INTO klienci (imie, nazwisko, plec, email, id_telefonu) VALUES (%s, %s, %s, %s, %s)",
-            (imie, nazwisko, plec, email, id_telefonu),
-        )
-        local_cursor.close()
-        connection.commit()
+        bulk_params.append((imie, nazwisko, plec, email, id_telefonu))
+
+    local_cursor.executemany(sql, bulk_params)
+    local_cursor.close()
+    connection.commit()
 
 
 def fill_rodzaje_transportu(connection):
     """Funkcja wypelniajaca tabele rodzaje transportu"""
+    cursor = connection.cursor()
     for nazwa, opis in RODZAJE_TRANSPORTU:
-        cursor = connection.cursor()
+
         cursor.execute(
             "INSERT INTO rodzaje_transportu (nazwa, opis) VALUES (%s, %s)",
             (nazwa, opis),
         )
-        cursor.close()
-        connection.commit()
+    cursor.close()
+    connection.commit()
 
 
 def dodaj_adres(connection, adres: Adres) -> int:
@@ -482,8 +485,8 @@ def fill_propozycje(connection):
                     "INSERT INTO propozycja_koszt_u_kontrahenta (id_propozycji, id_kosztu_u_kontrahenta) VALUES (%s, %s)",
                     (id_propozycji, id_kosztu),
                 )
-        connection.commit()
 
+    connection.commit()
     cursor.close()
 
 
@@ -566,21 +569,22 @@ def fill_wycieczki(connection):
                 "INSERT INTO pracownik_wycieczka (id_wycieczki, id_pracownika) VALUES (%s, %s)",
                 (id_wycieczki, pracownik_id),
             )
-        connection.commit()
 
+    connection.commit()
     cursor.close()
 
 
 def fill_transakcje_pracownicy(connection):
     """Funkcja wypelniajaca tabele transakcje pracownicy"""
     cursor = connection.cursor()
+    bulk_params = []
+    sql = "INSERT INTO transakcje_pracownicy (kwota, data_transakcji, id_pracownika) VALUES (%s, %s, %s)"
     for i in progressbar(range(len(TRANSAKCJE_PRACOWNICY))):
         data, pracownik, kwota = TRANSAKCJE_PRACOWNICY[i]
         id_pracownika = get_id_from_table(connection, "pracownicy", "uwagi", pracownik)
-        cursor.execute(
-            "INSERT INTO transakcje_pracownicy (kwota, data_transakcji, id_pracownika) VALUES (%s, %s, %s)",
-            (kwota, data, id_pracownika),
-        )
+        bulk_params.append((kwota, data, id_pracownika))
+
+    cursor.executemany(sql, bulk_params)
     cursor.close()
     connection.commit()
 
@@ -588,32 +592,33 @@ def fill_transakcje_pracownicy(connection):
 def fill_transakcje_kontrahenci(connection):
     """Funkcja wypelniajaca tabele transakcje kontrahenci"""
     cursor = connection.cursor()
+    bulk_params = []
+    sql = "INSERT INTO transakcje_kontrahenci (kwota, data_transakcji, id_kontrahenta, id_wycieczki) VALUES (%s, %s, %s, %s)"
     for i in progressbar(range(len(TRANSAKCJE_KONTRAHENCI))):
         kwota, data, kontrahent, id_wycieczki = TRANSAKCJE_KONTRAHENCI[i]
         id_kontrahenta = get_id_from_table(
             connection, "kontrahenci", "nazwa", kontrahent
         )
         assert id_kontrahenta is not None
-        cursor.execute(
-            "INSERT INTO transakcje_kontrahenci (kwota, data_transakcji, id_kontrahenta, id_wycieczki) VALUES (%s, %s, %s, %s)",
-            (kwota, data, id_kontrahenta, id_wycieczki),
-        )
+        bulk_params.append((kwota, data, id_kontrahenta, id_wycieczki))
 
+    cursor.executemany(sql, bulk_params)
     cursor.close()
     connection.commit()
 
 
 def fill_transakcje_klienci(connection):
     """Funkcja wypelniajaca tabele transakcje klienci"""
+    cursor = connection.cursor()
+    bulk_params = []
+    sql = "INSERT INTO transakcje_klienci (kwota, data_transakcji, id_klienta, id_wycieczki) VALUES (%s, %s, %s, %s)"
     for i in progressbar(range(len(TRANSAKCJE_KLIENCI))):
         kwota, data, id_klienta, id_wycieczki = TRANSAKCJE_KLIENCI[i]
-        cursor = connection.cursor()
-        cursor.execute(
-            "INSERT INTO transakcje_klienci (kwota, data_transakcji, id_klienta, id_wycieczki) VALUES (%s, %s, %s, %s)",
-            (kwota, data, id_klienta, id_wycieczki),
-        )
-        cursor.close()
-        connection.commit()
+        bulk_params.append((kwota, data, id_klienta, id_wycieczki))
+
+    cursor.executemany(sql, bulk_params)
+    cursor.close()
+    connection.commit()
 
 
 def dry_fill(connection):
