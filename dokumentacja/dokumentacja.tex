@@ -2,15 +2,207 @@
 \usepackage{graphicx}
 \usepackage{amsmath,amsfonts,amsthm,amssymb,mathtools}
 \usepackage{polski}
-\begin{document}
-    \title{Dokumentacja}
+\usepackage{dirtree}
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=red]{hyperref}
+\usepackage{outlines}
+\usepackage{minted}
+\usepackage{xcolor}
+\graphicspath{{../obrazy/}} %configuring the graphicx package
 
+\definecolor{LightGray}{gray}{0.92}
+
+\title{Dokumentacja projektu z baz danych}
+\author{
+    Jan Lewandowski, \and
+    Szymon Jończak-Lis, \and
+    Cezary Czetyrba, \and
+    Michał Mickiewicz \\[1ex]
+}
+\date{20.01.2025}
+
+
+\begin{document}
 \maketitle
+
+\section{Spis użytych technologii}
+
+\begin{outline}
+    \1 Python
+        \2 wersja $>= 3.9$
+        \2 moduły:
+            \3 pandas
+            \3 mysql-connector-python
+            \3 python-dotenv
+    \1 R
+        \2 wersja $>= 4.4.2$
+        \2 pakiety:
+            \3 RMariaDB
+            \3 ggplot2
+            \3 ggrepel
+            \3 lattice
+            \3 dplyr
+            \3 tidyverse
+            \3 ggpubr
+    \1 RStudio
+        \2 wersja $>=$ \begin{verbatim}2024.12.0+467\end{verbatim}
+    \1 Visual Studio Code
+        \2 Dodatki
+            \3 ERD editor
+            \3 Inline SQL
+    \1 Git, GitHub
+    \1 Git Bash w systemie Windows
+\end{outline}
+
+\newpage
+
+\section{Struktura projektu}
+
+\dirtree{%
+    .1 /.
+    .2 .github/.
+    .2 dane\_statystyczne/.
+    .3 Imiona\_nadane\_dzieciom\_w\_Polsce\_w\_*.csv.
+    .3 nazwiska\_meskie.csv.
+    .3 nazwiska\_zenskie.csv.
+    .2 dokumentacja/.
+    .3 dokumentacja.pdf.
+    .3 dokumentacja.tex.
+    .3 schemat\_bazy\_danych.vuerd.
+    .2 obrazy/.
+    .3 baza\_danych\_fullsize.png.
+    .3 baza\_danych.png.
+    .2 raport/.
+    .3 raport.html.
+    .3 raport.pdf.
+    .3 raport.Rmd.
+    .2 wypelnienie/.
+    .3 custom\_util.py.
+    .3 do\_wypelnienia.py.
+    .3 sql.py.
+    .3 wypelnienie.py.
+    .2 .env.example.
+    .2 .gitignore.
+    .2 LICENSE.
+    .2 README.md.
+    .2 requirements.txt.
+}
+
+\hspace{1cm}
+
+\noindent Projekt podzielony jest na główne foldery i pliki:
+
+\begin{outline}
+    \1 \textbf{.github}
+        \2 Folder zawierający pliki konfiguracyjne dla GitHub Actions. W naszym przypadku jest to analiza stylistyczna kodu.
+    \1 \textbf{dane\_statystyczne}
+        \2 Folder zawierający pliki z danymi statystycznymi. Są to pliki CSV z imionami i nazwiskami.
+            \3 Źródła:
+                \4 \href{https://dane.gov.pl/en/dataset/1681,nazwiska-osob-zyjacych-wystepujace-w-rejestrze-pesel}{Nazwiska w rejestrze PESEL}
+                \4 \href{https://dane.gov.pl/en/dataset/219,imiona-nadawane-dzieciom-w-polsce}{Imiona nadane dzieciom w Polsce}
+    \1 \textbf{dokumentacja}
+        \2 Folder zawierający pliki z dokumentacją projektu. Znajduje się tam plik \texttt{dokumentacja.pdf}, który jest wygenerowany z pliku \texttt{dokumentacja.tex} oraz \texttt{schemat\_bazy\_danych.vuerd} zawierający schemat bazy danych w formacie ERD Editor. 
+    \1 \textbf{obrazy}
+        \2 Folder zawierający obrazy wykorzystane w raporcie oraz dokumentacji. 
+    \1 \textbf{raport}
+        \2 Folder zawierający pliki z raportem projektu. Znajdują się tam pliki \texttt{raport.pdf} oraz \texttt{raport.html}, które są generowane z pliku \texttt{raport.Rmd}.
+    \1 \textbf{wypelnienie}
+        \2 Folder zawierający skrypty do wypełnienia bazy danych. Znajduje się tam główny plik \texttt{wypelnienie.py}, który wypełnia bazę danych.
+            \3 \texttt{custom\_util.py} - plik z funkcjami pomocniczymi.
+            \3 \texttt{do\_wypelnienia.py} - plik z danymi na temat wycieczek i pracowników.
+            \3 \texttt{sql.py} - plik z zapytaniami SQL.
+    \1 \textbf{.env.example}
+        \2 Przykładowy plik środowiskowy.
+    \1 \textbf{.gitignore}
+        \2 Lista plików ignorowanych przez Git.
+    \1 \textbf{LICENSE}
+        \2 Licencja projektu.
+    \1 \textbf{README.md}
+        \2 Ogólny opis projektu.
+\end{outline}
+
+
+\section{Instrukcja uruchomienia}
+
+Aby uruchomić projekt potrzebny jest Python w wersji 3.9 lub nowszej. Po sklonowaniu repozytorium należy zainstalować wymagane moduły Pythona:
+
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    bgcolor=LightGray,
+    fontsize=\footnotesize,
+    linenos,
+    framesep=10pt
+    ]{bash}
+cd projekt-bazy-danych
+pip install -r requirements.txt
+\end{minted}
+
+Następnie należy skopiować plik \texttt{.env.example} i zmienić jego nazwę na \texttt{.env}. W pliku tym należy podać hasło do połączenia z bazą danych.
+
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    bgcolor=LightGray,
+    fontsize=\footnotesize,
+    linenos,
+    framesep=10pt
+    ]{bash}
+cp .env.example .env
+vim .env
+\end{minted}
+
+Po zainstalowaniu modułów i uzupełnieniu pliku \texttt{.env} można uruchomić skrypt wypełniający bazę danych.
+
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    bgcolor=LightGray,
+    fontsize=\footnotesize,
+    linenos,
+    framesep=10pt
+    ]{bash}
+python wypelnienie/wypelnienie.py
+\end{minted}
+
+Kiedy zakończy się on poprawnie wypisując \texttt{Wypelniono baze danych}, możemy wygenerować raport. Można go otworzyć w \texttt{RStudio} i uruchomić przyciskiem \texttt{Knit} lub mając \texttt{Rscript} i \texttt{pandoc} poprzez umieszczenie 
+
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    bgcolor=LightGray,
+    fontsize=\footnotesize,
+    linenos,
+    framesep=10pt
+    ]{bash}
+export PATH=$PATH:"C:\Program Files\R\R-4.4.2\bin\x64"
+export PATH=$PATH:"C:\Program Files\RStudio\resources\app
+\bin\quarto\bin\tools"
+\end{minted}
+
+\noindent w \texttt{$\sim$/.bashrc} gdy używamy \texttt{Git Bash}. Po dodaniu zmiennych do ścieżki należy odświeżyć konsolę. Raport można wtedy wygenerować komendą
+
+\begin{minted}[
+    frame=lines,
+    framesep=2mm,
+    baselinestretch=1.2,
+    bgcolor=LightGray,
+    fontsize=\footnotesize,
+    linenos,
+    framesep=10pt
+    ]{bash}
+Rscript -e 'rmarkdown::render("raport/raport.Rmd")'
+\end{minted}
+
+Teraz możemy obejrzeć gotowy raport, znajduje się od w pliku \newline \texttt{raport/raport.pdf}.
+
 \section{Schemat bazy danych}
 \begin{figure}[h!]
     \centering
-
-    \includegraphics[scale=0.1]{../obrazy/baza_danych_fullsize.png}
+    \includegraphics[width=0.9\textwidth]{baza_danych_fullsize.png}
     \caption{Schemat bazy danych}
 \end{figure}
 \section{Analiza tabel}
@@ -304,25 +496,11 @@ Zatem każda nietrywialna zależność funkcyjna zaczyna się od nadklucza i tab
 
 W żadnym połączeniu tabel nie ma zależności tranzytywnych, każda tabela pojedynczo jest w EKNF, zatem to pokazuje, że cała baza danych jest w EKNF.
 
+\section{Co było najtrudniejsze w realizacji projektu}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+\begin{outline}
+    \1 Dopasowanie realistycznych kosztów usług i podróży.
+    \1 Aktualizacja wypełniania bazy danych po zmianach w schemacie.
+\end{outline}
 
 \end{document}
-
-
-
