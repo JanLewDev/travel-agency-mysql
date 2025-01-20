@@ -3,13 +3,13 @@ title: "Sprawozdanie firmy Wombat Grylls za rok 2024"
 author: "Grupa B"
 date: "`r Sys.Date()`"
 output:
-  pdf_document:
-    toc: true
   html_document:
     number_sections: false
     toc: true
     toc_float: true
     theme: united
+  pdf_document:
+    toc: true
 toc-title: "Spis treści"
 ---
 
@@ -17,13 +17,13 @@ toc-title: "Spis treści"
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(repos = list(CRAN="http://cran.rstudio.com/"))
 
-install.packages("RMariaDB")
-install.packages("ggplot2")
-install.packages("ggrepel")
-install.packages("lattice")
-install.packages("dplyr")
-install.packages("tidyverse")
-install.packages("ggpubr")
+# install.packages("RMariaDB")
+# install.packages("ggplot2")
+# install.packages("ggrepel")
+# install.packages("lattice")
+# install.packages("dplyr")
+# install.packages("tidyverse")
+# install.packages("ggpubr")
 
 library(lattice)
 library(ggplot2)
@@ -84,6 +84,7 @@ ggplot(data = df, mapping = aes(x = reorder(Rodzaj_wycieczki, -Procent_popularno
   ggtitle("Najpopularniejsze rodzaje wycieczek wśród naszych klientów") +
   ylab("Procent popularności") +
   xlab("Wycieczki") +
+  guides(fill = guide_legend(title = "Wycieczka")) +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank())
 
@@ -216,6 +217,7 @@ ggplot(data = df, mapping = aes(x = reorder(usluga_dodatkowa, -zysk),
             nudge_y = 5) +
   xlab("Usługa") +
   ylab("Zysk") +
+  guides(fill = guide_legend(title = "Usługa")) +
   ggtitle("Zysk przyniesiony przez dany rodzaj usługi dodatkowej") +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
@@ -352,10 +354,10 @@ ggplot(df, aes(x = Miesiąc,
   geom_bar(stat = "identity",
            width = 0.55) +
   scale_x_discrete(labels = as.roman(unlist(lapply(df$Miesiąc, FUN = function(x) substring(x, 6))))) +
-  geom_text(label = df$Zysk,
+  geom_text(label = paste0(df$Zysk, 'zł'),
             check_overlap = TRUE,
             nudge_y = 5) +
-  ylab("Obsłużeni klienci") +
+  ylab("Zysk") +
   ggtitle("Zyski w poszczególnych miesiącach 2024 roku") +
   theme(legend.position = "none")
 
@@ -431,6 +433,7 @@ ggplot(data = df2, mapping = aes(x = reorder(nazwa, -procent),
             nudge_y = 1) +
   xlab("Wycieczka") +
   ylab("Procent") +
+  guides(fill = guide_legend(title = "Wycieczka")) +
   scale_y_continuous(breaks = seq(from=0, to=100, by=25)) +
   ggtitle("Procent powracających klientów po danej wycieczce") +
   theme(axis.text.x = element_blank(),
@@ -502,6 +505,7 @@ ggplot(df3, aes(x = Płeć,
             vjust = -0.25,
             check_overlap = TRUE,
             show.legend = FALSE) +
+  guides(fill = guide_legend(title = "Wycieczka")) +
   ggtitle("Liczba mężczyzn i kobiet w zależności od propozycji wycieczki")
 
 vis <- 0
