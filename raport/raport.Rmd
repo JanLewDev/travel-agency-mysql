@@ -1,6 +1,6 @@
 ---
-title: "Raport firmy"
-author: "Grupa Wombat Grylls"
+title: "Sprawozdanie firmy Wombat Grylls za rok 2024"
+author: "Grupa B"
 date: "`r Sys.Date()`"
 output:
   pdf_document:
@@ -10,6 +10,7 @@ output:
     toc: true
     toc_float: true
     theme: united
+toc-title: "Spis treści"
 ---
 
 ```{r setup, include=FALSE}
@@ -34,16 +35,11 @@ library(dplyr)
 library(tidyverse)
 ```
 
-# Schemat bazy
-
-```{r, out.width="60%",  fig.align="center", fig.cap="Uproszczony schemat naszej bazy danych"}
-knitr::include_graphics("../obrazy/baza_danych.png")
-```
 # Wprowadzenie
-  Spółka WombatGrylls zajmuje się organizowaniem wycieczek do różnych miejsc na terenie Polski. Wakacje stanowią ważny element życia każdego człowieka, są czasem odpoczynku, nagrodą za ciężką pracę oraz szansą na poznanie nowych kultur lub zwyczajów. Celem naszej firmy jest pośredniczenie w okresie przygotowawczym do wyjazdu i usprawnienie wszelkich formalności tak, aby klienci mogli skupić się na odpoczynku i wartościowym czasie z rodziną i przjaciółmi.
+  Spółka Wombat Grylls zajmuje się organizowaniem wycieczek do różnych miejsc na terenie Polski. Wakacje stanowią ważny element życia każdego człowieka, są czasem odpoczynku, nagrodą za ciężką pracę oraz szansą na poznanie nowych kultur lub zwyczajów. Celem naszej firmy jest pośredniczenie w okresie przygotowawczym do wyjazdu i usprawnienie wszelkich formalności tak, aby klienci mogli skupić się na odpoczynku i wartościowym czasie z rodziną i przjaciółmi.
   
 # Analiza danych
-  Po roku funkcjonowania naszej firmy WombatGrylls sp. z o.o. przygotowany został ten raport w celu podsumowania wyników działania spółki, określenia słabych i mocnych stron, i możliwych strategii rozwoju w kolejnych latach.
+  Po roku funkcjonowania naszej firmy Wombat Grylls sp. z o.o. przygotowany został ten raport w celu podsumowania wyników działania spółki, określenia słabych i mocnych stron, i możliwych strategii rozwoju w kolejnych latach.
   
 ## Popularność wycieczek
 
