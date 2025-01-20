@@ -194,10 +194,10 @@ export PATH=$PATH:"C:\Program Files\RStudio\resources\app
     linenos,
     framesep=10pt
     ]{bash}
-Rscript -e 'rmarkdown::render("raport/raport.Rmd")'
+Rscript -e 'rmarkdown::render(input="raport/raport.Rmd", output_format="all")'
 \end{minted}
 
-Teraz możemy obejrzeć gotowy raport, znajduje się od w pliku \newline \texttt{raport/raport.pdf}.
+Teraz możemy obejrzeć gotowy raport, znajduje się od w pliku \newline \texttt{raport/raport.pdf} w formacie PDF oraz \texttt{raport/raport.html} w formacie HTML.
 
 \section{Schemat bazy danych}
 \begin{figure}[h!]
