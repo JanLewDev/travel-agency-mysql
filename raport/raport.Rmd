@@ -17,13 +17,13 @@ toc-title: "Spis treści"
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 options(repos = list(CRAN="http://cran.rstudio.com/"))
 
-# install.packages("RMariaDB")
-# install.packages("ggplot2")
-# install.packages("ggrepel")
-# install.packages("lattice")
-# install.packages("dplyr")
-# install.packages("tidyverse")
-# install.packages("ggpubr")
+install.packages("RMariaDB")
+install.packages("ggplot2")
+install.packages("ggrepel")
+install.packages("lattice")
+install.packages("dplyr")
+install.packages("tidyverse")
+install.packages("ggpubr")
 
 library(lattice)
 library(ggplot2)
@@ -39,11 +39,11 @@ library(tidyverse)
   Spółka Wombat Grylls zajmuje się organizowaniem wycieczek do różnych miejsc na terenie Polski. Wakacje stanowią ważny element życia każdego człowieka, są czasem odpoczynku, nagrodą za ciężką pracę oraz szansą na poznanie nowych kultur lub zwyczajów. Celem naszej firmy jest pośredniczenie w okresie przygotowawczym do wyjazdu i usprawnienie wszelkich formalności tak, aby klienci mogli skupić się na odpoczynku i wartościowym czasie z rodziną i przjaciółmi.
   
 # Analiza danych
-  Po roku funkcjonowania naszej firmy Wombat Grylls sp. z o.o. przygotowany został ten raport w celu podsumowania wyników działania spółki, określenia słabych i mocnych stron, i możliwych strategii rozwoju w kolejnych latach.
+  Po roku funkcjonowania naszej firmy Wombat Grylls sp. z o.o. przygotowany został ten raport w celu podsumowania wyników działania spółki, określenia słabych i mocnych stron oraz możliwych strategii rozwoju w kolejnych latach.
   
 ## Popularność wycieczek
 
-Raport rozpoczynamy od analizy popularności oferowanych przez nas wycieczek. Pomoże nam to w znalezieniu słabych punktów w naszej ofercie oraz poda jasny plan poprawy naszych usług.
+Raport rozpoczynamy od analizy popularności oferowanych przez nas wycieczek. Pomoże nam to w zidentyfikowaniu słabych punktów w naszej ofercie oraz przybliży jasny plan poprawy naszych usług.
 ```{r najpopularniejsze rodzaje wycieczek, fig.align="center"} 
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
