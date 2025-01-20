@@ -1,6 +1,6 @@
 ---
-title: "Raport firmy"
-author: "Grupa Wombat Grylls"
+title: "Sprawozdanie firmy Wombat Grylls za rok 2024"
+author: "Grupa B"
 date: "`r Sys.Date()`"
 output:
   pdf_document:
@@ -10,6 +10,7 @@ output:
     toc: true
     toc_float: true
     theme: united
+toc-title: "Spis treści"
 ---
 
 ```{r setup, include=FALSE}
@@ -34,14 +35,15 @@ library(dplyr)
 library(tidyverse)
 ```
 
-# Schemat bazy
-
-```{r, out.width="60%",  fig.align="center", fig.cap="Uproszczony schemat naszej bazy danych"}
-knitr::include_graphics("../obrazy/baza_danych.png")
-```
-
+# Wprowadzenie
+  Spółka Wombat Grylls zajmuje się organizowaniem wycieczek do różnych miejsc na terenie Polski. Wakacje stanowią ważny element życia każdego człowieka, są czasem odpoczynku, nagrodą za ciężką pracę oraz szansą na poznanie nowych kultur lub zwyczajów. Celem naszej firmy jest pośredniczenie w okresie przygotowawczym do wyjazdu i usprawnienie wszelkich formalności tak, aby klienci mogli skupić się na odpoczynku i wartościowym czasie z rodziną i przjaciółmi.
+  
 # Analiza danych
+  Po roku funkcjonowania naszej firmy Wombat Grylls sp. z o.o. przygotowany został ten raport w celu podsumowania wyników działania spółki, określenia słabych i mocnych stron, i możliwych strategii rozwoju w kolejnych latach.
+  
+## Popularność wycieczek
 
+Raport rozpoczynamy od analizy popularności oferowanych przez nas wycieczek. Pomoże nam to w znalezieniu słabych punktów w naszej ofercie oraz poda jasny plan poprawy naszych usług.
 ```{r najpopularniejsze rodzaje wycieczek, fig.align="center"} 
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
@@ -87,6 +89,20 @@ ggplot(data = df, mapping = aes(x = reorder(Rodzaj_wycieczki, -Procent_popularno
 
 dbDisconnect(con)
 ```
+
+Wycieczki:  `r df$Rodzaj_wycieczki[df$Procent_popularności < 80]` nie cieszą się satysfakcjonującym poziomem popularności, po zakończeniu każdej wycieczki z tych kategorii, powiniśmy poprosić klientów o wyrażenie swoich opinii i dostować się do ich głosów.
+
+## Analiza rentowności
+
+Efektywne zarządzanie kosztami oraz maksymalizacja zysków to kluczowe elementy sukcesu każdej firmy w branży turystycznej. Analiza kosztów i zysków poszczególnych wycieczek pozwala zidentyfikować:
+
+- Wycieczki, które przynoszą największy zysk, co może wskazywać na ich wysoką atrakcyjność dla klientów.
+
+- Wycieczki generujące wysokie koszty, które mogą wymagać optymalizacji lub zmiany oferty.
+
+- Ogólną strukturę przychodów i kosztów, co umożliwia określenie, które aspekty działalności wymagają szczególnej uwagi.
+
+Celem tej analizy jest dostarczenie klarownego obrazu rentowności organizowanych wycieczek, co umożliwi podejmowanie świadomych decyzji dotyczących rozwoju oferty, optymalizacji kosztów oraz zwiększenia zyskowności firmy.
 
 ```{r Porównanie kosztów i zysków wycieczek, fig.align='center'}
 what <- readRenviron('../.env')
@@ -159,7 +175,10 @@ ggplot(data = df, mapping = aes(x = "",
 
 dbDisconnect(con)
 ```
+Trzy najbardziej dochodowe wycieczki to `r df2$nazwa[c(1, 2, 3)]`. W następnym roku naszej działalności powiniśmy zainwestować w infrastrukturę umożliwiającą zwiększenie liczby tych wycieczek, aby zmaksymalizować nasz zysk.
 
+## Udział usług dodatkowych w zyskach
+Wykres przedstawia analizę zysków wygenerowanych przez różne rodzaje usług dodatkowych. Usługi dodatkowe stanowią istotny element oferty, który nie tylko zwiększa atrakcyjność wycieczek, ale również przyczynia się do wzrostu dochodów. Dzięki szczegółowemu zestawieniu można zidentyfikować najbardziej dochodowe usługi, a także te, które wymagają optymalizacji lub większej promocji.
 ```{r Najbardziej dochodowe dla nas usługi dodatkowe, fig.align='center'}
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
@@ -205,136 +224,8 @@ ggplot(data = df, mapping = aes(x = reorder(usluga_dodatkowa, -zysk),
 dbDisconnect(con)
 ```
 
-```{r Średni procent powracajacych klientow, fig.align='center'}
-what <- readRenviron('../.env')
-pass <- Sys.getenv("CONNECTION_PASSWORD")
-
-
-con <- dbConnect(RMariaDB::MariaDB(),
-                 dbname = 'team02',
-                 username = 'team02',
-                 password = pass,
-                 host = 'giniewicz.it')
-
-query = "SELECT
-    w.id_wycieczki,
-    w.id_propozycji,
-    pw.nazwa,
-    w.czas_wyjazdu,
-    w.czas_powrotu,
-    COUNT(DISTINCT k.id_klienta) AS Liczba_klientów,
-    COUNT(DISTINCT CASE WHEN k.id_klienta IN (
-        SELECT
-            kw2.id_klienta
-        FROM
-            klient_wycieczka kw2
-        WHERE
-            kw2.id_wycieczki != w.id_wycieczki
-    ) THEN k.id_klienta END) AS Liczba_powracajacych_klientow,
-    (COUNT(DISTINCT CASE WHEN k.id_klienta IN (
-        SELECT
-            kw2.id_klienta
-        FROM
-            klient_wycieczka kw2
-        WHERE
-            kw2.id_wycieczki != w.id_wycieczki
-    ) THEN k.id_klienta END) / COUNT(DISTINCT k.id_klienta)) * 100 AS Procent_powracających_klientów
-FROM
-    wycieczki w
-JOIN
-    klient_wycieczka kw ON w.id_wycieczki = kw.id_wycieczki
-JOIN
-    klienci k ON kw.id_klienta = k.id_klienta
-JOIN
-    propozycje_wycieczki pw ON w.id_propozycji = pw.id_propozycji
-GROUP BY
-    w.id_wycieczki
-ORDER BY
-    Liczba_powracajacych_klientow DESC;"
-
-df <- dbGetQuery(con, query)
-
-df2 <- df %>%
-  group_by(nazwa) %>%
-  summarise(procent = mean(Procent_powracających_klientów, na.rm = TRUE))
-
-
-ggplot(data = df2, mapping = aes(x = reorder(nazwa, -procent),
-                                y = procent,
-                                fill = nazwa)) +
-  geom_bar(stat = 'identity', 
-           width = 0.55) +
-  geom_text(label = paste0(round(df2$procent, 0), "%"),
-            check_overlap = TRUE,
-            nudge_y = 1) +
-  xlab("Wycieczka") +
-  ylab("Procent") +
-  scale_y_continuous(breaks = seq(from=0, to=100, by=25)) +
-  ggtitle("Procent powracających klientów po danej wycieczce") +
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.title = element_blank())
-
-dbDisconnect(con)
-```
-
-```{r Proporcja klientek do klientow}
-what <- readRenviron('../.env')
-pass <- Sys.getenv("CONNECTION_PASSWORD")
-
-
-con <- dbConnect(RMariaDB::MariaDB(),
-                 dbname = 'team02',
-                 username = 'team02',
-                 password = pass,
-                 host = 'giniewicz.it')
-
-query <- "SELECT
-    w.id_wycieczki,
-    pw.nazwa,
-    SUM(CASE WHEN k.plec = 'K' THEN 1 ELSE 0 END) AS liczba_kobiet,
-    SUM(CASE WHEN k.plec = 'M' THEN 1 ELSE 0 END) AS liczba_mezczyzn,
-    (SUM(CASE WHEN k.plec = 'K' THEN 1 ELSE 0 END) / SUM(CASE WHEN k.plec = 'M' THEN 1 ELSE 0 END)) AS Proporcja_kobiet_do_mężczyzn
-FROM
-    wycieczki w
-JOIN
-    klient_wycieczka kw ON w.id_wycieczki = kw.id_wycieczki
-JOIN
-    klienci k ON kw.id_klienta = k.id_klienta
-JOIN
-    propozycje_wycieczki pw ON pw.id_propozycji = w.id_propozycji
-GROUP BY
-    w.id_wycieczki;"
-
-df <- dbGetQuery(con, query)
-
-df2_males <- df %>%
-  group_by(nazwa) %>%
-  summarise(mężczyźni = sum(liczba_mezczyzn))
-
-df2_females <- df %>%
-  group_by(nazwa) %>%
-  summarise(kobiety = sum(liczba_kobiet))
-
-df2 <- merge(df2_males, df2_females)
-
-df3 <- df2 %>%
-  gather(Płeć, ilość, -nazwa)
-
-ggplot(df3, aes(x = Płeć,
-                y = ilość,
-                fill = nazwa)) +
-  geom_col(position = "dodge") +
-  geom_text(label = df3$ilość,
-            position = position_dodge(width=0.9),
-            vjust = -0.25,
-            check_overlap = TRUE,
-            show.legend = FALSE) +
-  ggtitle("Liczba mężczyzn i kobiet w zależności od propozycji wycieczki")
-
-dbDisconnect(con)
-```
-
+## Analiza kosztów u kontrahentów
+Poniższy wykres kołowy przedstawia rozkład kosztów poniesionych na rzecz poszczególnych kontrahentów. Każdy sektor reprezentuje kwotę wydaną na współpracę z danym podmiotem, co pozwala zidentyfikować najważniejszych partnerów pod względem finansowym. Największe nakłady zostały poniesione na rzecz sieci hoteli Gromada oraz szkoły kitesurfingu ProKajciarz, co wskazuje na ich istotne znaczenie w realizacji oferty. Analiza ta umożliwia ocenę struktury wydatków i może stanowić podstawę do negocjacji oraz optymalizacji kosztów współpracy z poszczególnymi partnerami.
 ```{r Najbardziej kosztowni kontrahenci, fig.align='center'}
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
@@ -385,45 +276,9 @@ ggplot(data = df_ideal, mapping = aes(x = "",
 dbDisconnect(con)
 ```
 
-```{r liczba obsluzonych klientow w kazdym miesiacu, fig.align='center'}
-what <- readRenviron('../.env')
-pass <- Sys.getenv("CONNECTION_PASSWORD")
+## Analiza zysków i strat na miesięcznej podstawie
 
-
-con <- dbConnect(RMariaDB::MariaDB(),
-                 dbname = 'team02',
-                 username = 'team02',
-                 password = pass,
-                 host = 'giniewicz.it')
-
-query = "SELECT
-    DATE_FORMAT(tk.data_transakcji, '%Y-%m') AS Miesiąc,
-    COUNT(DISTINCT tk.id_klienta) AS Liczba_obsłużonych_klientów
-FROM
-    transakcje_klienci tk
-GROUP BY
-    DATE_FORMAT(tk.data_transakcji, '%Y-%m')
-ORDER BY
-    Miesiąc;"
-
-df <- dbGetQuery(con, query)
-
-ggplot(df, aes(x = Miesiąc,
-               y = Liczba_obsłużonych_klientów,
-               fill = Miesiąc)) +
-  geom_bar(stat = "identity",
-           width = 0.55) +
-  scale_x_discrete(labels = as.roman(unlist(lapply(df$Miesiąc, FUN = function(x) substring(x, 6))))) +
-  geom_text(label = df$Liczba_obsłużonych_klientów,
-            check_overlap = TRUE,
-            nudge_y = 5) +
-  ylab("Obsłużeni klienci") +
-  ggtitle("Liczba klientów w poszczególnych miesiącach 2024 roku") +
-  theme(legend.position = "none")
-
-dbDisconnect(con)
-```
-
+Analiza zysków w poszczególnych miesiącach ma na celu ocenę wyników finansowych w rozbiciu na okresy miesięczne, co pozwala na dokładniejsze zrozumienie dynamiki przychodów oraz kosztów. Analiza uwzględnia dane finansowe za ostatnie 12 miesięcy, przy czym każdy miesiąc został dokładnie zbadany pod kątem przychodów oraz kosztów. Celem jest zidentyfikowanie kluczowych trendów i wzorców, które mogą pomóc w lepszym planowaniu przyszłych działań biznesowych.
 ```{r zyski w poszegolnych miesiacach, fig.align='center'}
 what <- readRenviron('../.env')
 pass <- Sys.getenv("CONNECTION_PASSWORD")
@@ -501,13 +356,216 @@ ggplot(df, aes(x = Miesiąc,
             check_overlap = TRUE,
             nudge_y = 5) +
   ylab("Obsłużeni klienci") +
+  ggtitle("Zyski w poszczególnych miesiącach 2024 roku") +
+  theme(legend.position = "none")
+
+dbDisconnect(con)
+```
+
+Największe zyski generujemy w miesiącach wakacyjnych, a także we wrześniu i styczniu. Są to okresy, w których popyt na wycieczki jest szczególnie wysoki, co daje nam możliwość maksymalizacji przychodów. Z kolei największe straty ponosimy w marcu i listopadzie, co może być związane z niższym zainteresowaniem ofertą turystyczną w tych miesiącach, w tym brakiem sezonu urlopowego oraz mniejszymi możliwościami finansowymi klientów. W pozostałych miesiącach udało nam się utrzymać stabilność finansową, co świadczy o dobrze dopasowanej ofercie, choć wciąż istnieje potencjał do dalszego jej optymalizowania.
+
+Aby utrzymać i zwiększyć zyski, rekomendujemy rozszerzenie oferty wycieczek latem oraz w styczniu, co odpowiada na wzrost popytu w tych okresach. Można rozważyć wprowadzenie nowych atrakcji lub promocji skierowanych do różnych grup docelowych, co zwiększy naszą konkurencyjność na rynku. Dodatkowo, warto zainwestować w marketing, który wzmocni naszą obecność w tych miesiącach.
+
+W przypadku miesięcy, w których notujemy straty, takich jak marzec i listopad, warto przeanalizować, czy istnieją czynniki zewnętrzne, które mogłyby wpłynąć na wyniki, takie jak warunki pogodowe, zmiany w preferencjach turystów czy globalne kryzysy. Można także spróbować dostosować ofertę do oczekiwań klientów w tych okresach – na przykład poprzez oferowanie tańszych, krótkoterminowych wycieczek, które będą atrakcyjniejsze w mniej popularnych miesiącach. Ostatecznie, balansowanie oferty i dostosowywanie jej do sezonowych zmienności pozwoli nam zoptymalizować wyniki finansowe przez cały rok.
+```{r Średni procent powracajacych klientow, fig.align='center'}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query = "SELECT
+    w.id_wycieczki,
+    w.id_propozycji,
+    pw.nazwa,
+    w.czas_wyjazdu,
+    w.czas_powrotu,
+    COUNT(DISTINCT k.id_klienta) AS Liczba_klientów,
+    COUNT(DISTINCT CASE WHEN k.id_klienta IN (
+        SELECT
+            kw2.id_klienta
+        FROM
+            klient_wycieczka kw2
+        WHERE
+            kw2.id_wycieczki != w.id_wycieczki
+    ) THEN k.id_klienta END) AS Liczba_powracajacych_klientow,
+    (COUNT(DISTINCT CASE WHEN k.id_klienta IN (
+        SELECT
+            kw2.id_klienta
+        FROM
+            klient_wycieczka kw2
+        WHERE
+            kw2.id_wycieczki != w.id_wycieczki
+    ) THEN k.id_klienta END) / COUNT(DISTINCT k.id_klienta)) * 100 AS Procent_powracających_klientów
+FROM
+    wycieczki w
+JOIN
+    klient_wycieczka kw ON w.id_wycieczki = kw.id_wycieczki
+JOIN
+    klienci k ON kw.id_klienta = k.id_klienta
+JOIN
+    propozycje_wycieczki pw ON w.id_propozycji = pw.id_propozycji
+GROUP BY
+    w.id_wycieczki
+ORDER BY
+    Liczba_powracajacych_klientow DESC;"
+
+df <- dbGetQuery(con, query)
+
+df2 <- df %>%
+  group_by(nazwa) %>%
+  summarise(procent = mean(Procent_powracających_klientów, na.rm = TRUE))
+
+
+ggplot(data = df2, mapping = aes(x = reorder(nazwa, -procent),
+                                y = procent,
+                                fill = nazwa)) +
+  geom_bar(stat = 'identity', 
+           width = 0.55) +
+  geom_text(label = paste0(round(df2$procent, 0), "%"),
+            check_overlap = TRUE,
+            nudge_y = 1) +
+  xlab("Wycieczka") +
+  ylab("Procent") +
+  scale_y_continuous(breaks = seq(from=0, to=100, by=25)) +
+  ggtitle("Procent powracających klientów po danej wycieczce") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.title = element_blank())
+
+dbDisconnect(con)
+```
+
+Największe zyski generujemy dzięki pośrednictwu w kursach kitesurfingu. Niestety, wycieczka, w ramach której oferujemy ten kurs, charakteryzuje się najniższym współczynnikiem powracających klientów. Taki wynik może sugerować, że klienci nie są w pełni zadowoleni z oferowanej usługi lub nie widzą wystarczającej wartości w powrocie na kolejne edycje. Aby poprawić tę sytuację, rekomendujemy wprowadzenie programu lojalnościowego, w ramach którego klienci, którzy skorzystają z naszych usług ponownie, otrzymają atrakcyjne zniżki lub inne korzyści, takie jak dodatkowe godziny na wodzie lub ekskluzywne materiały edukacyjne. Tego typu inicjatywy mogą zachęcić do ponownych wizyt oraz stworzyć więź emocjonalną z marką.
+
+Kolejnym istotnym aspektem jest poprawa zadowolenia klientów z naszej kadry instruktorskiej. Słaba jakość obsługi lub negatywne doświadczenia związane z instruktorami mogą wpływać na decyzję o powrocie do naszej oferty. W związku z tym warto przeanalizować dotychczasowe opinie uczestników kursów, zidentyfikować obszary do poprawy i przeprowadzić dodatkowe szkolenia dla instruktorów, aby podnieść jakość świadczonej usługi. Warto także wprowadzić system oceniania kadry przez klientów, który pozwoli na bieżąco monitorować poziom satysfakcji i reagować na pojawiające się problemy.
+
+Zoptymalizowanie tych dwóch aspektów — lojalności klientów oraz jakości obsługi — pomoże nie tylko zwiększyć liczbę powracających uczestników kursów, ale także wpłynie pozytywnie na reputację firmy i długoterminowy wzrost zysków.
+
+## Trendy demograficzne
+
+Analiza popularności wycieczek pomiędzy oboma płciami umożliwi nam lepsze dostosowanie oferty do wymagań danej grupy oraz identyfikację ewentualnych różnic w preferencjach, które mogą wpłynąć na kierunki podróży, rodzaje aktywności czy preferencje dotyczące standardu zakwaterowania. Analiza tych trendów pozwoli również na opracowanie bardziej spersonalizowanych ofert, które przyciągną większą liczbę klientów z obu płci, zwiększając tym samym efektywność działań marketingowych oraz poprawiając wyniki sprzedaży. 
+
+```{r Proporcja klientek do klientow, results='asis'}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query <- "SELECT
+    w.id_wycieczki,
+    pw.nazwa,
+    SUM(CASE WHEN k.plec = 'K' THEN 1 ELSE 0 END) AS liczba_kobiet,
+    SUM(CASE WHEN k.plec = 'M' THEN 1 ELSE 0 END) AS liczba_mezczyzn,
+    (SUM(CASE WHEN k.plec = 'K' THEN 1 ELSE 0 END) / SUM(CASE WHEN k.plec = 'M' THEN 1 ELSE 0 END)) AS Proporcja_kobiet_do_mężczyzn
+FROM
+    wycieczki w
+JOIN
+    klient_wycieczka kw ON w.id_wycieczki = kw.id_wycieczki
+JOIN
+    klienci k ON kw.id_klienta = k.id_klienta
+JOIN
+    propozycje_wycieczki pw ON pw.id_propozycji = w.id_propozycji
+GROUP BY
+    w.id_wycieczki;"
+
+df <- dbGetQuery(con, query)
+
+df2_males <- df %>%
+  group_by(nazwa) %>%
+  summarise(mężczyźni = sum(liczba_mezczyzn))
+
+df2_females <- df %>%
+  group_by(nazwa) %>%
+  summarise(kobiety = sum(liczba_kobiet))
+
+df2 <- merge(df2_males, df2_females)
+
+df3 <- df2 %>%
+  gather(Płeć, ilość, -nazwa)
+
+ggplot(df3, aes(x = Płeć,
+                y = ilość,
+                fill = nazwa)) +
+  geom_col(position = "dodge") +
+  geom_text(label = df3$ilość,
+            position = position_dodge(width=0.9),
+            vjust = -0.25,
+            check_overlap = TRUE,
+            show.legend = FALSE) +
+  ggtitle("Liczba mężczyzn i kobiet w zależności od propozycji wycieczki")
+
+vis <- 0
+if (length(df2$nazwa[(df2$kobiety - df2$mężczyźni)/df2$kobiety > 0.1]) > 0) {
+  cat(paste('Wycieczki', paste(df2$nazwa[(df2$kobiety - df2$mężczyźni)/df2$kobiety > 0.1], collapse = ', '), 'cieszą się większą popularnością wśród kobiet. Aby jeszcze bardziej zwiększyć ich atrakcyjność, warto rozważyć przeprowadzenie kampanii marketingowej skierowanej specjalnie do tej grupy docelowej, co może przyczynić się do dalszego wzrostu popularności wśród kobiet.\n'))
+  vis <- 1
+}
+if (length(df2$nazwa[(df2$mężczyźni - df2$kobiety)/df2$mężczyźni > 0.1]) > 0) {
+  cat(paste('Wycieczki', paste(df2$nazwa[(df2$mężczyźni - df2$kobiety)/df2$mężczyźni > 0.1], collapse = ", "), 'są bardziej popularne wśród mężczyzn. W związku z tym, aby jeszcze skuteczniej przyciągnąć tę grupę, powinniśmy zwiększyć liczbę reklam skierowanych bezpośrednio do mężczyzn, co może przyczynić się do dalszego wzrostu liczby uczestników męskiej części tych wycieczek.\n'))
+  vis <- 1
+}
+if (vis == 0) {
+  cat(paste('Nie występują wyraźne preferencje związane z płcią. Oferta powinna być skierowana do obu grup w równym stopniu, uwzględniając szeroką gamę działań marketingowych, które nie będą faworyzować jednej płci.\n'))
+}
+
+dbDisconnect(con)
+```
+
+## Dynamika liczby klientów miesięcznie
+Wykres przedstawia liczbę klientów odwiedzających naszą firmę w poszczególnych miesiącach. Analiza ta pozwala na ocenę dynamiki ruchu klientów w ciągu roku, uwzględniając zmiany sezonowe oraz potencjalne czynniki wpływające na frekwencję, takie jak promocje, wydarzenia specjalne czy zmiany rynkowe. Dzięki temu wykresowi możemy zidentyfikować miesiące o najwyższym oraz najniższym natężeniu klientów, co umożliwia optymalizację działań marketingowych, dostosowanie oferty i lepsze planowanie zasobów w okresach o zmiennej liczbie odwiedzających.
+```{r liczba obsluzonych klientow w kazdym miesiacu, fig.align='center'}
+what <- readRenviron('../.env')
+pass <- Sys.getenv("CONNECTION_PASSWORD")
+
+
+con <- dbConnect(RMariaDB::MariaDB(),
+                 dbname = 'team02',
+                 username = 'team02',
+                 password = pass,
+                 host = 'giniewicz.it')
+
+query = "SELECT
+    DATE_FORMAT(tk.data_transakcji, '%Y-%m') AS Miesiąc,
+    COUNT(DISTINCT tk.id_klienta) AS Liczba_obsłużonych_klientów
+FROM
+    transakcje_klienci tk
+GROUP BY
+    DATE_FORMAT(tk.data_transakcji, '%Y-%m')
+ORDER BY
+    Miesiąc;"
+
+df <- dbGetQuery(con, query)
+
+ggplot(df, aes(x = Miesiąc,
+               y = Liczba_obsłużonych_klientów,
+               fill = Miesiąc)) +
+  geom_bar(stat = "identity",
+           width = 0.55) +
+  scale_x_discrete(labels = as.roman(unlist(lapply(df$Miesiąc, FUN = function(x) substring(x, 6))))) +
+  geom_text(label = df$Liczba_obsłużonych_klientów,
+            check_overlap = TRUE,
+            nudge_y = 5) +
+  ylab("Obsłużeni klienci") +
   ggtitle("Liczba klientów w poszczególnych miesiącach 2024 roku") +
   theme(legend.position = "none")
 
 dbDisconnect(con)
 ```
-# Podsumowanie
 
+Pomimo, że w marcu udzieliliśmy naszych usług drugiej największej liczbie osób to ponieśliśmy największe straty na przestrzeni roku. W związku z tym powiniśmy przenegocjować nasze umowy z kontrahentami wycieczek, które odbyły się w tym miesiącu oraz nałożyć większą marżę na nasze usługi.
+ 
+
+# Podsumowanie
+Po pierwszym roku działalności osiągnęliśmy zysk, co stanowi solidną podstawę do dalszego rozwoju. W związku z tym warto rozważyć rozszerzenie naszej kadry, poszerzenie oferty wycieczek oraz zakup nowych autokarów. Ponadto, zaleca się nawiązanie współpracy z liniami lotniczymi, aby umożliwić wprowadzenie wycieczek międzynarodowych do naszej oferty. Kolejnym celem na przyszłość jest zwiększenie zysków w miesiącach zimowych i wiosennych. Aby to osiągnąć, warto przeanalizować możliwości renegocjacji istniejących umów oraz zawarcie nowych kontraktów z dotychczasowymi i potencjalnymi kontrahentami.
  
 
 
