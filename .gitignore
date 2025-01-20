@@ -6,3 +6,5 @@ __pycache__
 *.log
 *.tex.swp
 *.Rhistory
+*.out
+*minted*

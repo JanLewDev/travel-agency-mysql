@@ -7,7 +7,6 @@ Autorzy:
 - Michał Mickiewicz
 - Szymon Jończak-Lis
 
-## Instalacja
+## Dokumentacja
 
-`pip install -r requirements.txt`
-...
+Znajduje się [tutaj](/dokumentacja/dokumentacja.pdf).
